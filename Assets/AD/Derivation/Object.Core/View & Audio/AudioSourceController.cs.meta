@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: f022ede4737c096489813705081d6c42
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _Mixer: {instanceID: 0}
+  - LineRendererPrefab: {fileID: 4262952743692840906, guid: c7c605c249fa3354993de8af5df1af12, type: 3}
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: 8bd6fe11574cb4d45872518ba72b670e, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

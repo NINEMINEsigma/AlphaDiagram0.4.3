@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: f8c4f9625c297cc47b6b06b9df5fec9f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _Toggle: {fileID: 254901351885064430, guid: a0e2171712923504dad4ca3e6710777e, type: 3}
+  - _Button: {fileID: 1498806284698747971, guid: 6be8b892649722f46b1c22cd647f573b, type: 3}
+  - _InputField: {fileID: 5191791341152653597, guid: 27a92f1ef5bc9c94a97ea07b6509e3d8, type: 3}
+  - _RawImage: {fileID: 3866729093808359234, guid: ea9da0ac8b1e9764fb91a892e0737e7a, type: 3}
+  - _Slider: {fileID: 6436064238636930884, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
+  - _Text: {fileID: 4247100306540257601, guid: d7f701b428163a440a69cd4d249ca855, type: 3}
+  - _DropDown: {fileID: 3762967444482738523, guid: 671e8cc089f46934cb79b307758c3cc8, type: 3}
+  - _Image: {fileID: 350532603337223207, guid: 8c9f0d46552aa6847b18cd92b5ed7b71, type: 3}
+  - _AudioSource: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+  - _CustomWindowElement: {fileID: 74856100616418833, guid: 312f31ed2782b8f48b2b5e85ef045aa2, type: 3}
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: 8bd6fe11574cb4d45872518ba72b670e, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

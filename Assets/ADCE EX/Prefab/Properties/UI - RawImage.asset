@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dac8106700973d24bb89fe8d633b024a, type: 3}
+  m_Name: UI - RawImage
+  m_EditorClassIdentifier: 
+  BindKey: UI - RawImage
+  Prefab: {fileID: 603510184312996367, guid: 03f960515d397164480e1a2993180d41, type: 3}
+  TypeName: RawImage
