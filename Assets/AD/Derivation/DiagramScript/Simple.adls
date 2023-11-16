@@ -1,0 +1,18 @@
+﻿ADLS AlphaDiagramLineScript
+Key
+[InstanceName]
+-[TypeFullName|AssemblyFullName]
+-[@MemberFieldRef:InstanceName|MemberField=Value]
+-[InitializeFunctionName]
+
+Simple
+---------------------------------------------
+DefaultKey
+[Vector4Value]
+-[AD.Vector|Assembly-CSharp]
+-[x=0|y=0|z=0|w=0|key=TargetKey]
+-[]
+[TargetKey]
+-[AD.Key|Assembly-CSharp]
+-[str=""]
+-[]
