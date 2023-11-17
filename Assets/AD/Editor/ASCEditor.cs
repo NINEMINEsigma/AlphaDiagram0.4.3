@@ -104,7 +104,7 @@ public class ASCEditor : Editor
 
             GUI.enabled = true;
 
-            if (GUILayout.Button("Next", new GUILayoutOption[] { })) that.NextPair();
+            if (GUILayout.Button("NextLine", new GUILayoutOption[] { })) that.NextPair();
             if (GUILayout.Button("Previous", new GUILayoutOption[] { })) that.PreviousPair();
             if (GUILayout.Button("Random", new GUILayoutOption[] { })) that.RandomPair();
             if (GUILayout.Button("Play", new GUILayoutOption[] { })) that.Play();

@@ -56,7 +56,7 @@ public class VCEditor : Editor
             EditorGUILayout.IntSlider("CurrentIndex", that.CurrentIndex, 0, that.SourcePairs.Count - 1, null);
 
             GUI.enabled = true;
-            if (GUILayout.Button("Next", new GUILayoutOption[] { })) that.NextPair();
+            if (GUILayout.Button("NextLine", new GUILayoutOption[] { })) that.NextPair();
             if (GUILayout.Button("Previous", new GUILayoutOption[] { })) that.PreviousPair();
             if (GUILayout.Button("Random", new GUILayoutOption[] { })) that.RandomPair(); 
         }

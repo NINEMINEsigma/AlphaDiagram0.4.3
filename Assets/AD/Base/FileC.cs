@@ -439,6 +439,147 @@ namespace AD.BASE
             }
             return targetFile;
         }
+
+        public static ADStream GenerateStream(string path)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    return new ADStream(File.ReadAllText(path));
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.LogError(ex);
+                return null;
+            }
+            return null;
+        }
+
+        public static ADStream GenerateStream(string path,params char[] s)
+        {
+            try
+            {
+                if (File.Exists(path))
+                {
+                    return new ADStream(File.ReadAllText(path),s);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+                return null;
+            }
+            return null;
+        }
+    }
+
+    public class ADStream
+    {
+        private List<string> data = new();
+        private int index = 0;
+        public int CurrentIndex => index;
+        public string CurrentStr => data[index];
+        private int char_index = 0;
+        public char CurrentChar => CurrentStr[char_index];
+
+        public string this[int indexX]
+        {
+            get => data[indexX];
+        }
+
+        public bool NextLine()
+        {
+            index++;
+            if (index < data.Count) return true;
+            else
+            {
+                index = data.Count - 1;
+                return false;
+            }
+        }
+
+        public bool PreLine()
+        {
+            index--;
+            if (index >= 0) return true;
+            else
+            {
+                index = 0;
+                return false;
+            }
+        }
+
+        public void NextLine(string input,bool isMoveCurrent)
+        {
+            data.Insert(index + 1, input);
+            if (isMoveCurrent) NextLine();
+        }
+
+        public void PreLine(string input, bool isMoveCurrent)
+        {
+            data.Insert(index - 1, input);
+            if (isMoveCurrent) PreLine();
+        }
+
+        public bool NextChar()
+        {
+            char_index++;
+            if (char_index < CurrentStr.Length) return true;
+            else
+            {
+                char_index = CurrentStr.Length - 1;
+                return false;
+            }
+        }
+
+        public bool PreChar()
+        {
+            char_index--;
+            if (char_index >= 0) return true;
+            else
+            {
+                char_index = 0;
+                return false;
+            }
+        }
+
+        public void NextChar(string input, bool isMoveCurrent)
+        {
+            CurrentStr.Insert(char_index + 1, input);
+            if (isMoveCurrent) NextChar();
+        }
+
+        public void PreChar(string input, bool isMoveCurrent)
+        {
+            CurrentStr.Insert(char_index - 1, input);
+            if (isMoveCurrent) PreChar();
+        }
+
+        internal ADStream()
+        {
+        }
+
+        internal ADStream(string str)
+        {
+            data = str.Split('\n').ToList();
+        }
+
+        internal ADStream(string str,params char[] s)
+        {
+            data = str.Split(s).ToList();
+        }
+
+        public string ReadAll()
+        {
+            string result = "";
+            foreach (var str in data)
+            {
+                result += str + "\n";
+            }
+            return result;
+        }
     }
 
     public interface ICanBreakpointResume
