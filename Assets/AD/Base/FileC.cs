@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -165,7 +166,6 @@ namespace AD.BASE
             File.Delete(sourceFile);
         }
 
-
         //重命名文件
         public static void FileRename(string sourceFile, string newNameWithFullPath)
         {
@@ -282,45 +282,29 @@ namespace AD.BASE
             return asset;
         }
 
-
-        public static bool BreakpointResume(this ICanBreakpointResume self, string loadPath, string savePath, double loadedBytes, UnityAction<string> callback)
-        {
-            if (self.As<MonoBehaviour>(out var result))
-            {
-                result.StartCoroutine(BreakpointResume(result, loadPath, savePath, loadedBytes, callback));
-                return true;
-            }
-            else return false;
-        }
-
         /// <summary>
         /// 分段，断点下载文件
         /// </summary>
         /// <param name="loadPath">下载地址</param>
         /// <param name="savePath">保存路径</param>
         /// <returns></returns>
-        public static IEnumerator BreakpointResume(MonoBehaviour sendObject, string loadPath, string savePath, double loadedBytes, UnityAction<string> callback)
+        public static IEnumerator BreakpointResume(MonoBehaviour sendObject, string loadPath, string savePath, double loadedBytes, UnityAction<float, string> callback)
         {
-            //UnityWebRequest 经配置可传输 HTTP HEAD 请求的 UnityWebRequest。
             UnityWebRequest headRequest = UnityWebRequest.Head(loadPath);
-            //开始与远程服务器通信。
             yield return headRequest.SendWebRequest();
 
             if (!string.IsNullOrEmpty(headRequest.error))
             {
-                callback(headRequest.error + ":cannt found the file");
+                callback(-1, headRequest.error + ":cannt found the file");
                 yield break;
             }
-            //获取文件总大小
             ulong totalLength = ulong.Parse(headRequest.GetResponseHeader("Content-Length"));
             Debug.Log("获取大小" + totalLength);
             headRequest.Dispose();
-            UnityWebRequest Request = UnityWebRequest.Get(loadPath);
+            using UnityWebRequest Request = UnityWebRequest.Get(loadPath);
             //append设置为true文件写入方式为接续写入，不覆盖原文件。
             Request.downloadHandler = new DownloadHandlerFile(savePath, true);
-            //创建文件
             FileInfo file = new FileInfo(savePath);
-            //当前下载的文件长度
             ulong fileLength = (ulong)file.Length;
 
             //请求网络数据从第fileLength到最后的字节；
@@ -328,7 +312,7 @@ namespace AD.BASE
 
             if (!string.IsNullOrEmpty(headRequest.error))
             {
-                callback(headRequest.error + ":failed");
+                callback(0, headRequest.error + ":failed");
                 yield break;
             }
             if (fileLength < totalLength)
@@ -337,18 +321,18 @@ namespace AD.BASE
                 while (!Request.isDone)
                 {
                     double progress = (Request.downloadedBytes + fileLength) / (double)totalLength;
-                    callback((progress * 100 + 0.01f).ToString("f2") + "%");
-                    // Debug.Log("下载量" + Request.downloadedBytes);
+                    callback((float)progress, "loading");
+                    Debug.Log("下载量" + Request.downloadedBytes);
                     //超过一定的字节关闭现在的协程，开启新的协程，将资源分段下载
                     if (Request.downloadedBytes >= loadedBytes)
                     {
-                        sendObject.StopCoroutine("BreakpointResume");
+                        sendObject.StopCoroutine(nameof(BreakpointResume));
 
                         //如果 UnityWebRequest 在进行中，就停止。
                         Request.Abort();
                         if (!string.IsNullOrEmpty(headRequest.error))
                         {
-                            callback(headRequest.error + ":failed");
+                            callback(0, headRequest.error + ":failed");
                             yield break;
                         }
                         yield return sendObject.StartCoroutine(BreakpointResume(sendObject, loadPath, savePath, loadedBytes, callback));
@@ -359,10 +343,8 @@ namespace AD.BASE
             if (string.IsNullOrEmpty(Request.error))
             {
                 Debug.Log("下载成功" + savePath);
-                callback("succeed");
+                callback(1, "succeed");
             }
-            //表示不再使用此 UnityWebRequest，并且应清理它使用的所有资源。
-            Request.Dispose();
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
@@ -440,150 +422,129 @@ namespace AD.BASE
             return targetFile;
         }
 
-        public static ADStream GenerateStream(string path)
+        public static bool IsAbsolute(this string path)
         {
-            try
-            {
-                if (File.Exists(path))
-                {
-                    return new ADStream(File.ReadAllText(path));
-                }
-            }
-            catch(Exception ex)
-            {
-                Debug.LogError(ex);
-                return null;
-            }
-            return null;
+            if (path.Length > 0 && (path[0] == '/' || path[0] == '\\'))
+                return true;
+            if (path.Length > 1 && path[1] == ':')
+                return true;
+            return false;
         }
 
-        public static ADStream GenerateStream(string path,params char[] s)
+        public static Stream CreateFileStream(string FilePath, bool isWriteStream, int bufferSize = 1024, bool IsTurnIntoGZipStream = false)
         {
+            Stream stream = null;
+            // Check that the path is in a valid format. This will throw an exception if not.
+            new FileInfo(FilePath);
+
             try
             {
-                if (File.Exists(path))
-                {
-                    return new ADStream(File.ReadAllText(path),s);
-                }
+                // There's no point in creating an empty MemoryStream if we're only reading from it.
+                if (!isWriteStream)
+                    return null;
+                stream = new MemoryStream(bufferSize);
+                return CreateStream(stream, isWriteStream, IsTurnIntoGZipStream);
             }
             catch (Exception ex)
             {
-                Debug.LogError(ex);
-                return null;
+                stream?.Dispose();
+                throw ex;
             }
-            return null;
-        }
-    }
-
-    public class ADStream
-    {
-        private List<string> data = new();
-        private int index = 0;
-        public int CurrentIndex => index;
-        public string CurrentStr => data[index];
-        private int char_index = 0;
-        public char CurrentChar => CurrentStr[char_index];
-
-        public string this[int indexX]
-        {
-            get => data[indexX];
         }
 
-        public bool NextLine()
+        public static Stream CreatePlayerPrefsStream(string FilePath, bool isWriteStream, bool isAppend, int bufferSize = 1024, bool IsTurnIntoGZipStream = false)
         {
-            index++;
-            if (index < data.Count) return true;
-            else
+            Stream stream = null;
+
+            // Check that the path is in a valid format. This will throw an exception if not.
+            new FileInfo(FilePath);
+
+            try
             {
-                index = data.Count - 1;
-                return false;
+                if (isWriteStream)
+                    stream = new ADPlayerPrefsStream(FilePath, bufferSize, isAppend);
+                else
+                {
+                    if (!PlayerPrefs.HasKey(FilePath))
+                        return null;
+                    stream = new ADPlayerPrefsStream(FilePath);
+                }
+                return CreateStream(stream, isWriteStream, IsTurnIntoGZipStream);
             }
-        }
-
-        public bool PreLine()
-        {
-            index--;
-            if (index >= 0) return true;
-            else
+            catch (Exception ex)
             {
-                index = 0;
-                return false;
+                stream?.Dispose();
+                throw ex;
             }
         }
 
-        public void NextLine(string input,bool isMoveCurrent)
+        public static Stream CreateResourcesStream(string FilePath, bool isWriteStream)
         {
-            data.Insert(index + 1, input);
-            if (isMoveCurrent) NextLine();
-        }
+            Stream stream = null;
 
-        public void PreLine(string input, bool isMoveCurrent)
-        {
-            data.Insert(index - 1, input);
-            if (isMoveCurrent) PreLine();
-        }
+            // Check that the path is in a valid format. This will throw an exception if not.
+            new FileInfo(FilePath);
 
-        public bool NextChar()
-        {
-            char_index++;
-            if (char_index < CurrentStr.Length) return true;
-            else
+            try
             {
-                char_index = CurrentStr.Length - 1;
-                return false;
+                if (!isWriteStream)
+                {
+                    var resourcesStream = new ADResourcesStream(FilePath);
+                    if (resourcesStream.Exists)
+                        stream = resourcesStream;
+                    else
+                    {
+                        resourcesStream.Dispose();
+                        return null;
+                    }
+                }
+                else if (UnityEngine.Application.isEditor)
+                    throw new System.NotSupportedException("Cannot write directly to Resources folder." +
+                        " Try writing to a directory outside of Resources, and then manually move the file there.");
+                else
+                    throw new System.NotSupportedException("Cannot write to Resources folder at runtime." +
+                        " Use a different save location at runtime instead.");
+                return CreateStream(stream, isWriteStream, false);
             }
-        }
-
-        public bool PreChar()
-        {
-            char_index--;
-            if (char_index >= 0) return true;
-            else
+            catch (System.Exception e)
             {
-                char_index = 0;
-                return false;
+                if (stream != null)
+                    stream.Dispose();
+                throw e;
             }
         }
 
-        public void NextChar(string input, bool isMoveCurrent)
+        public static Stream CreateStream(Stream stream, bool isWriteStream, bool IsTurnIntoGZipStream)
         {
-            CurrentStr.Insert(char_index + 1, input);
-            if (isMoveCurrent) NextChar();
-        }
-
-        public void PreChar(string input, bool isMoveCurrent)
-        {
-            CurrentStr.Insert(char_index - 1, input);
-            if (isMoveCurrent) PreChar();
-        }
-
-        internal ADStream()
-        {
-        }
-
-        internal ADStream(string str)
-        {
-            data = str.Split('\n').ToList();
-        }
-
-        internal ADStream(string str,params char[] s)
-        {
-            data = str.Split(s).ToList();
-        }
-
-        public string ReadAll()
-        {
-            string result = "";
-            foreach (var str in data)
+            try
             {
-                result += str + "\n";
+                if (IsTurnIntoGZipStream && stream.GetType() != typeof(GZipStream))
+                {
+                    stream = isWriteStream ? new GZipStream(stream, CompressionMode.Compress) : new GZipStream(stream, CompressionMode.Decompress);
+                }
+
+                return stream;
             }
-            return result;
+            catch (System.Exception e)
+            {
+                stream?.Dispose();
+                if (e.GetType() == typeof(System.Security.Cryptography.CryptographicException))
+                    throw new System.Security.Cryptography.CryptographicException("Could not decrypt file." +
+                        " Please ensure that you are using the same password used to encrypt the file.");
+                else throw e;
+            }
         }
-    }
 
-    public interface ICanBreakpointResume
-    {
-
+        public static void CopyTo(Stream source, Stream destination)
+        {
+#if UNITY_2019_1_OR_NEWER
+            source.CopyTo(destination);
+#else
+            byte[] buffer = new byte[2048];
+            int bytesRead;
+            while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
+                destination.Write(buffer, 0, bytesRead);
+#endif
+        }
     }
 }

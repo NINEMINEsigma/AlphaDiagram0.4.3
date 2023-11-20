@@ -36,6 +36,9 @@ namespace AD.Utility
 
     public static class ReflectionExtension
     {
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public static string[] assemblyNames = new string[] { "Assembly-CSharp-firstpass", "Assembly-CSharp" };
+
         public static readonly BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
         public static readonly BindingFlags AllBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
 
@@ -594,7 +597,7 @@ namespace AD.Utility
             return new ADReflectedMember(propertyInfo);
         }
 
-        public static ADReflectedMember GetES3ReflectedMember(Type type, string fieldName)
+        public static ADReflectedMember GetADReflectedMember(Type type, string fieldName)
         {
             var fieldInfo = GetField(type, fieldName);
             return new ADReflectedMember(fieldInfo);

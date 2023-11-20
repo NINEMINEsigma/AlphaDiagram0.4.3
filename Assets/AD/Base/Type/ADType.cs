@@ -94,69 +94,17 @@ namespace AD.Types
         {
             ADType adType = null;
 
-            if (ReflectionExtension.IsEnum(type))
-                return new ES3Type_enum(type);
-            else if (ReflectionExtension.TypeIsArray(type))
-            {
-                int rank = ReflectionExtension.GetArrayRank(type);
-                if (rank == 1)
-                    adType = new ES3ArrayType(type);
-                else if (rank == 2)
-                    adType = new ES32DArrayType(type);
-                else if (rank == 3)
-                    adType = new ES33DArrayType(type);
-                else if (throwException)
-                    throw new NotSupportedException("Only arrays with up to three dimensions are supported by ADType.");
-                else
-                    return null;
-            }
-            else if (ReflectionExtension.IsGenericType(type) && ReflectionExtension.ImplementsInterface(type, typeof(IEnumerable)))
-            {
-                Type genericType = ReflectionExtension.GetGenericTypeDefinition(type);
-                if (typeof(List<>).IsAssignableFrom(genericType))
-                    adType = new ES3ListType(type);
-                else if (typeof(IDictionary).IsAssignableFrom(genericType))
-                    adType = new ES3DictionaryType(type);
-                else if (genericType == typeof(Queue<>))
-                    adType = new ES3QueueType(type);
-                else if (genericType == typeof(Stack<>))
-                    adType = new ES3StackType(type);
-                else if (genericType == typeof(HashSet<>))
-                    adType = new ES3HashSetType(type);
-                else if (genericType == typeof(Unity.Collections.NativeArray<>))
-                    adType = new ES3NativeArrayType(type);
-                else if (throwException)
-                    throw new NotSupportedException("Generic type \"" + type.ToString() + "\" is not supported by Easy Save.");
-                else
-                    return null;
-            }
-            else if (ReflectionExtension.IsPrimitive(type)) // ERROR: We should not have to create an ES3Type for a primitive.
-            {
-                if (types == null || types.Count == 0)  // If the type list is not initialised, it is most likely an initialisation error.
-                    throw new TypeLoadException("ES3Type for primitive could not be found, and the type list is empty. Please contact Easy Save developers at http://www.moodkie.com/contact");
-                else // Else it's a different error, possibly an error in the specific ES3Type for that type.
-                    throw new TypeLoadException("ES3Type for primitive could not be found, but the type list has been initialised and is not empty. Please contact Easy Save developers on mail@moodkie.com");
-            }
-            else
-            {
-                if (ReflectionExtension.IsAssignableFrom(typeof(Component), type))
-                    adType = new ES3ReflectedComponentType(type);
-                else if (ReflectionExtension.IsValueType(type))
-                    adType = new ES3ReflectedValueType(type);
-                else if (ReflectionExtension.IsAssignableFrom(typeof(ScriptableObject), type))
-                    adType = new ES3ReflectedScriptableObjectType(type);
-                else if (ReflectionExtension.IsAssignableFrom(typeof(UnityEngine.Object), type))
-                    adType = new ES3ReflectedUnityObjectType(type);
-                else if (type.Name.StartsWith("Tuple`"))
-                    adType = new ES3TupleType(type);
-                else
-                    adType = new ES3ReflectedObjectType(type);
-            }
+            if (ReflectionExtension.IsEnum(type)) adType = CreateEnumType(type);
+            else if (ReflectionExtension.TypeIsArray(type)) adType = CreateArrayType(type, throwException);
+            else if (ReflectionExtension.IsGenericType(type)
+                && ReflectionExtension.ImplementsInterface(type, typeof(IEnumerable))) adType = CreateGenericImplementsInterface(type, throwException);
+            else if (ReflectionExtension.IsPrimitive(type)) adType = CreatePrimitiveType(type);
+            else adType = CreateElseType(type);
 
             if (adType.type == null || adType.isUnsupported)
             {
                 if (throwException)
-                    throw new NotSupportedException(string.Format("ES3Type.type is null when trying to create an ES3Type for {0}, possibly because the element type is not supported.", type));
+                    throw new NotSupportedException(string.Format("ADType.type is null when trying to create an ADType for {0}, possibly because the element type is not supported.", type));
                 return null;
             }
 
@@ -165,12 +113,73 @@ namespace AD.Types
             return adType;
         }
 
+        private static ADType CreateEnumType(Type type)
+        {
+            //return new ES3Type_enum(type);
+            throw new NotImplementedException();
+        }
+        private static ADType CreateArrayType(Type type,bool throwException)
+        {
+            throw new NotImplementedException();
+            /*int rank = ReflectionExtension.GetArrayRank(type);
+            if (rank == 1)
+                return new ES3ArrayType(type);
+            else if (rank == 2)
+                return new ES32DArrayType(type);
+            else if (rank == 3)
+                return new ES33DArrayType(type);
+            else if (throwException)
+                throw new NotSupportedException("Only arrays with up to three dimensions are supported by ADType.");
+            else
+                return null;*/
+        }
+        private static ADType CreateGenericImplementsInterface(Type type, bool throwException)
+        {
+            throw new NotImplementedException();/*
+            Type genericType = ReflectionExtension.GetGenericTypeDefinition(type);
+            if (typeof(List<>).IsAssignableFrom(genericType))
+                return new ES3ListType(type);
+            else if (typeof(IDictionary).IsAssignableFrom(genericType))
+                return new ES3DictionaryType(type);
+            else if (genericType == typeof(Queue<>))
+                return new ES3QueueType(type);
+            else if (genericType == typeof(Stack<>))
+                return new ES3StackType(type);
+            else if (genericType == typeof(HashSet<>))
+                return new ES3HashSetType(type);
+            else if (genericType == typeof(Unity.Collections.NativeArray<>))
+                return new ES3NativeArrayType(type);
+            else if (throwException)
+                throw new NotSupportedException("Generic type \"" + type.ToString() + "\" is not supported by Easy Save.");
+            else
+                return null;*/
+        }
+        private static ADType CreatePrimitiveType(Type type)
+        {
+            return null;
+        }
+        private static ADType CreateElseType(Type type)
+        {
+            throw new NotImplementedException();
+            /*if (ReflectionExtension.IsAssignableFrom(typeof(Component), type))
+                return new ES3ReflectedComponentType(type);
+            else if (ReflectionExtension.IsValueType(type))
+                return new ES3ReflectedValueType(type);
+            else if (ReflectionExtension.IsAssignableFrom(typeof(ScriptableObject), type))
+                return new ES3ReflectedScriptableObjectType(type);
+            else if (ReflectionExtension.IsAssignableFrom(typeof(UnityEngine.Object), type))
+                return new ES3ReflectedUnityObjectType(type);
+            else if (type.Name.StartsWith("Tuple`"))
+                return new ES3TupleType(type);
+            else
+                return new ES3ReflectedObjectType(type);*/
+        }
+
         internal static void Init()
         {
             lock (_lock)
             {
                 types = new Dictionary<Type, ADType>();
-                // ES3Types add themselves to the types Dictionary.
                 ReflectionExtension.GetInstances<ADType>();
 
                 // Check that the type list was initialised correctly.
@@ -240,25 +249,6 @@ namespace AD.Types
         {
             this.elementType = elementType;
             isCollection = true;
-        }
-
-        public override object Read<T>(ADStream stream)
-        {
-            var current = stream.CurrentStr;
-            for
-        }
-
-        public override void Write(object obj, ADStream stream)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected abstract object ReadObject(string strs);
-        protected abstract void WriteObject(object obj, ADStream stream);
-
-        protected abstract object AddRange()
-        {
-
         }
     }
 }
