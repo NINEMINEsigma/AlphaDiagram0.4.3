@@ -5,6 +5,8 @@ using UnityEngine;
 using System;
 using AD.Types;
 using AD.BASE;
+using System.Globalization;
+using System.Text;
 
 namespace AD.Utility
 {
@@ -18,9 +20,9 @@ namespace AD.Utility
 		protected int serializationDepth = 0;
 		public int serializationDepthLimit = 16;
 
-        #region ES3Writer Abstract Methods
+		#region Abstract Methods
 
-        internal abstract void WriteNull();
+		internal abstract void WriteNull();
 
 		internal virtual void StartWriteFile()
 		{
@@ -99,7 +101,7 @@ namespace AD.Utility
 
 		#endregion
 
-		protected ADWriter( bool writeHeaderAndFooter, bool overwriteKeys)
+		public ADWriter(bool writeHeaderAndFooter, bool overwriteKeys)
 		{
 			this.writeHeaderAndFooter = writeHeaderAndFooter;
 			this.overwriteKeys = overwriteKeys;
@@ -116,7 +118,7 @@ namespace AD.Utility
 			WriteRawProperty("value", value);
 			EndWriteObject(key);
 			EndWriteProperty(key);
-			MarkKeyForDeletion(key);
+			//MarkKeyForDeletion(key);
 		}
 
 		/// <summary>Writes a value to the writer with the given key.</summary>
@@ -143,27 +145,24 @@ namespace AD.Utility
 			WriteProperty("value", value, ADType.GetOrCreateADType(type));
 			EndWriteObject(key);
 			EndWriteProperty(key);
-			MarkKeyForDeletion(key);
+			//MarkKeyForDeletion(key);
 		}
 
 		#endregion
 
 		#region Write(value) & Write(value, ES3Type) Methods
 
-		/// <summary>Writes a value to the writer. Note that this should only be called within an ES3Type.</summary>
-		/// <param name="value">The value we want to write.</param>
-		/// <param name="memberReferenceMode">Whether we want to write UnityEngine.Object fields and properties by reference, by value, or both.</param>
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public virtual void Write(object value, ES3.ReferenceMode memberReferenceMode = ES3.ReferenceMode.ByRef)
+		public virtual void Write(object value)
 		{
 			if (value == null) { WriteNull(); return; }
 
 			var type = ADType.GetOrCreateADType(value.GetType());
-			Write(value, type, memberReferenceMode);
+			Write(value, type);
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public virtual void Write(object value, ADType type, ES3.ReferenceMode memberReferenceMode = ES3.ReferenceMode.ByRef)
+		public virtual void Write(object value, ADType type)
 		{
 			// Note that we have to check UnityEngine.Object types for null by casting it first, otherwise
 			// it will always return false.
@@ -172,6 +171,8 @@ namespace AD.Utility
 				WriteNull();
 				return;
 			}
+			if (type == null)
+				throw new ArgumentNullException("ADType argument cannot be null.");
 
 			// Deal with System.Objects
 			if (type == null || type.type == typeof(object))
@@ -194,14 +195,12 @@ namespace AD.Utility
 				}
 			}
 
-			if (type == null)
-				throw new ArgumentNullException("ES3Type argument cannot be null.");
 			if (type.isUnsupported)
 			{
 				if (type.isCollection || type.isDictionary)
-					throw new NotSupportedException(type.type + " is not supported because it's element type is not supported. Please see the Supported Types guide for more information: https://docs.moodkie.com/easy-save-3/es3-supported-types/");
+					throw new NotSupportedException(type.type + " is not supported because it's element type is not supported");
 				else
-					throw new NotSupportedException("Types of " + type.type + " are not supported. Please see the Supported Types guide for more information: https://docs.moodkie.com/easy-save-3/es3-supported-types/");
+					throw new NotSupportedException("Types of " + type.type + " are not supported");
 			}
 
 			if (type.isPrimitive || type.isEnum)
@@ -209,24 +208,21 @@ namespace AD.Utility
 			else if (type.isCollection)
 			{
 				StartWriteCollection();
-				((ADCollectionType)type).Write(value, this, memberReferenceMode);
+				((ADCollectionType)type).Write(value, this);
 				EndWriteCollection();
 			}
 			else if (type.isDictionary)
 			{
 				StartWriteDictionary();
-				((ADDictionaryType)type).Write(value, this, memberReferenceMode);
+				((ADDictionaryType)type).Write(value, this);
 				EndWriteDictionary();
 			}
 			else
 			{
-				if (type.type == typeof(GameObject))
-					((ADType_GameObject)type).saveChildren = settings.saveChildren;
-
 				StartWriteObject(null);
 
 				if (type.isADTypeUnityObject)
-					((ADUnityObjectType)type).WriteObject(value, this, memberReferenceMode);
+					((ADUnityObjectType)type).WriteObject(value, this);
 				else
 					type.Write(value, this);
 				EndWriteObject(null);
@@ -257,35 +253,11 @@ namespace AD.Utility
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public virtual void WriteProperty(string name, object value, ADType type)
 		{
-			WriteProperty(name, value, type);
-		}
-
-		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public virtual void WriteProperty(string name, object value, ADType type, ES3.ReferenceMode memberReferenceMode)
-		{
 			if (SerializationDepthLimitExceeded())
 				return;
 
 			StartWriteProperty(name);
-			Write(value, type, memberReferenceMode);
-			EndWriteProperty(name);
-		}
-
-		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public virtual void WritePropertyByRef(string name, UnityEngine.Object value)
-		{
-			if (SerializationDepthLimitExceeded())
-				return;
-
-			StartWriteProperty(name);
-			if (value == null)
-			{
-				WriteNull();
-				return;
-			};
-			StartWriteObject(name);
-			WriteRef(value);
-			EndWriteObject(name);
+			Write(value, type);
 			EndWriteProperty(name);
 		}
 
@@ -330,46 +302,9 @@ namespace AD.Utility
 		}
 
 		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public void WritePrivatePropertyByRef(string name, object objectContainingProperty)
-		{
-			var property = ReflectionExtension.GetADReflectedProperty(objectContainingProperty.GetType(), name);
-			if (property.IsNull)
-				throw new MissingMemberException("A private property named " + name + " does not exist in the type " + objectContainingProperty.GetType());
-			WritePropertyByRef(name, (UnityEngine.Object)property.GetValue(objectContainingProperty));
-		}
-
-		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-		public void WritePrivateFieldByRef(string name, object objectContainingField)
-		{
-			var field = ReflectionExtension.GetADReflectedMember(objectContainingField.GetType(), name);
-			if (field.IsNull)
-				throw new MissingMemberException("A private field named " + name + " does not exist in the type " + objectContainingField.GetType());
-			WritePropertyByRef(name, (UnityEngine.Object)field.GetValue(objectContainingField));
-		}
-
-		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public void WriteType(Type type)
 		{
 			WriteProperty(ADType.typeFieldName, ReflectionExtension.GetTypeString(type));
-		}
-
-		#endregion
-
-		#region Create methods
-
-		/// <summary>Creates a new ADWriter.</summary>
-		/// <param name="filePath">The relative or absolute path of the file we want to write to.</param>
-		/// <param name="settings">The settings we want to use to override the default settings.</param>
-		public static ADWriter Create(string filePath, ES3Settings settings)
-		{
-			return Create(new ES3Settings(filePath, settings));
-		}
-
-		/// <summary>Creates a new ADWriter.</summary>
-		/// <param name="settings">The settings we want to use to override the default settings.</param>
-		public static ADWriter Create(ES3Settings settings)
-		{
-			return Create(settings, true, true, false);
 		}
 
 		#endregion
@@ -393,56 +328,230 @@ namespace AD.Utility
 		 * 	Marks a key for deletion.
 		 * 	When merging files, keys marked for deletion will not be included.
 		 */
-		[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+		/*[System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
 		public virtual void MarkKeyForDeletion(string key)
 		{
 			keysToDelete.Add(key);
+		}*/
+	}
+
+	public class ADJSONWriter : ADWriter
+	{
+		internal StreamWriter baseWriter;
+
+		public Encoding encoding = System.Text.Encoding.UTF8;
+
+		private bool isFirstProperty = true;
+
+		public ADJSONWriter(Stream stream) : this(stream, true, true) { }
+
+		internal ADJSONWriter(Stream stream, bool writeHeaderAndFooter, bool mergeKeys) : base(writeHeaderAndFooter, mergeKeys)
+		{
+			baseWriter = new StreamWriter(stream);
+			StartWriteFile();
 		}
 
-		/*
-		 * 	Merges the contents of the non-temporary file with this ADWriter,
-		 * 	ignoring any keys which are marked for deletion.
-		 */
-		protected void Merge()
+		#region WritePrimitive(value) methods.
+
+		internal override void WritePrimitive(int value) { baseWriter.Write(value); }
+		internal override void WritePrimitive(float value) { baseWriter.Write(value.ToString("R", CultureInfo.InvariantCulture)); }
+		internal override void WritePrimitive(bool value) { baseWriter.Write(value ? "true" : "false"); }
+		internal override void WritePrimitive(decimal value) { baseWriter.Write(value.ToString(CultureInfo.InvariantCulture)); }
+		internal override void WritePrimitive(double value) { baseWriter.Write(value.ToString("R", CultureInfo.InvariantCulture)); }
+		internal override void WritePrimitive(long value) { baseWriter.Write(value); }
+		internal override void WritePrimitive(ulong value) { baseWriter.Write(value); }
+		internal override void WritePrimitive(uint value) { baseWriter.Write(value); }
+		internal override void WritePrimitive(byte value) { baseWriter.Write(System.Convert.ToInt32(value)); }
+		internal override void WritePrimitive(sbyte value) { baseWriter.Write(System.Convert.ToInt32(value)); }
+		internal override void WritePrimitive(short value) { baseWriter.Write(System.Convert.ToInt32(value)); }
+		internal override void WritePrimitive(ushort value) { baseWriter.Write(System.Convert.ToInt32(value)); }
+		internal override void WritePrimitive(char value) { WritePrimitive(value.ToString()); }
+		internal override void WritePrimitive(byte[] value) { WritePrimitive(System.Convert.ToBase64String(value)); }
+
+
+		internal override void WritePrimitive(string value)
 		{
-			using (var reader = ES3Reader.Create(settings))
+			baseWriter.Write("\"");
+
+			// Escape any quotation marks within the string.
+			for (int i = 0; i < value.Length; i++)
 			{
-				if (reader == null)
-					return;
-				Merge(reader);
+				char c = value[i];
+				switch (c)
+				{
+					case '\"':
+					case '“':
+					case '”':
+					case '\\':
+					case '/':
+						baseWriter.Write('\\');
+						baseWriter.Write(c);
+						break;
+					case '\b':
+						baseWriter.Write("\\b");
+						break;
+					case '\f':
+						baseWriter.Write("\\f");
+						break;
+					case '\n':
+						baseWriter.Write("\\n");
+						break;
+					case '\r':
+						baseWriter.Write("\\r");
+						break;
+					case '\t':
+						baseWriter.Write("\\t");
+						break;
+					default:
+						baseWriter.Write(c);
+						break;
+				}
 			}
+			baseWriter.Write("\"");
 		}
 
-		/*
-		 * 	Merges the contents of the ES3Reader with this ADWriter,
-		 * 	ignoring any keys which are marked for deletion.
-		 */
-		protected void Merge(ES3Reader reader)
+		internal override void WriteNull()
 		{
-			foreach (KeyValuePair<string, ES3Data> kvp in reader.RawEnumerator)
-				if (!keysToDelete.Contains(kvp.Key) || kvp.Value.type == null) // Don't add keys whose data is of a type which no longer exists in the project.
-					Write(kvp.Key, kvp.Value.type.type, kvp.Value.bytes);
+			baseWriter.Write("null");
 		}
 
-		/// <summary>Stores the contents of the writer and overwrites any existing keys if overwriting is enabled.</summary>
-		public virtual void Save()
+		#endregion
+
+		#region Format-specific methods
+
+		private static bool CharacterRequiresEscaping(char c)
 		{
-			Save(overwriteKeys);
+			return c == '\"' || c == '\\' || c == '“' || c == '”';
 		}
 
-		/// <summary>Stores the contents of the writer and overwrites any existing keys if overwriting is enabled.</summary>
-		/// <param name="overwriteKeys">Whether we should overwrite existing keys.</param>
-		public virtual void Save(bool overwriteKeys)
+		private void WriteCommaIfRequired()
 		{
-			if (overwriteKeys)
-				Merge();
-			EndWriteFile();
-			Dispose();
+			if (!isFirstProperty)
+				baseWriter.Write(',');
+			else
+				isFirstProperty = false;
+			WriteNewlineAndTabs();
+		}
 
-			// If we're writing to a location which can become corrupted, rename the backup file to the file we want.
-			// This prevents corrupt data.
-			if (settings.location == ES3.Location.File || settings.location == ES3.Location.PlayerPrefs)
-				ES3IO.CommitBackup(settings);
+		internal override void WriteRawProperty(string name, byte[] value)
+		{
+			StartWriteProperty(name); baseWriter.Write(encoding.GetString(value, 0, value.Length)); EndWriteProperty(name);
+		}
+
+		internal override void StartWriteFile()
+		{
+			if (writeHeaderAndFooter)
+				baseWriter.Write('{');
+			base.StartWriteFile();
+		}
+
+		internal override void EndWriteFile()
+		{
+			base.EndWriteFile();
+			WriteNewlineAndTabs();
+			if (writeHeaderAndFooter)
+				baseWriter.Write('}');
+		}
+
+		internal override void StartWriteProperty(string name)
+		{
+			base.StartWriteProperty(name);
+			WriteCommaIfRequired();
+			Write(name);
+
+			baseWriter.Write(' ');
+			baseWriter.Write(':');
+			baseWriter.Write(' ');
+		}
+
+		internal override void EndWriteProperty(string name)
+		{
+			// It's not necessary to perform any operations after writing the property in JSON.
+			base.EndWriteProperty(name);
+		}
+
+		internal override void StartWriteObject(string name)
+		{
+			base.StartWriteObject(name);
+			isFirstProperty = true;
+			baseWriter.Write('{');
+		}
+
+		internal override void EndWriteObject(string name)
+		{
+			base.EndWriteObject(name);
+			// Set isFirstProperty to false incase we didn't write any properties, in which case
+			// WriteCommaIfRequired() is never called.
+			isFirstProperty = false;
+			WriteNewlineAndTabs();
+			baseWriter.Write('}');
+		}
+
+		internal override void StartWriteCollection()
+		{
+			base.StartWriteCollection();
+			baseWriter.Write('[');
+			WriteNewlineAndTabs();
+		}
+
+		internal override void EndWriteCollection()
+		{
+			base.EndWriteCollection();
+			WriteNewlineAndTabs();
+			baseWriter.Write(']');
+		}
+
+		internal override void StartWriteCollectionItem(int index)
+		{
+			if (index != 0)
+				baseWriter.Write(',');
+		}
+
+		internal override void EndWriteCollectionItem(int index)
+		{
+		}
+
+		internal override void StartWriteDictionary()
+		{
+			StartWriteObject(null);
+		}
+
+		internal override void EndWriteDictionary()
+		{
+			EndWriteObject(null);
+		}
+
+		internal override void StartWriteDictionaryKey(int index)
+		{
+			if (index != 0)
+				baseWriter.Write(',');
+		}
+
+		internal override void EndWriteDictionaryKey(int index)
+		{
+			baseWriter.Write(':');
+		}
+
+		internal override void StartWriteDictionaryValue(int index)
+		{
+		}
+
+		internal override void EndWriteDictionaryValue(int index)
+		{
+		}
+
+		#endregion
+
+		public override void Dispose()
+		{
+			baseWriter.Dispose();
+		}
+
+		public void WriteNewlineAndTabs()
+		{
+			baseWriter.Write(Environment.NewLine);
+			for (int i = 0; i < serializationDepth; i++)
+				baseWriter.Write('\t');
 		}
 	}
 }
