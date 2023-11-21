@@ -7,6 +7,7 @@ using System.ComponentModel;
 using AD.Types;
 using AD.BASE;
 using System.Collections;
+using UnityEngine;
 
 namespace AD.Utility
 {
@@ -14,8 +15,9 @@ namespace AD.Utility
     {
 
         protected int serializationDepth = 0;
+        public int bufferSize { get; protected set; } = 0;
 
-        #region ES3Reader Abstract Methods
+        #region Reader Abstract Methods
 
         internal abstract int Read_int();
         internal abstract float Read_float();
@@ -85,9 +87,9 @@ namespace AD.Utility
 
         #endregion
 
-        internal ADReader(ES3Settings settings, bool readHeaderAndFooter = true)
+        internal ADReader(int bufferSize,bool readHeaderAndFooter = true)
         {
-            this.settings = settings;
+            this.bufferSize = bufferSize;
         }
 
         // If this is not null, the next call to the Properties will return this name.
@@ -263,7 +265,7 @@ namespace AD.Utility
 
         #endregion
 
-        #region Read(ES3Type) & Read(obj,ES3Type) methods
+        #region Read(ADType) & Read(obj,ADType) methods
 
         /*
          * 	Parses the next JSON Object in the stream (i.e. must be between '{' and '}' chars).
@@ -379,7 +381,7 @@ namespace AD.Utility
                     reader.ReadKeySuffix();
 
                     if (type != null)
-                        yield return new KeyValuePair<string, ADData>(key, new ES3Data(type, bytes));
+                        yield return new KeyValuePair<string, ADData>(key, new ADData(type, bytes));
                 }
             }
         }
@@ -391,7 +393,7 @@ namespace AD.Utility
 
         public StreamReader baseReader;
 
-        internal ADJSONReader(Stream stream, ES3Settings settings, bool readHeaderAndFooter = true) : base(settings, readHeaderAndFooter)
+        internal ADJSONReader(Stream stream,int bufferSize, bool readHeaderAndFooter = true) : base(bufferSize,readHeaderAndFooter)
         {
             this.baseReader = new StreamReader(stream);
 
@@ -435,7 +437,7 @@ namespace AD.Utility
             if (propertyName == null)
                 throw new FormatException("Stream isn't positioned before a property.");
 
-            ES3Debug.Log("<b>" + propertyName + "</b> (reading property)", null, serializationDepth);
+            Debug.LogFormat("<b>" + propertyName + "</b> (reading property)", null, serializationDepth);
 
             // Skip the ':' seperating property and value.
             ReadCharIgnoreWhitespace(':');
@@ -455,10 +457,10 @@ namespace AD.Utility
             Type dataType = null;
 
             string propertyName = ReadPropertyName();
-            if (propertyName == ES3Type.typeFieldName)
+            if (propertyName == ADType.typeFieldName)
             {
                 string typeString = Read_string();
-                dataType = ignoreType ? null : ES3Reflection.GetType(typeString);
+                dataType = ignoreType ? null : ReflectionExtension.GetType(typeString);
                 propertyName = ReadPropertyName();
             }
 
@@ -596,7 +598,7 @@ namespace AD.Utility
         internal override byte[] ReadElement(bool skip = false)
         {
             // If 'skip' is enabled, don't create a stream or writer as we'll discard all bytes we read.
-            StreamWriter writer = skip ? null : new StreamWriter(new MemoryStream(settings.bufferSize));
+            StreamWriter writer = skip ? null : new StreamWriter(new MemoryStream(bufferSize));
 
             using (writer)
             {
