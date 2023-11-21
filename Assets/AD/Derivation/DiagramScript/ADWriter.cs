@@ -220,11 +220,7 @@ namespace AD.Utility
 			else
 			{
 				StartWriteObject(null);
-
-				if (type.isADTypeUnityObject)
-					((ADUnityObjectType)type).WriteObject(value, this);
-				else
-					type.Write(value, this);
+				type.Write(value, this);
 				EndWriteObject(null);
 			}
 		}

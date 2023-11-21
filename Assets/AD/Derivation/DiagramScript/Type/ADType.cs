@@ -24,7 +24,6 @@ namespace AD.Types
         public bool isDictionary { get; protected set; } = false;
         public bool isTuple { get; protected set; } = false;
         public bool isEnum { get; protected set; } = false;
-        public bool isADTypeUnityObject { get; protected set; } = false;
         public bool isReflectedType { get; protected set; } = false;
         public bool isUnsupported { get; protected set; } = false;
         public int priority { get; protected set; } = 0;
@@ -1273,7 +1272,6 @@ namespace AD.Types
         }
     }
 
-
     [UnityEngine.Scripting.Preserve]
     public class ADQueueType : ADCollectionType
     {
@@ -1402,12 +1400,12 @@ namespace AD.Types
     {
         public ADStackType(Type type) : base(type) { }
 
-        public override void Write(object obj, ES3Writer writer, ES3.ReferenceMode memberReferenceMode)
+        public override void Write(object obj, ADWriter writer)
         {
             var list = (ICollection)obj;
 
             if (elementType == null)
-                throw new ArgumentNullException("ES3Type argument cannot be null.");
+                throw new ArgumentNullException("ADType argument cannot be null.");
 
             //writer.StartWriteCollection();
 
@@ -1415,7 +1413,7 @@ namespace AD.Types
             foreach (object item in list)
             {
                 writer.StartWriteCollectionItem(i);
-                writer.Write(item, elementType, memberReferenceMode);
+                writer.Write(item, elementType);
                 writer.EndWriteCollectionItem(i);
                 i++;
             }
@@ -1423,29 +1421,12 @@ namespace AD.Types
             //writer.EndWriteCollection();
         }
 
-        public override object Read<T>(ES3Reader reader)
+        public override object Read<T>(ADReader reader)
         {
             return Read(reader);
-            /*if(reader.StartReadCollection())
-				return null;
-
-			var stack = new Stack<T>();
-
-			// Iterate through each character until we reach the end of the array.
-			while(true)
-			{
-				if(!reader.StartReadCollectionItem())
-					break;
-				stack.Push(reader.Read<T>(elementType));
-				if(reader.EndReadCollectionItem())
-					break;
-			}
-
-			reader.EndReadCollection();
-			return stack;*/
         }
 
-        public override void ReadInto<T>(ES3Reader reader, object obj)
+        public override void ReadInto<T>(ADReader reader, object obj)
         {
             if (reader.StartReadCollection())
                 throw new NullReferenceException("The Collection we are trying to load is stored as null, which is not allowed when using ReadInto methods.");
@@ -1479,9 +1460,9 @@ namespace AD.Types
             reader.EndReadCollection();
         }
 
-        public override object Read(ES3Reader reader)
+        public override object Read(ADReader reader)
         {
-            var instance = (IList)ES3Reflection.CreateInstance(ES3Reflection.MakeGenericType(typeof(List<>), elementType.type));
+            var instance = (IList)ReflectionExtension.CreateInstance(ReflectionExtension.MakeGenericType(typeof(List<>), elementType.type));
 
             if (reader.StartReadCollection())
                 return null;
@@ -1499,12 +1480,12 @@ namespace AD.Types
 
             reader.EndReadCollection();
 
-            ES3Reflection.GetMethods(instance.GetType(), "Reverse").FirstOrDefault(t => !t.IsStatic).Invoke(instance, new object[] { });
-            return ES3Reflection.CreateInstance(type, instance);
+            ReflectionExtension.GetMethods(instance.GetType(), "Reverse").FirstOrDefault(t => !t.IsStatic).Invoke(instance, new object[] { });
+            return ReflectionExtension.CreateInstance(type, instance);
 
         }
 
-        public override void ReadInto(ES3Reader reader, object obj)
+        public override void ReadInto(ADReader reader, object obj)
         {
             if (reader.StartReadCollection())
                 throw new NullReferenceException("The Collection we are trying to load is stored as null, which is not allowed when using ReadInto methods.");
@@ -1539,5 +1520,171 @@ namespace AD.Types
         }
     }
 
+    [UnityEngine.Scripting.Preserve]
+    public class ES3TupleType : ADType
+    {
+        public ADType[] es3Types;
+        public Type[] types;
+
+        protected ReflectionExtension.ADReflectedMethod readMethod = null;
+        protected ReflectionExtension.ADReflectedMethod readIntoMethod = null;
+
+        public ES3TupleType(Type type) : base(type)
+        {
+            types = ReflectionExtension.GetElementTypes(type);
+            es3Types = new ADType[types.Length];
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                es3Types[i] = ADType.GetOrCreateADType(types[i], false);
+                if (es3Types[i] == null)
+                    isUnsupported = true;
+            }
+
+            isTuple = true;
+        }
+
+        public override void Write(object obj, ADWriter writer)
+        {
+            if (obj == null) { writer.WriteNull(); return; };
+
+            writer.StartWriteCollection();
+
+            for (int i = 0; i < es3Types.Length; i++)
+            {
+                var itemProperty = ReflectionExtension.GetProperty(type, "Item" + (i + 1));
+                var item = itemProperty.GetValue(obj);
+                writer.StartWriteCollectionItem(i);
+                writer.Write(item, es3Types[i]);
+                writer.EndWriteCollectionItem(i);
+            }
+
+            writer.EndWriteCollection();
+        }
+
+        public override object Read<T>(ADReader reader)
+        {
+            var objects = new object[types.Length];
+
+            if (reader.StartReadCollection())
+                return null;
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                reader.StartReadCollectionItem();
+                objects[i] = reader.Read<object>(es3Types[i]);
+                reader.EndReadCollectionItem();
+            }
+
+            reader.EndReadCollection();
+
+            var constructor = type.GetConstructor(types);
+            var instance = constructor.Invoke(objects);
+
+            return instance;
+        }
+    }
+
     #endregion
+}
+
+namespace AD.Types
+{
+    [UnityEngine.Scripting.Preserve]
+    [ADProperties()]
+    public class ADType_Type : ADType
+    {
+        public static ADType Instance = null;
+
+        public ADType_Type() : base(typeof(System.Type))
+        {
+            Instance = this;
+        }
+
+        public override void Write(object obj, ADWriter writer)
+        {
+            Type type = (Type)obj;
+            writer.WriteProperty("assemblyQualifiedName", type.AssemblyQualifiedName);
+        }
+
+        public override object Read<T>(ADReader reader)
+        {
+            return Type.GetType(reader.ReadProperty<string>());
+        }
+    }
+}
+
+namespace AD.Types
+{
+    [UnityEngine.Scripting.Preserve]
+    public abstract class ADObjectType : ADType
+    {
+        public ADObjectType(Type type) : base(type) { }
+
+        protected abstract void WriteObject(object obj, ADWriter writer);
+        protected abstract object ReadObject<T>(ADReader reader);
+
+        protected virtual void ReadObject<T>(ADReader reader, object obj)
+        {
+            throw new NotSupportedException("ReadInto is not supported for type " + type);
+        }
+
+        public override void Write(object obj, ADWriter writer)
+        {
+            if (!WriteUsingDerivedType(obj, writer))
+            {
+                var baseType = ReflectionExtension.BaseType(obj.GetType());
+                if (baseType != typeof(object))
+                {
+                    var adType = ADType.GetOrCreateADType(baseType, false);
+                    // If it's a Dictionary or Collection, we need to write it as a field with a property name.
+                    if (adType != null && (adType.isDictionary || adType.isCollection))
+                        writer.WriteProperty("_Values", obj, adType);
+                }
+
+                WriteObject(obj, writer);
+            }
+        }
+
+        public override object Read<T>(ADReader reader)
+        {
+            string propertyName;
+            while (true)
+            {
+                propertyName = ReadPropertyName(reader);
+
+                if (propertyName == ADType.typeFieldName)
+                    return ADType.GetOrCreateADType(reader.ReadType()).Read<T>(reader);
+                else
+                {
+                    reader.overridePropertiesName = propertyName;
+
+                    return ReadObject<T>(reader);
+                }
+            }
+        }
+
+        public override void ReadInto<T>(ADReader reader, object obj)
+        {
+            string propertyName;
+            while (true)
+            {
+                propertyName = ReadPropertyName(reader);
+
+                if (propertyName == ADType.typeFieldName)
+                {
+                    ADType.GetOrCreateADType(reader.ReadType()).ReadInto<T>(reader, obj);
+                    return;
+                }
+                // This is important we return if the enumerator returns null, otherwise we will encounter an endless cycle.
+                else if (propertyName == null)
+                    return;
+                else
+                {
+                    reader.overridePropertiesName = propertyName;
+                    ReadObject<T>(reader, obj);
+                }
+            }
+        }
+    }
 }
