@@ -1688,3 +1688,42 @@ namespace AD.Types
         }
     }
 }
+
+namespace AD.Types
+{
+    #region String
+
+    [UnityEngine.Scripting.Preserve]
+    public class ADType_string : ADType
+    {
+        public static ADType Instance = null;
+
+        public ADType_string() : base(typeof(string))
+        {
+            isPrimitive = true;
+            Instance = this;
+        }
+
+        public override void Write(object obj, ADWriter writer)
+        {
+            writer.WritePrimitive((string)obj);
+        }
+
+        public override object Read<T>(ADReader reader)
+        {
+            return reader.Read_string();
+        }
+    }
+
+    public class ADType_StringArray : ADArrayType
+    {
+        public static ADType Instance;
+
+        public ADType_StringArray() : base(typeof(string[]), ADType_string.Instance)
+        {
+            Instance = this;
+        }
+    }
+
+    #endregion
+}

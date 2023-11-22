@@ -36,7 +36,6 @@ MonoBehaviour:
     - IngameDebugConsole.Runtime
     - LeanCommon
     - LeanPool
-    - MK.Glow
     - RuntimeInspector.Runtime
     - UniRx
     - UniRx.Examples

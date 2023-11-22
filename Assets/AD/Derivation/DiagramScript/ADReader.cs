@@ -162,7 +162,7 @@ namespace AD.Utility
 
         internal Type ReadType()
         {
-            return ReflectionExtension.GetType(Read<string>(ADType_String.Instance));
+            return ReflectionExtension.GetType(Read<string>(ADType_string.Instance));
         }
 
         /// <summary>Sets the value of a private property on an object.</summary>
