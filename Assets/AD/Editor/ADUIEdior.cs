@@ -70,9 +70,9 @@ public abstract class AbstractCustomADEditor : Editor
         defaultColor = GUI.color;
 
         if (EditorGUIUtility.isProSkin == true)
-            customSkin = (GUISkin)Resources.Load("Editor\\MUI Skin Dark");
+            customSkin = (GUISkin)Resources.Load("Editor\\ADUI Skin Dark");
         else
-            customSkin = (GUISkin)Resources.Load("Editor\\MUI Skin Light");
+            customSkin = (GUISkin)Resources.Load("Editor\\ADUI Skin Light");
 
         GUILayout.BeginHorizontal();
         GUI.backgroundColor = defaultColor;

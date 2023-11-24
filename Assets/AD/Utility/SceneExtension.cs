@@ -37,6 +37,11 @@ namespace AD.Utility
             return SceneManager.GetActiveScene();
         }
 
+        public static UnityEngine.SceneManagement.Scene GetCurrent()
+        {
+            return Get();
+        }
+
         /*
         Scene scene = SceneManager.GetActiveScene();
         Debug.Log(scene.name);

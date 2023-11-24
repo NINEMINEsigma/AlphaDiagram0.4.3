@@ -222,6 +222,19 @@ namespace AD.BASE
         private DateTime AD__GeneratedTime;
     }
 
+    //TODO
+    public class ADAssertion
+    {
+        public ADAssertion(bool assert, string message)
+        {
+            if (assert) throw new ADException(message);
+        }
+        public ADAssertion(Exception ex, string message)
+        {
+            if (ex != null) throw new ADException(message, ex);
+        }
+    }
+
     public interface IAnyArchitecture
     {
 

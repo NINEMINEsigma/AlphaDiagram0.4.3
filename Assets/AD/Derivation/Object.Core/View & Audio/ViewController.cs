@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using AD.BASE;
 using AD.Utility;
+using UniRx.Triggers;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -91,6 +92,9 @@ namespace AD.UI
         [HideInInspector] public ICanGetArchitecture architectureObtainer = null;
         [HideInInspector] public ICanTransformSprite canTransformSprite = null;
 
+        //会对性能产生不低的影响
+        public bool IsKeepCoverParent = false;
+
         #endregion
 
         #region Function
@@ -107,6 +111,18 @@ namespace AD.UI
             ViewImage = GetComponent<Image>();
             ViewImage.sprite = CurrentImage;
         }
+        private void OnValidate()
+        {
+            Update();
+        }
+        private void Update()
+        {
+            if (IsKeepCoverParent)
+            {
+                SetupCoverParent();
+            }
+        }
+
         private void OnDestroy()
         {
             AD.UI.ADUI.Destory(this);
@@ -232,6 +248,24 @@ namespace AD.UI
             ViewImage.sprite = null;
             ViewImage.sprite = AudioSourceController.BakeAudioWaveform(clip).ToSprite();
             return this;
+        }
+
+        public void SetupCoverParent()
+        {
+            if (SourcePairs.Count == 0 && this.transform.parent == null) return;
+            float ratio = (float)CurrentImage.texture.height / CurrentImage.texture.width;
+            var p_rectt = this.transform.parent.transform.As<RectTransform>();
+            var p_temp_rect = p_rectt.GetRect();
+            float parentRatio = Mathf.Abs(p_temp_rect[0].y - p_temp_rect[1].y) / (float)Mathf.Abs(p_temp_rect[2].x - p_temp_rect[1].x);
+            this.transform.localPosition = Vector3.zero;
+            if (ratio > parentRatio)
+            {
+                this.transform.As<RectTransform>().sizeDelta = new Vector2(p_rectt.sizeDelta.x, p_rectt.sizeDelta.x * ratio);
+            }
+            else
+            {
+                this.transform.As<RectTransform>().sizeDelta = new Vector2(p_rectt.sizeDelta.y / ratio, p_rectt.sizeDelta.y);
+            }
         }
 
         public void Init()

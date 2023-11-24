@@ -1,53 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using AD.UI;
-using AD.Utility;
 using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(ViewController)), CanEditMultipleObjects]
-public class VCEditor : Editor
+public class VCEditor : ADUIEditor
 {
     private ViewController that = null;
 
-    private /*List<SourcePair>*/SerializedProperty SourcePairs; 
-
-    /*private SourcePair CurrentSourcePair = null;
-    private AudioClip CurrentClip = null;
-    private int CurrentIndex = 0;
-    private bool IsPlay = false;
-    private float CurrentTime = 0;*/
+    SerializedProperty SourcePairs;
+    SerializedProperty IsKeepCoverParent;
 
 
-    private void OnEnable()
+    protected override void OnEnable()
     {
+        base.OnEnable();
         that = target as ViewController; 
 
-        SourcePairs = serializedObject.FindProperty("SourcePairs"); 
+        SourcePairs = serializedObject.FindProperty("SourcePairs");
+        IsKeepCoverParent = serializedObject.FindProperty("IsKeepCoverParent");
+
     }
 
-    public override void OnInspectorGUI()
+    public override void OnContentGUI()
     {
-        //BASE.OnInspectorGUI();
-        bool IsSourcePairsChange = false;
-
-        serializedObject.Update();
-
-        if (Application.isPlaying)
-        {
-            GUI.enabled = false;
-
-            EditorGUILayout.IntSlider("SerialNumber", that.SerialNumber, 0, AD.UI.ADUI.TotalSerialNumber - 1);
-            EditorGUILayout.TextField("ElementName", that.ElementName);
-            EditorGUILayout.TextField("ElementArea", that.ElementArea);
-
-            GUI.enabled = true;
-        }
-
-
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.PropertyField(SourcePairs);
-        IsSourcePairsChange = EditorGUI.EndChangeCheck();
+        if (EditorGUI.EndChangeCheck())
+        {
+            that.ViewImage.sprite = that.CurrentImage;
+        }
 
         if (Application.isPlaying)
         {
@@ -58,14 +39,26 @@ public class VCEditor : Editor
             GUI.enabled = true;
             if (GUILayout.Button("NextLine", new GUILayoutOption[] { })) that.NextPair();
             if (GUILayout.Button("Previous", new GUILayoutOption[] { })) that.PreviousPair();
-            if (GUILayout.Button("Random", new GUILayoutOption[] { })) that.RandomPair(); 
+            if (GUILayout.Button("Random", new GUILayoutOption[] { })) that.RandomPair();
         }
 
         serializedObject.ApplyModifiedProperties();
 
-        if(IsSourcePairsChange)
-        {
-            that.ViewImage.sprite = that.CurrentImage; 
-        }
+        if (GUILayout.Button("Try Cover Parent")) that.SetupCoverParent();
+    }
+
+    public override void OnResourcesGUI()
+    {
+
+    }
+
+    public override void OnSettingsGUI()
+    {
+        GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+        IsKeepCoverParent.boolValue = GUILayout.Toggle(IsKeepCoverParent.boolValue, new GUIContent("Is Keep Cover Parent"), customSkin.FindStyle("Toggle"));
+        IsKeepCoverParent.boolValue = GUILayout.Toggle(IsKeepCoverParent.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+        GUILayout.EndHorizontal();
     }
 }

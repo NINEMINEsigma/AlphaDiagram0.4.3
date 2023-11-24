@@ -588,7 +588,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -5177388603050735206, guid: 3a44a74aec0d44987862b7a93a1ae0c9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c5dfddac54159f439141aae8bc43049, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -597,7 +597,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 2
+  m_PixelsPerUnitMultiplier: 12
 --- !u!114 &3241788777981816900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -708,9 +708,10 @@ MonoBehaviour:
   Selected: 0
   ElementArea: Image
   SourcePairs:
-  - SpriteSource: {fileID: 21300000, guid: 1e8e8b567c6db47a49a2e29ee718d1a2, type: 3}
+  - SpriteSource: {fileID: 21300002, guid: 93780b5f4e631a94ba8b90e04eb83c45, type: 3}
     Name: 
     SpriteName: 
+  IsKeepCoverParent: 0
 --- !u!1 &3241788778569828105
 GameObject:
   m_ObjectHideFlags: 0
