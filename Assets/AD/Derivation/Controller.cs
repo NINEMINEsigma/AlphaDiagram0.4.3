@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.UI;
@@ -109,12 +110,12 @@ namespace AD
 
             OnSceneEnd.Invoke();
 
-
-            HowToLoadScene();
+            StartCoroutine(HowToLoadScene());
         }
 
-        protected virtual void HowToLoadScene()
+        protected virtual IEnumerator HowToLoadScene()
         {
+            yield return null;
             UnityEngine.SceneManagement.SceneManager.LoadScene(TargetSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
         }
 

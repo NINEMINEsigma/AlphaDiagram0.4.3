@@ -26,7 +26,7 @@ namespace AD.UI
     [Serializable]
     public abstract class ADUI : MonoBehaviour, IADUI
     {
-        public static ADUI CurrentSelect { get; private set; }
+        public static ADUI CurrentSelect { get; internal set; }
 
         private BehaviourContext _Context;
         public virtual bool IsNeedContext => true;
@@ -44,7 +44,7 @@ namespace AD.UI
 
         public static List<IADUI> Items { get; private set; } = new List<IADUI>();
         public static int TotalSerialNumber { get; private set; } = 0;
-        public static string UIArea { get; private set; } = "null";
+        public static string UIArea { get; internal set; } = "null";
 
         public string ElementName { get; set; } = "null";
         public int SerialNumber { get; set; } = 0;

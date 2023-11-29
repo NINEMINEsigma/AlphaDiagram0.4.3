@@ -43,8 +43,8 @@ public class SceneTransEditor : AbstractCustomADEditor
 
     public override void OnSettingsGUI()
     {
-        testKey=EditorGUILayout.TextField(testKey);
-        if(GUILayout.Button("- Test String Animation -"))
+        testKey = EditorGUILayout.TextField(testKey);
+        if (GUILayout.Button("- Test String Animation -"))
         {
             that.PlayAnimation(testKey);
         }

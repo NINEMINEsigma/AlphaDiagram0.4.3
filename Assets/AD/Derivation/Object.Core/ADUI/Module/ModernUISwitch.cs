@@ -97,6 +97,17 @@ namespace AD.UI
             }
         }
 
+        private void Start()
+        {
+            ADUI.Initialize(this);
+            SwitchButton.onClick.AddListener(OnClick);
+        }
+
+        private void OnDestroy()
+        {
+            ADUI.Destory(this);
+        }
+
         public void Init()
         {
             _isOn = false;

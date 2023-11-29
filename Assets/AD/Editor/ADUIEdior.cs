@@ -27,7 +27,21 @@ public abstract class AbstractCustomADEditor : Editor
 
     public virtual void OnADUIInspectorGUI()
     {
+        /*if (Application.isPlaying)
+        {
+            if (target.As<AD.UI.IADUI>(out var adui))
+            {
+                GUI.enabled = false;
 
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                EditorGUILayout.IntSlider("SerialNumber", adui.SerialNumber, 0, AD.UI.ADUI.TotalSerialNumber - 1);
+                EditorGUILayout.TextField("ElementName", adui.ElementName);
+                GUILayout.EndHorizontal();
+
+                GUI.enabled = true;
+            }
+        }
+        else HelpBox("ADUI Element Detail Will SerializeField When Playing Mode", MessageType.Info);*/
     }
 
     public void OnNotChangeGUI(UnityAction action)
@@ -164,12 +178,12 @@ public abstract class IADUIEditor : AbstractCustomADEditor
 
 public abstract class ADUIEditor : IADUIEditor
 {
-    private AD.UI.ADUI _target = null;
+    private AD.UI.IADUI _target = null;
 
     protected override void OnEnable()
     {
         base.OnEnable();
-        _target = (AD.UI.ADUI)target;
+        _target = (AD.UI.IADUI)target;
     }
 
     /// <summary>
@@ -185,13 +199,26 @@ public abstract class ADUIEditor : IADUIEditor
             EditorGUILayout.IntSlider("SerialNumber", _target.SerialNumber, 0, AD.UI.ADUI.TotalSerialNumber - 1);
             EditorGUILayout.TextField("ElementName", _target.ElementName);
             GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal(EditorStyles.helpBox);
-            EditorGUILayout.TextField("ElementArea", _target.ElementArea);
+            if (_target.As<AD.UI.ADUI>(out var adui))
+            {
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                EditorGUILayout.TextField("ElementArea", adui.ElementArea);
 
-            GUI.enabled = true;
+                GUI.enabled = true;
 
-            EditorGUILayout.Toggle("IsSelect", _target.Selected, customSkin.GetStyle("Toggle"));
-            GUILayout.EndHorizontal();
+                EditorGUILayout.Toggle("IsSelect", adui.Selected, customSkin.GetStyle("Toggle"));
+                GUILayout.EndHorizontal();
+            }
+            else if(_target.As<AD.UI.ViewController>(out var viewC))
+            {
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                EditorGUILayout.TextField("ElementArea", viewC.ElementArea);
+
+                GUI.enabled = true;
+
+                EditorGUILayout.Toggle("IsSelect", viewC.Selected, customSkin.GetStyle("Toggle"));
+                GUILayout.EndHorizontal();
+            }
         }
         else HelpBox("ADUI Element Detail Will SerializeField When Playing Mode", MessageType.Info);
     }

@@ -3,8 +3,6 @@ using AD.BASE;
 using UnityEditor;
 using UnityEngine;
 using AD.UI;
-using System;
-using Codice.CM.Common;
 
 namespace AD
 {
@@ -47,6 +45,8 @@ namespace AD
         SerializedProperty mCanvasInitializer;
 
         SerializedProperty TargetSceneName;
+        SerializedProperty isAsyncToLoadNextScene;
+        SerializedProperty WaitTime;
 
         protected override void OnEnable()
         {
@@ -86,6 +86,8 @@ namespace AD
             OnSceneEnd = serializedObject.FindProperty(nameof(OnSceneEnd));
             mCanvasInitializer = serializedObject.FindProperty(nameof(mCanvasInitializer));
             TargetSceneName = serializedObject.FindProperty(nameof(TargetSceneName));
+            isAsyncToLoadNextScene = serializedObject.FindProperty(nameof(isAsyncToLoadNextScene));
+            WaitTime = serializedObject.FindProperty(nameof(WaitTime));
         }
 
         public override void OnContentGUI()
@@ -94,7 +96,16 @@ namespace AD
             {
                 EditorGUILayout.LabelField(new GUIContent("TargetSceneName"), customSkin.FindStyle("Text"), GUILayout.Width(120));
                 EditorGUILayout.PropertyField(TargetSceneName, new GUIContent(""));
+
             });
+            GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+            isAsyncToLoadNextScene.boolValue = GUILayout.Toggle(isAsyncToLoadNextScene.boolValue, new GUIContent("Is AsyncLoad"), customSkin.FindStyle("Toggle"));
+            isAsyncToLoadNextScene.boolValue = GUILayout.Toggle(isAsyncToLoadNextScene.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+            EditorGUILayout.PropertyField(WaitTime, new GUIContent("Waiting Of Load"));
+
+            GUILayout.EndHorizontal();
 
             GUILayout.BeginVertical(EditorStyles.helpBox);
 

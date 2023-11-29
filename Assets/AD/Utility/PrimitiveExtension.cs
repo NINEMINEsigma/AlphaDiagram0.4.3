@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace AD.Utility
 {
-    public static class FloatExtension
+    public static class PrimitiveExtension
     {
         public static float Sum(this IEnumerator<float> self)
         {
@@ -41,5 +41,9 @@ namespace AD.Utility
             return max;
         }
 
+        public static bool Is_pow_2(ulong _Value)
+        {
+            return _Value != 0 && (_Value & (_Value - 1)) == 0;
+        }
     }
 }

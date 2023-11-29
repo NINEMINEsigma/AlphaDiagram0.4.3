@@ -26,7 +26,7 @@ namespace AD.Experimental.SceneTrans
             }
         }
 
-        protected virtual void Awake()
+        protected virtual void Start()
         {
             var temp = GameObject.FindObjectsOfType<SceneBaseController>();
             if (temp.Length == 0)
@@ -72,13 +72,15 @@ namespace AD.Experimental.SceneTrans
         {
             if (SceneOpenAnimation.TryGetValue(SceneExtension.GetCurrent().name, out var openAnimtion))
             {
+                Animator.Play("Idle");
                 Animator.Play(openAnimtion);
             }
             sceneBase.OnSceneEnd.AddListener(() =>
             {
-                if (SceneCloseAnimation.TryGetValue(sceneBase.TargetSceneName, out var targetAnimation))
+                if (SceneCloseAnimation.TryGetValue(SceneExtension.GetCurrent().name, out var targetAnimation))
                 {
-                    Animator.Play(openAnimtion);
+                    Animator.Play("Idle");
+                    Animator.Play(targetAnimation);
                 }
             });
         }
@@ -89,11 +91,13 @@ namespace AD.Experimental.SceneTrans
         {
             if (SceneOpenAnimation.TryGetValue(key, out var openAnimtion))
             {
-                animator.Play(openAnimtion);
+                Animator.Play("Idle");
+                Animator.Play(openAnimtion);
             }
             else if (SceneCloseAnimation.TryGetValue(key, out var closeAnimtion))
             {
-                animator.Play(closeAnimtion);
+                Animator.Play("Idle");
+                Animator.Play(closeAnimtion);
             }
         }
         public void PlayAction(string key)

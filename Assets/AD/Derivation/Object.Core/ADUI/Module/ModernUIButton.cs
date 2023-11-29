@@ -144,7 +144,7 @@ namespace AD.UI
 
         public ModernUIButton SetTitle(string title)
         {
-            buttonText=title;
+            buttonText = title;
             UpdateUI();
             return this;
         }

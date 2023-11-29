@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -195,8 +196,8 @@ namespace AD
                 return _m_instance;
             }
         }
-    
-        [Space(20),Header("GlobalSystem")]
+
+        [Space(20), Header("GlobalSystem")]
         public bool IsNeedExcepion = true;
         public uint MaxRecordItemCount = 10000;
         public static bool IsKeepException => instance.IsNeedExcepion;
@@ -220,7 +221,7 @@ namespace AD
         public AudioSourceController _AudioSource;
         public CustomWindowElement _CustomWindowElement;
 
-        public static T GenerateElement<T>()where T:ADUI
+        public static T GenerateElement<T>() where T : ADUI
         {
             try
             {
@@ -648,7 +649,7 @@ namespace AD
         }
 
         public static bool Deserialize<T>(string source, out object obj)
-        { 
+        {
             if (typeof(T).IsPrimitive)
             {
                 try
@@ -939,6 +940,36 @@ namespace AD
 
 
         #endregion
+
+        #region Scene
+
+        [SerializeField, Tooltip("Is AsyncLoad Next Scene")] private bool isAsyncToLoadNextScene = false;
+        public float WaitTime = 1.5f;
+
+        public static AsyncOperation CurrentAsyncOperation;
+
+        protected override IEnumerator HowToLoadScene()
+        {
+            if (isAsyncToLoadNextScene)
+            {
+                float waitClock = WaitTime;
+                CurrentAsyncOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(TargetSceneName, UnityEngine.SceneManagement.LoadSceneMode.Single);
+                CurrentAsyncOperation.allowSceneActivation = false;
+                while (waitClock > 0 || !(CurrentAsyncOperation.IsDone() && (WhenEndScene == null || WhenEndScene.Invoke(CurrentAsyncOperation.progress))))
+                {
+                    waitClock -= Time.deltaTime;
+                    yield return null;
+                }
+                CurrentAsyncOperation.allowSceneActivation = true;
+                CurrentAsyncOperation = null;
+            }
+            else yield return base.HowToLoadScene();
+        }
+
+        public Func<float, bool> WhenEndScene = null;
+
+        #endregion
+
     }
 
     public static class MethodBaseExtension

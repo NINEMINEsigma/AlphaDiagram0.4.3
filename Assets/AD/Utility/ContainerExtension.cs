@@ -33,6 +33,55 @@ namespace AD.Utility
             return result;
         }
 
+        public static List<Value> GetSubListAboutValue<Key, Value>(this Dictionary<Key, Value> self)
+        {
+            List<Value> result = new();
+            foreach (var item in self)
+            {
+                result.Add(item.Value);
+            }
+            return result;
+        }
+
+        public static List<Key> GetSubListAboutKey<Key, Value>(this Dictionary<Key, Value> self)
+        {
+            List<Key> result = new();
+            foreach (var item in self)
+            {
+                result.Add(item.Key);
+            }
+            return result;
+        }
+
+        public static List<T> GetSubListAboutValue<T, Key, Value>(this Dictionary<Key, Value> self) where Value : T
+        {
+            List<T> result = new();
+            foreach (var item in self)
+            {
+                result.Add(item.Value);
+            }
+            return result;
+        }
+
+        public static List<T> GetSubListAboutKey<T, Key, Value>(this Dictionary<Key, Value> self) where Key : T
+        {
+            List<T> result = new();
+            foreach (var item in self)
+            {
+                result.Add(item.Key);
+            }
+            return result;
+        }
+
+        public static List<Result> GetSubList<Result, T>(this IEnumerable<T> self, Func<T, bool> predicate, Func<T, Result> transformFunc)
+        {
+            List<Result> result = new();
+            foreach (var item in self)
+            {
+                if (predicate(item)) result.Add(transformFunc(item));
+            }
+            return result;
+        }
     }
 
     [System.Serializable]
@@ -83,6 +132,7 @@ namespace AD.Utility
                         if (!this.TryAdd(Data[i].Key, Data[i].Value))
                         {
                             if (typeof(TKey) == typeof(string)) this.Add("New Key".As<TKey>(), Data[i].Value);
+                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) this.Add(0.As<TKey>(), Data[i].Value);
                         }
                     }
                     catch { }
@@ -103,3 +153,4 @@ namespace AD.Utility
         }
     }
 }
+

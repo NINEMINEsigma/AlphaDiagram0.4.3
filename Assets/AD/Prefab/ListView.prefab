@@ -69,7 +69,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5e16c7aea118d68498053518146c9cf9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 64f9edae6383adb4b9a008ebe5962a9c, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -188,7 +188,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5618123237d1d3f49a5a6025287065f7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c5dfddac54159f439141aae8bc43049, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -296,7 +296,6 @@ GameObject:
   - component: {fileID: 4994205416283259551}
   - component: {fileID: 4994205416283259520}
   - component: {fileID: 4994205416283259521}
-  - component: {fileID: 4994205416283259550}
   m_Layer: 5
   m_Name: Scrollbar
   m_TagString: Untagged
@@ -383,22 +382,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4994205416283259550
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4994205416283259548}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e098a0a519700eb4094ec2c8b9d07b30, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
-  webglMode: 0
-  background: {fileID: 4994205415942601676}
-  bar: {fileID: 4994205417334539626}
 --- !u!1 &4994205416411601995
 GameObject:
   m_ObjectHideFlags: 0
@@ -569,7 +552,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 5618123237d1d3f49a5a6025287065f7, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 8c5dfddac54159f439141aae8bc43049, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1

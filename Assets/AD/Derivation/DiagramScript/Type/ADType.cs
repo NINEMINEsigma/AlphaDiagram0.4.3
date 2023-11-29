@@ -204,7 +204,7 @@ namespace AD.Types
             else if (ReflectionExtension.IsAssignableFrom(typeof(UnityEngine.Object), type))
                 return new ES3ReflectedUnityObjectType(type);
             else if (type.Name.StartsWith("Tuple`"))
-                return new ES3TupleType(type);
+                return new ADTupleType(type);
             else
                 return new ES3ReflectedObjectType(type);*/
         }
@@ -1521,23 +1521,23 @@ namespace AD.Types
     }
 
     [UnityEngine.Scripting.Preserve]
-    public class ES3TupleType : ADType
+    public class ADTupleType : ADType
     {
-        public ADType[] es3Types;
-        public Type[] types;
+        public ADType[] adTypes;
+        public Type[] subTypes;
 
         protected ReflectionExtension.ADReflectedMethod readMethod = null;
         protected ReflectionExtension.ADReflectedMethod readIntoMethod = null;
 
-        public ES3TupleType(Type type) : base(type)
+        public ADTupleType(Type type) : base(type)
         {
-            types = ReflectionExtension.GetElementTypes(type);
-            es3Types = new ADType[types.Length];
+            subTypes = ReflectionExtension.GetElementTypes(type);
+            adTypes = new ADType[subTypes.Length];
 
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < subTypes.Length; i++)
             {
-                es3Types[i] = ADType.GetOrCreateADType(types[i], false);
-                if (es3Types[i] == null)
+                adTypes[i] = ADType.GetOrCreateADType(subTypes[i], false);
+                if (adTypes[i] == null)
                     isUnsupported = true;
             }
 
@@ -1550,12 +1550,12 @@ namespace AD.Types
 
             writer.StartWriteCollection();
 
-            for (int i = 0; i < es3Types.Length; i++)
+            for (int i = 0; i < adTypes.Length; i++)
             {
                 var itemProperty = ReflectionExtension.GetProperty(type, "Item" + (i + 1));
                 var item = itemProperty.GetValue(obj);
                 writer.StartWriteCollectionItem(i);
-                writer.Write(item, es3Types[i]);
+                writer.Write(item, adTypes[i]);
                 writer.EndWriteCollectionItem(i);
             }
 
@@ -1564,21 +1564,21 @@ namespace AD.Types
 
         public override object Read<T>(ADReader reader)
         {
-            var objects = new object[types.Length];
+            var objects = new object[subTypes.Length];
 
             if (reader.StartReadCollection())
                 return null;
 
-            for (int i = 0; i < types.Length; i++)
+            for (int i = 0; i < subTypes.Length; i++)
             {
                 reader.StartReadCollectionItem();
-                objects[i] = reader.Read<object>(es3Types[i]);
+                objects[i] = reader.Read<object>(adTypes[i]);
                 reader.EndReadCollectionItem();
             }
 
             reader.EndReadCollection();
 
-            var constructor = type.GetConstructor(types);
+            var constructor = type.GetConstructor(subTypes);
             var instance = constructor.Invoke(objects);
 
             return instance;

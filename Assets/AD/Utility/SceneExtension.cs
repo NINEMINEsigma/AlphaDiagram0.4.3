@@ -70,7 +70,7 @@ namespace AD.Utility
 
     static public class AsyncOperationExtension
     {
-        public static bool IsDone(this AsyncOperation operation,float targetProgress)
+        public static bool IsDone(this AsyncOperation operation, float targetProgress = 0.9f)
         {
             Debug.Log("now progress : " + operation.progress);
             if (operation.progress >= targetProgress)
