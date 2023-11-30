@@ -5,175 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace AD.UI
 {
-    public class BasePointerEnterBehaviour : MonoBehaviour, IPointerEnterHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnPointerEnterEvent;
-
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            OnPointerEnterEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BasePointerExitBehaviour : MonoBehaviour, IPointerExitHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnPointerExitEvent;
-
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            OnPointerExitEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BasePointerDownBehaviour : MonoBehaviour, IPointerDownHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnPointerDownEvent;
-
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            OnPointerDownEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BasePointerUpBehaviour : MonoBehaviour, IPointerUpHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnPointerUpEvent;
-
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            OnPointerUpEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BasePointerClickBehaviour : MonoBehaviour, IPointerClickHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnPointerClickEvent;
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            OnPointerClickEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseInitializePotentialDragBehaviour : MonoBehaviour, IInitializePotentialDragHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnInitializePotentialDragEvent;
-
-        public void OnInitializePotentialDrag(PointerEventData eventData)
-        {
-            OnInitializePotentialDragEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseBeginDragBehaviour : MonoBehaviour, IBeginDragHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnBeginDragEvent;
-
-        public void OnBeginDrag(PointerEventData eventData)
-        {
-            OnBeginDragEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseDragBehaviour : MonoBehaviour, IDragHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnDragEvent;
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            OnDragEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseEndDragBehaviour : MonoBehaviour, IEndDragHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnEndDragEvent;
-
-        public void OnEndDrag(PointerEventData eventData)
-        {
-            OnEndDragEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseDropBehaviour : MonoBehaviour, IDropHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnDropEvent;
-
-        public void OnDrop(PointerEventData eventData)
-        {
-            OnDropEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseScrollBehaviour : MonoBehaviour, IScrollHandler
-    {
-        public ADOrderlyEvent<PointerEventData> OnScrollEvent;
-
-        public void OnScroll(PointerEventData eventData)
-        {
-            OnScrollEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseUpdateSelectedBehaviour : MonoBehaviour, IUpdateSelectedHandler
-    {
-        public ADOrderlyEvent<BaseEventData> OnUpdateSelectedEvent;
-
-        public void OnUpdateSelected(BaseEventData eventData)
-        {
-            OnUpdateSelectedEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseSelectBehaviour : MonoBehaviour, ISelectHandler
-    {
-        public ADOrderlyEvent<BaseEventData> OnSelectEvent;
-
-        public void OnSelect(BaseEventData eventData)
-        {
-            OnSelectEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseDeselectBehaviour : MonoBehaviour, IDeselectHandler
-    {
-        public ADOrderlyEvent<BaseEventData> OnDeselectEvent;
-
-        public void OnDeselect(BaseEventData eventData)
-        {
-            OnDeselectEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseMoveBehaviour : MonoBehaviour, IMoveHandler
-    {
-        public ADOrderlyEvent<AxisEventData> OnMoveEvent;
-
-        public void OnMove(AxisEventData eventData)
-        {
-            OnMoveEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseSubmitBehaviour : MonoBehaviour, ISubmitHandler
-    {
-        public ADOrderlyEvent<BaseEventData> OnSubmitEvent;
-
-        public void OnSubmit(BaseEventData eventData)
-        {
-            OnSubmitEvent?.Invoke(eventData);
-        }
-    }
-
-    public class BaseCancelBehaviour : MonoBehaviour, ICancelHandler
-    {
-        public ADOrderlyEvent<BaseEventData> OnCancelEvent;
-
-        public void OnCancel(BaseEventData eventData)
-        {
-            OnCancelEvent?.Invoke(eventData);
-        }
-    }
+    public interface IBehaviourOperator { }
 
     public class BehaviourContext : MonoBehaviour,
         ICanvasRaycastFilter
@@ -182,8 +14,7 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseBeginDragBehaviour>();
-                if(cat==null) return null;
+                if (!TryGetComponent<BaseBeginDragBehaviour>(out var cat)) return null;
                 return cat.OnBeginDragEvent;
             }
             set
@@ -196,8 +27,7 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseDragBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseDragBehaviour>(out var cat)) return null;
                 return cat.OnDragEvent;
             }
             set
@@ -210,8 +40,7 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseDropBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseDropBehaviour>(out var cat)) return null;
                 return cat.OnDropEvent;
             }
             set
@@ -224,8 +53,7 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseEndDragBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseEndDragBehaviour>(out var cat)) return null;
                 return cat.OnEndDragEvent;
             }
             set
@@ -238,8 +66,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseInitializePotentialDragBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseInitializePotentialDragBehaviour>(out var cat))
+                    return null;
                 return cat.OnInitializePotentialDragEvent;
             }
             set
@@ -252,8 +80,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BasePointerClickBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BasePointerClickBehaviour>(out var cat))
+                    return null;
                 return cat.OnPointerClickEvent;
             }
             set
@@ -266,8 +94,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BasePointerDownBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BasePointerDownBehaviour>(out var cat))
+                    return null;
                 return cat.OnPointerDownEvent;
             }
             set
@@ -280,8 +108,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BasePointerEnterBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BasePointerEnterBehaviour>(out var cat))
+                    return null;
                 return cat.OnPointerEnterEvent;
             }
             set
@@ -294,8 +122,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BasePointerExitBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BasePointerExitBehaviour>(out var cat))
+                    return null;
                 return cat.OnPointerExitEvent;
             }
             set
@@ -308,8 +136,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BasePointerUpBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BasePointerUpBehaviour>(out var cat))
+                    return null;
                 return cat.OnPointerUpEvent;
             }
             set
@@ -322,8 +150,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseScrollBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseScrollBehaviour>(out var cat))
+                    return null;
                 return cat.OnScrollEvent;
             }
             set
@@ -337,8 +165,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseCancelBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseCancelBehaviour>(out var cat))
+                    return null;
                 return cat.OnCancelEvent;
             }
             set
@@ -351,8 +179,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseDeselectBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseDeselectBehaviour>(out var cat))
+                    return null;
                 return cat.OnDeselectEvent;
             }
             set
@@ -365,8 +193,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseSelectBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseSelectBehaviour>(out var cat))
+                    return null;
                 return cat.OnSelectEvent;
             }
             set
@@ -379,8 +207,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseSubmitBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseSubmitBehaviour>(out var cat))
+                    return null;
                 return cat.OnSubmitEvent;
             }
             set
@@ -393,8 +221,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseUpdateSelectedBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseUpdateSelectedBehaviour>(out var cat))
+                    return null;
                 return cat.OnUpdateSelectedEvent;
             }
             set
@@ -408,8 +236,8 @@ namespace AD.UI
         {
             get
             {
-                var cat = this.GetComponent<BaseMoveBehaviour>();
-                if (cat == null) return null;
+                if (!this.TryGetComponent<BaseMoveBehaviour>(out var cat))
+                    return null;
                 return cat.OnMoveEvent;
             }
             set
@@ -425,6 +253,14 @@ namespace AD.UI
         public bool IsRaycastLocationValid(Vector2 sp, Camera eventCamera)
         {
             return locationValid?.Invoke(sp, eventCamera) ?? true;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (var item in GetComponents<IBehaviourOperator>())
+            {
+                Destroy(item.As<MonoBehaviour>());
+            }
         }
     }
 }

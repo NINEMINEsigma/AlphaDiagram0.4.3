@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(AD.UI.ListView)), CanEditMultipleObjects]
+[CustomEditor(inspectedType: typeof(AD.UI.ListView), editorForChildClasses: true, isFallback = false), CanEditMultipleObjects]
 public class ListViewEditor : ADUIEditor
 {
     private ListView that;

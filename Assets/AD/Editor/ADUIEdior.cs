@@ -77,6 +77,16 @@ public abstract class AbstractCustomADEditor : Editor
     protected GUISkin customSkin;
     protected Color defaultColor;
 
+    public void Toggle(SerializedProperty enableTrigger, string label)
+    {
+        GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+        enableTrigger.boolValue = GUILayout.Toggle(enableTrigger.boolValue, new GUIContent(label), customSkin.FindStyle("Toggle"));
+        enableTrigger.boolValue = GUILayout.Toggle(enableTrigger.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+        GUILayout.EndHorizontal();
+    }
+
     public override void OnInspectorGUI()
     {
         serializedObject.Update();

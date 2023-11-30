@@ -28,16 +28,20 @@ namespace AD.Experimental.SceneTrans
 
         protected virtual void Start()
         {
+            SceneBaseController sceneBase = null;
             var temp = GameObject.FindObjectsOfType<SceneBaseController>();
-            if (temp.Length == 0)
+            if (temp.Length == 0) throw new ADException("Scene Controller is not found");
+            else if (temp.Length == 1) sceneBase = temp[0];
+            else if (temp.Length == 2)
             {
-                throw new ADException("Scene Controller is not found");
+                if (temp[0] is ADGlobalSystem) sceneBase = temp[1];
+                else if (temp[1] is ADGlobalSystem) sceneBase = temp[0];
+                else throw new ADException("There have too much Scene Controller");
             }
-            if (temp.Length > 1)
+            else
             {
                 throw new ADException("There have too much Scene Controller");
             }
-            SceneBaseController sceneBase = temp[0];
             if (GameObject.FindObjectsOfType<SceneTrans>().Length > 1)
             {
                 instance.SetupCurrentSceneBaseEvent(sceneBase);

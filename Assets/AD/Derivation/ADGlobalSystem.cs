@@ -461,7 +461,7 @@ namespace AD
         {
             if (_m_instance != null && _m_instance != this) DestroyImmediate(_m_instance.gameObject);
             _m_instance = this;
-            base.Awake();
+            if (IsEnableSceneController) base.Awake();
         }
 
         private void LateUpdate()
@@ -943,8 +943,15 @@ namespace AD
 
         #region Scene
 
+        public bool IsEnableSceneController = false;
+
         [SerializeField, Tooltip("Is AsyncLoad Next Scene")] private bool isAsyncToLoadNextScene = false;
         public float WaitTime = 1.5f;
+
+        public override void OnEnd()
+        {
+            if (IsEnableSceneController) base.OnEnd();
+        }
 
         public static AsyncOperation CurrentAsyncOperation;
 

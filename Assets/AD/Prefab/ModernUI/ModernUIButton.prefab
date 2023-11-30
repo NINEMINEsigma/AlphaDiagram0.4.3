@@ -12,9 +12,6 @@ GameObject:
   - component: {fileID: 1700112587579632844}
   - component: {fileID: 1700112587579632845}
   - component: {fileID: 2125785148805611815}
-  - component: {fileID: 5620640836660969347}
-  - component: {fileID: 4604164823434860657}
-  - component: {fileID: 1084093274242994637}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -191,46 +188,6 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
---- !u!114 &5620640836660969347
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700112587579632840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4604164823434860657
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700112587579632840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerEnterEvent:
-    InvokeArray: 00000000
---- !u!114 &1084093274242994637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700112587579632840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerExitEvent:
-    InvokeArray: 00000000
 --- !u!1 &1700112587902579846
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,10 +199,10 @@ GameObject:
   - component: {fileID: 1700112587902580089}
   - component: {fileID: 1700112587902580090}
   - component: {fileID: 1700112587902580091}
-  - component: {fileID: 5181476331835636057}
-  - component: {fileID: 4557430493873814128}
-  - component: {fileID: 5649295332227305032}
   - component: {fileID: 2459154617306750998}
+  - component: {fileID: 3993771436284202510}
+  - component: {fileID: 7969471325783006931}
+  - component: {fileID: 1046171784709747282}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -301,7 +258,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 8c5dfddac54159f439141aae8bc43049, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -311,46 +268,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 55
---- !u!114 &5181476331835636057
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700112587902579846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4557430493873814128
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700112587902579846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerEnterEvent:
-    InvokeArray: 0000000000000000
---- !u!114 &5649295332227305032
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1700112587902579846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerExitEvent:
-    InvokeArray: 0000000000000000
 --- !u!114 &2459154617306750998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,7 +284,10 @@ MonoBehaviour:
   ElementArea: Image
   _ViewImage: {fileID: 1700112587902580091}
   HasImage: 1
-  SourcePairs: []
+  SourcePairs:
+  - SpriteSource: {fileID: 21300000, guid: 4083811a1eecdcb498ba17610b772a98, type: 3}
+    Name: 
+    SpriteName: 
   IsKeepCoverParent: 0
   _gradientType: 0
   _blendMode: 2
@@ -403,6 +323,46 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
+--- !u!114 &3993771436284202510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700112587902579846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7969471325783006931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700112587902579846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 213f8197d2e780a4eb37503ae30823ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPointerEnterEvent:
+    InvokeArray: 000000000000000000000000
+--- !u!114 &1046171784709747282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1700112587902579846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5977b725805788d429efc1ae02814fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPointerExitEvent:
+    InvokeArray: 000000000000000000000000
 --- !u!1 &1700112588271723248
 GameObject:
   m_ObjectHideFlags: 0
@@ -767,7 +727,7 @@ MonoBehaviour:
   useClickSound: 0
   useRipple: 1
   rippleUpdateMode: 1
-  rippleShape: {fileID: 21300000, guid: d25e2ce15dd1c67438e4b70f404fb197, type: 3}
+  rippleShape: {fileID: 21300000, guid: 8c5dfddac54159f439141aae8bc43049, type: 3}
   speed: 2.4
   maxSize: 4
   startColor: {r: 0, g: 0, b: 0, a: 0.5019608}
@@ -858,9 +818,9 @@ GameObject:
   - component: {fileID: 1700112589284365118}
   - component: {fileID: 1700112589284365119}
   - component: {fileID: 3498369671746041177}
-  - component: {fileID: 2689425609659868649}
-  - component: {fileID: 564479003548340583}
-  - component: {fileID: 4241305038634992497}
+  - component: {fileID: 800819664799850478}
+  - component: {fileID: 2624006251377063392}
+  - component: {fileID: 1651882684861800976}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -981,7 +941,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
---- !u!114 &2689425609659868649
+--- !u!114 &800819664799850478
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -993,7 +953,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &564479003548340583
+--- !u!114 &2624006251377063392
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1002,12 +962,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1700112589284365114}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 213f8197d2e780a4eb37503ae30823ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnPointerEnterEvent:
-    InvokeArray: 00000000
---- !u!114 &4241305038634992497
+    InvokeArray: 000000000000000000000000
+--- !u!114 &1651882684861800976
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1016,11 +976,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1700112589284365114}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 5977b725805788d429efc1ae02814fe4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   OnPointerExitEvent:
-    InvokeArray: 00000000
+    InvokeArray: 000000000000000000000000
 --- !u!1 &1700112589418911072
 GameObject:
   m_ObjectHideFlags: 0

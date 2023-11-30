@@ -44,6 +44,7 @@ namespace AD
 
         SerializedProperty mCanvasInitializer;
 
+        SerializedProperty IsEnableSceneController;
         SerializedProperty TargetSceneName;
         SerializedProperty isAsyncToLoadNextScene;
         SerializedProperty WaitTime;
@@ -85,6 +86,7 @@ namespace AD
             OnSceneStart = serializedObject.FindProperty(nameof(OnSceneStart));
             OnSceneEnd = serializedObject.FindProperty(nameof(OnSceneEnd));
             mCanvasInitializer = serializedObject.FindProperty(nameof(mCanvasInitializer));
+            IsEnableSceneController = serializedObject.FindProperty(nameof(IsEnableSceneController));
             TargetSceneName = serializedObject.FindProperty(nameof(TargetSceneName));
             isAsyncToLoadNextScene = serializedObject.FindProperty(nameof(isAsyncToLoadNextScene));
             WaitTime = serializedObject.FindProperty(nameof(WaitTime));
@@ -92,32 +94,36 @@ namespace AD
 
         public override void OnContentGUI()
         {
-            HorizontalBlockWithBox(() =>
+            if (IsEnableSceneController.boolValue)
             {
-                EditorGUILayout.LabelField(new GUIContent("TargetSceneName"), customSkin.FindStyle("Text"), GUILayout.Width(120));
-                EditorGUILayout.PropertyField(TargetSceneName, new GUIContent(""));
+                HorizontalBlockWithBox(() =>
+                {
+                    EditorGUILayout.LabelField(new GUIContent("TargetSceneName"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                    EditorGUILayout.PropertyField(TargetSceneName, new GUIContent(""));
 
-            });
-            GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                });
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
-            isAsyncToLoadNextScene.boolValue = GUILayout.Toggle(isAsyncToLoadNextScene.boolValue, new GUIContent("Is AsyncLoad"), customSkin.FindStyle("Toggle"));
-            isAsyncToLoadNextScene.boolValue = GUILayout.Toggle(isAsyncToLoadNextScene.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+                isAsyncToLoadNextScene.boolValue = GUILayout.Toggle(isAsyncToLoadNextScene.boolValue, new GUIContent("Is AsyncLoad"), customSkin.FindStyle("Toggle"));
+                isAsyncToLoadNextScene.boolValue = GUILayout.Toggle(isAsyncToLoadNextScene.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
 
-            EditorGUILayout.PropertyField(WaitTime, new GUIContent("Waiting Of Load"));
+                EditorGUILayout.PropertyField(WaitTime, new GUIContent("Waiting Of Load"));
 
-            GUILayout.EndHorizontal();
+                GUILayout.EndHorizontal();
 
-            GUILayout.BeginVertical(EditorStyles.helpBox);
+                GUILayout.BeginVertical(EditorStyles.helpBox);
 
-            GUILayout.BeginHorizontal(EditorStyles.helpBox);
-            EditorGUILayout.LabelField(new GUIContent("On Scene Event"), customSkin.FindStyle("Text"), GUILayout.Width(120));
-            GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal(EditorStyles.helpBox);
+                EditorGUILayout.LabelField(new GUIContent("On Scene Event"), customSkin.FindStyle("Text"), GUILayout.Width(120));
+                GUILayout.EndHorizontal();
 
-            GUILayout.Space(2);
-            EditorGUILayout.PropertyField(OnSceneStart, true);
-            EditorGUILayout.PropertyField(OnSceneEnd, true);
-            GUILayout.Space(2);
-            GUILayout.EndVertical();
+                GUILayout.Space(2);
+                EditorGUILayout.PropertyField(OnSceneStart, true);
+                EditorGUILayout.PropertyField(OnSceneEnd, true);
+                GUILayout.Space(2);
+                GUILayout.EndVertical();
+
+            }
 
             if (that._IsOnValidate)
             {
@@ -206,6 +212,16 @@ namespace AD
 
         public override void OnSettingsGUI()
         {
+
+            GUILayout.BeginHorizontal(EditorStyles.helpBox);
+
+            this.HelpBox("Is set this system \nas SceneController", MessageType.Info);
+
+            IsEnableSceneController.boolValue = GUILayout.Toggle(IsEnableSceneController.boolValue, new GUIContent("SC Enable"), customSkin.FindStyle("Toggle"));
+            IsEnableSceneController.boolValue = GUILayout.Toggle(IsEnableSceneController.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
+
+            GUILayout.EndHorizontal();
+
             HorizontalBlockWithBox(() =>
             {
                 IsNeedExcepion.boolValue = GUILayout.Toggle(IsNeedExcepion.boolValue, new GUIContent("Is Need Throw Excepion"), customSkin.FindStyle("Toggle"));

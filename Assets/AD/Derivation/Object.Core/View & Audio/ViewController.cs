@@ -103,11 +103,6 @@ namespace AD.UI
                 }
                 return _ViewImage;
             }
-            set
-            {
-                HasImage = value != null;
-                _ViewImage = value;
-            }
         }
 
         public List<ImagePair> SourcePairs = new();
@@ -256,10 +251,12 @@ namespace AD.UI
         protected override void Start()
         {
             base.Start();
-            AD.UI.ADUI.Initialize(this);
 
             if (ViewImage != null)
+            {
+                AD.UI.ADUI.Initialize(this);
                 ViewImage.sprite = CurrentImage;
+            }
         }
         protected override void OnValidate()
         {
@@ -277,7 +274,10 @@ namespace AD.UI
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            AD.UI.ADUI.Destory(this);
+            if (ViewImage != null)
+            {
+                AD.UI.ADUI.Destory(this);
+            }
         }
 
         #endregion
