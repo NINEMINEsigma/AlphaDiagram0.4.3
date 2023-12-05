@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace AD.UI
 {
-    public class ModernUIInputField : PropertyModule
+    public class ModernUIInputField : PropertyModule,INumericManager<string>
     {
         public ModernUIInputField()
         {
@@ -30,7 +30,10 @@ namespace AD.UI
                 if (_inputFieldAnimator == null) GetComponent<Animator>();
                 return _inputFieldAnimator;
             }
-        } 
+        }
+
+        [Header("Setting")]
+        public string NumericManagerName = "DefaultInput";
 
         // Hidden variables
         private readonly string inAnim = "In";
@@ -43,6 +46,9 @@ namespace AD.UI
             Source.source.onSelect.AddListener(delegate { AnimateIn(); });
             Source.source.onEndEdit.AddListener(delegate { AnimateOut(); });
             UpdateState();
+
+            ADGlobalSystem.instance.StringValues.TryGetValue(this.NumericManagerName, out string str);
+            this.text = str;
         }
 
         public ModernUIInputField SetTitle(string title)
@@ -153,5 +159,9 @@ namespace AD.UI
             return this;
         }
 
+        public void NumericManager(string value)
+        {
+            SetValue_NumericManagerName(this.NumericManagerName, this.text);
+        }
     } 
 }

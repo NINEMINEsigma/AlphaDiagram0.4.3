@@ -45,5 +45,15 @@ namespace AD.Utility
         {
             return _Value != 0 && (_Value & (_Value - 1)) == 0;
         }
+
+        public static float Clamp(this float value, float min, float max)
+        {
+            return Mathf.Clamp(value, min, max);
+        }
+
+        public static int Clamp(this int value, int min, int max)
+        {
+            return Mathf.Clamp(value, min, max);
+        }
     }
 }

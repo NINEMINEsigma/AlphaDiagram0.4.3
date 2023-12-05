@@ -486,6 +486,62 @@ PrefabInstance:
       propertyPath: buttonText
       value: Item
       objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1637991407}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 398096572}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnEnd
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetADGlobalSystemTargetScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.ADGlobalSystem, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.UI.ModernUIButton, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1700112589223663274, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_Pivot.x
       value: 1
@@ -576,6 +632,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+--- !u!114 &398096572 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+  m_PrefabInstance: {fileID: 398096571}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 991e263b8343e1d4fb67fbf8ba3ac8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &451163648 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1700112589284365114, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
@@ -636,6 +703,62 @@ PrefabInstance:
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: buttonText
       value: Story
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1637991407}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 524588606}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnEnd
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetADGlobalSystemTargetScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.ADGlobalSystem, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.UI.ModernUIButton, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 1700112589223663274, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_Pivot.x
@@ -727,6 +850,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+--- !u!114 &524588606 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+  m_PrefabInstance: {fileID: 524588605}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 991e263b8343e1d4fb67fbf8ba3ac8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &526396584
 GameObject:
   m_ObjectHideFlags: 0
@@ -967,6 +1101,62 @@ PrefabInstance:
       propertyPath: buttonText
       value: Start
       objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1637991407}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 620556037}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnEnd
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetADGlobalSystemTargetScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.ADGlobalSystem, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.UI.ModernUIButton, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1700112589223663274, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_Pivot.x
       value: 1
@@ -1057,6 +1247,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+--- !u!114 &620556037 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+  m_PrefabInstance: {fileID: 620556036}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 991e263b8343e1d4fb67fbf8ba3ac8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &699336881
 GameObject:
   m_ObjectHideFlags: 0
@@ -1722,6 +1923,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+--- !u!114 &1637991407 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+  m_PrefabInstance: {fileID: 1637991406}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8c4f9625c297cc47b6b06b9df5fec9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1719965411
 GameObject:
   m_ObjectHideFlags: 0
@@ -1825,6 +2037,62 @@ PrefabInstance:
       propertyPath: buttonText
       value: Setting
       objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1637991407}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1760305642}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnEnd
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetADGlobalSystemTargetScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.ADGlobalSystem, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: AD.UI.ModernUIButton, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1700112589223663274, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_Pivot.x
       value: 1
@@ -1915,6 +2183,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+--- !u!114 &1760305642 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+  m_PrefabInstance: {fileID: 1760305641}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 991e263b8343e1d4fb67fbf8ba3ac8be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1802636772
 GameObject:
   m_ObjectHideFlags: 0

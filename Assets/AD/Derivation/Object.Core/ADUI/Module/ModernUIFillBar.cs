@@ -1,8 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using AD.BASE;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace AD.UI
@@ -14,12 +13,13 @@ namespace AD.UI
         float GetValue();
     }
 
-    public class ModernUIFillBar : PropertyModule, IHaveValue
+    public class ModernUIFillBar : PropertyModule, IHaveValue, INumericManager<float>
     {
         public ModernUIFillBar()
         {
             this.ElementArea = nameof(ModernUIFillBar);
         }
+
 
         // Content
         private float lastPercent;
@@ -40,16 +40,62 @@ namespace AD.UI
         // Settings  
         public bool IsPercent = true;
         public bool IsInt = false;
+        public float DragChangeSpeed = 0.5f;
+        public string NumericManagerName = "DefaultFillBar";
+
+        public override void InitializeContext()
+        {
+            base.InitializeContext();
+            Context.OnDragEvent = InitializeContextSingleEvent(Context.OnDragEvent, OnDrag);
+        }
+
+        public void SetPerecent(float t)
+        {
+            if (IsLockByScript) currentPercent = Mathf.Clamp(t, 0, 1);
+            else loadingBar.fillAmount = t;
+        }
+
+        public void SetPerecent(float t, float a, float b)
+        {
+            if (IsLockByScript) currentPercent = Mathf.Clamp(t, 0, 1);
+            else loadingBar.fillAmount = t;
+            minValue = a;
+            maxValue = b;
+            IsInt = false;
+        }
+
+        public void SetPerecent(float t, int a, int b)
+        {
+            if (IsLockByScript) currentPercent = Mathf.Clamp(t, 0, 1);
+            else loadingBar.fillAmount = t;
+            minValue = a;
+            maxValue = b;
+            IsInt = true;
+        }
+
+        public void OnDrag(PointerEventData data)
+        {
+            if (!IsLockByScript) loadingBar.fillAmount += data.delta.x * Time.deltaTime * DragChangeSpeed;
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            ADGlobalSystem.instance.FloatValues.TryGetValue(this.NumericManagerName + "_Percent", out float value);
+            this.currentPercent = loadingBar.fillAmount = this.lastPercent = value;
+            textPercent.text = currentPercent.ToString("F2") + (IsPercent ? "%" : "");
+            textValue.text = GetValue().ToString("F2");
+        }
 
         public void LateUpdate()
         {
+            if (IsLockByScript) loadingBar.fillAmount = Mathf.Clamp(currentPercent, 0, 1);
+            else currentPercent = loadingBar.fillAmount;
+
             if (currentPercent == lastPercent) return;
 
             lastPercent = currentPercent;
             OnValueChange.Invoke(currentPercent);
-
-            if (IsLockByScript) loadingBar.fillAmount = Mathf.Clamp(currentPercent, 0, 1);
-            else currentPercent = loadingBar.fillAmount;
 
             textPercent.text = currentPercent.ToString("F2") + (IsPercent ? "%" : "");
             textValue.text = GetValue().ToString("F2");
@@ -58,6 +104,11 @@ namespace AD.UI
         public float GetValue()
         {
             return IsInt ? (int)value : value;
+        }
+
+        public int GetIntValue()
+        {
+            return (int)value;
         }
 
         public void Set(float min, float max)
@@ -76,9 +127,16 @@ namespace AD.UI
 
         public void Init()
         {
+            if (ADGlobalSystem.instance.FloatValues.TryGetValue(this.NumericManagerName + "_Percent", out this.currentPercent)) return;
             currentPercent = 0;
             minValue = 0;
             maxValue = 1;
+        }
+
+        public void NumericManager(float value)
+        {
+            SetValue_NumericManagerName(this.NumericManagerName + "_Percent", this.currentPercent);
+            SetValue_NumericManagerName(this.NumericManagerName, this.Value);
         }
     }
 }

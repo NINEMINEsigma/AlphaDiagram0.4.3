@@ -315,5 +315,10 @@ namespace AD.UI
             clickEvent.RemoveAllListeners();
             return this;
         }
+
+        public void SetADGlobalSystemTargetScene()
+        {
+            ADGlobalSystem.instance.TargetSceneName = this.buttonText + "Scene";
+        }
     }
 }

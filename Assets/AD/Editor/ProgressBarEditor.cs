@@ -9,12 +9,15 @@ public class ProgressBarEditor : ADUIEditor
 
     SerializedProperty minValue;
     SerializedProperty maxValue;
+    SerializedProperty OnValueChange;
     SerializedProperty loadingBar;
     SerializedProperty textPercent;
     SerializedProperty textValue;
     SerializedProperty IsPercent;
     SerializedProperty IsInt;
     SerializedProperty IsLockByScript;
+    SerializedProperty DragChangeSpeed;
+    SerializedProperty NumericManagerName;
 
     protected override void OnEnable()
     {
@@ -23,12 +26,15 @@ public class ProgressBarEditor : ADUIEditor
 
         minValue = serializedObject.FindProperty("minValue");
         maxValue = serializedObject.FindProperty("maxValue");
+        OnValueChange = serializedObject.FindProperty(nameof(OnValueChange));
         loadingBar = serializedObject.FindProperty("loadingBar");
         textPercent = serializedObject.FindProperty("textPercent");
         textValue = serializedObject.FindProperty("textValue");
         IsPercent = serializedObject.FindProperty("IsPercent");
         IsInt = serializedObject.FindProperty("IsInt");
         IsLockByScript = serializedObject.FindProperty("IsLockByScript");
+        DragChangeSpeed = serializedObject.FindProperty("DragChangeSpeed");
+        NumericManagerName = serializedObject.FindProperty(nameof(NumericManagerName));
     }
 
     public override void OnContentGUI()
@@ -62,6 +68,8 @@ public class ProgressBarEditor : ADUIEditor
         EditorGUILayout.PropertyField(maxValue, new GUIContent(""));
 
         GUILayout.EndHorizontal();
+
+        EditorGUILayout.PropertyField(OnValueChange);
     }
 
     public override void OnResourcesGUI()
@@ -101,5 +109,7 @@ public class ProgressBarEditor : ADUIEditor
         IsInt.boolValue = GUILayout.Toggle(IsInt.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
 
         GUILayout.EndHorizontal();
+        EditorGUILayout.PropertyField(DragChangeSpeed);
+        EditorGUILayout.PropertyField(NumericManagerName);
     }
 }

@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using AD.BASE;
+using AD.Utility;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
+using static UnityEngine.Rendering.DebugUI;
 
 namespace AD.UI
 {
@@ -143,6 +146,19 @@ namespace AD.UI
                 Event.AddListener(call);
             return Event;
         }
+
+        public static void SetValue_NumericManagerName(string NumericManagerName, float value)
+        {
+            ADGlobalSystem.instance.SetFloatValue(NumericManagerName, value);
+        }
+        public static void SetValue_NumericManagerName(string NumericManagerName, int value)
+        {
+            ADGlobalSystem.instance.SetIntValue(NumericManagerName, value);
+        }
+        public static void SetValue_NumericManagerName(string NumericManagerName, string value)
+        {
+            ADGlobalSystem.instance.SetStringValue(NumericManagerName, value);
+        }
     }
 
     public interface IButton : IADUI
@@ -168,5 +184,10 @@ namespace AD.UI
         void Select(string option);
         void AddListener(UnityAction<string> action);
         void RemoveListener(UnityAction<string> action);
+    }
+
+    public interface INumericManager<T>
+    {
+        void NumericManager(T value);
     }
 }

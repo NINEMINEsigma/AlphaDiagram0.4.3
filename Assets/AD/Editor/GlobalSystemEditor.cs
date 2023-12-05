@@ -49,6 +49,12 @@ namespace AD
         SerializedProperty isAsyncToLoadNextScene;
         SerializedProperty WaitTime;
 
+        //NumericManager
+
+        SerializedProperty IntValues;
+        SerializedProperty FloatValues;
+        SerializedProperty StringValues;
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -90,6 +96,9 @@ namespace AD
             TargetSceneName = serializedObject.FindProperty(nameof(TargetSceneName));
             isAsyncToLoadNextScene = serializedObject.FindProperty(nameof(isAsyncToLoadNextScene));
             WaitTime = serializedObject.FindProperty(nameof(WaitTime));
+            IntValues = serializedObject.FindProperty(nameof(IntValues));
+            FloatValues = serializedObject.FindProperty(nameof(FloatValues));
+            StringValues = serializedObject.FindProperty(nameof(StringValues));
         }
 
         public override void OnContentGUI()
@@ -262,6 +271,15 @@ namespace AD
                     EditorGUILayout.ObjectField("CurrentADUI", ADUI.CurrentSelect, typeof(ADUI), @object);
                 });
             });
+
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+            if (GUILayout.Button("  -- Save NumericManager Values --")) that.SaveNumericManager();
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.PropertyField(IntValues);
+            EditorGUILayout.PropertyField(FloatValues);
+            EditorGUILayout.PropertyField(StringValues);
+            GUILayout.EndVertical();
+            GUILayout.EndVertical();
         }
     }
 

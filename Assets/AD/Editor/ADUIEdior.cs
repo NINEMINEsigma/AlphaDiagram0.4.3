@@ -70,6 +70,13 @@ public abstract class AbstractCustomADEditor : Editor
         GUILayout.EndHorizontal();
     }
 
+    public void VerticalBlockWithBox(UnityAction action)
+    {
+        GUILayout.BeginVertical(EditorStyles.helpBox);
+        action();
+        GUILayout.EndVertical();
+    }
+
     public abstract void OnContentGUI();
     public abstract void OnResourcesGUI();
     public abstract void OnSettingsGUI();

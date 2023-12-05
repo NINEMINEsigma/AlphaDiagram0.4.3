@@ -169,7 +169,7 @@ namespace AD
     {
         #region Attribute
 
-        private static bool AppQuitting = false;
+        private static bool AppQuitting = true;
         public static ADGlobalSystem _m_instance = null;
         public static ADGlobalSystem instance
         {
@@ -462,6 +462,24 @@ namespace AD
             if (_m_instance != null && _m_instance != this) DestroyImmediate(_m_instance.gameObject);
             _m_instance = this;
             if (IsEnableSceneController) base.Awake();
+
+            //if (StringValues == null)
+            {
+                ADGlobalSystem.Deserialize<ADSerializableDictionary<string, string>>(PlayerPrefs.GetString("NumericManager_String"), out object temp0);
+                StringValues = (ADSerializableDictionary<string, string>)temp0 ?? new();
+            }
+            //if (IntValues == null)
+            {
+                ADGlobalSystem.Deserialize<ADSerializableDictionary<string, int>>(PlayerPrefs.GetString("NumericManager_Int"), out object temp1);
+                IntValues = (ADSerializableDictionary<string, int>)temp1 ?? new();
+            }
+            //if (FloatValues == null)
+            {
+                ADGlobalSystem.Deserialize<ADSerializableDictionary<string, float>>(PlayerPrefs.GetString("NumericManager_Float"), out object temp2);
+                FloatValues = (ADSerializableDictionary<string, float>)temp2 ?? new();
+            }
+
+            AppQuitting = false;
         }
 
         private void LateUpdate()
@@ -974,6 +992,40 @@ namespace AD
         }
 
         public Func<float, bool> WhenEndScene = null;
+
+        #endregion
+
+        #region NumericManager
+
+        public ADSerializableDictionary<string, int> IntValues;
+        public ADSerializableDictionary<string, float> FloatValues;
+        public ADSerializableDictionary<string, string> StringValues;
+
+        public void SaveNumericManager()
+        {
+            ADGlobalSystem.Serialize(StringValues, out var str_str);
+            PlayerPrefs.SetString("NumericManager_String", str_str);
+            ADGlobalSystem.Serialize(IntValues, out var str_int);
+            PlayerPrefs.SetString("NumericManager_Int", str_int);
+            ADGlobalSystem.Serialize(FloatValues, out var str_float);
+            PlayerPrefs.SetString("NumericManager_Float", str_float);
+        }
+
+        public void SetIntValue(string key,int value)
+        {
+            IntValues.TryAdd(key, value);
+            IntValues[key] = value;
+        }
+        public void SetFloatValue(string key, float value)
+        {
+            FloatValues.TryAdd(key, value);
+            FloatValues[key] = value;
+        }
+        public void SetStringValue(string key, string value)
+        {
+            StringValues.TryAdd(key, value);
+            StringValues[key] = value;
+        }
 
         #endregion
 
