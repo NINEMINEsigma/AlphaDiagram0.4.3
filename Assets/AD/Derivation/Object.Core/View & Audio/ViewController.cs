@@ -143,6 +143,8 @@ namespace AD.UI
 
         //会对性能产生不低的影响
         public bool IsKeepCoverParent = false;
+        //更好的选择
+        public bool IsSetUpCoverParentAtStart = false;
 
         [SerializeField]
         Type _gradientType;
@@ -257,11 +259,19 @@ namespace AD.UI
                 AD.UI.ADUI.Initialize(this);
                 ViewImage.sprite = CurrentImage;
             }
+            if (IsSetUpCoverParentAtStart)
+            {
+                SetupCoverParent();
+            }
         }
         protected override void OnValidate()
         {
             base.OnValidate();
-            Update();
+            if (IsKeepCoverParent)
+            {
+                SetupCoverParent();
+            }
+            if (ViewImage != null) ViewImage.sprite = CurrentImage;
         }
         private void Update()
         {
@@ -269,6 +279,10 @@ namespace AD.UI
             {
                 SetupCoverParent();
             }
+        }
+        protected override void OnEnable()
+        {
+            if (ViewImage != null) ViewImage.sprite = CurrentImage;
         }
 
         protected override void OnDestroy()
@@ -409,18 +423,26 @@ namespace AD.UI
         public void SetupCoverParent()
         {
             if (SourcePairs.Count == 0 && this.transform.parent == null) return;
-            float ratio = (float)CurrentImage.texture.height / CurrentImage.texture.width;
-            var p_rectt = this.transform.parent.transform.As<RectTransform>();
-            var p_temp_rect = p_rectt.GetRect();
-            float parentRatio = Mathf.Abs(p_temp_rect[0].y - p_temp_rect[1].y) / (float)Mathf.Abs(p_temp_rect[2].x - p_temp_rect[1].x);
-            this.transform.localPosition = Vector3.zero;
-            if (ratio > parentRatio)
+            if (CurrentImage == null)
             {
-                this.transform.As<RectTransform>().sizeDelta = new Vector2(p_rectt.sizeDelta.x, p_rectt.sizeDelta.x * ratio);
+                this.transform.localPosition = Vector3.zero;
+                this.transform.As<RectTransform>().sizeDelta = this.transform.parent.transform.As<RectTransform>().sizeDelta;
             }
             else
             {
-                this.transform.As<RectTransform>().sizeDelta = new Vector2(p_rectt.sizeDelta.y / ratio, p_rectt.sizeDelta.y);
+                float ratio = (float)CurrentImage.texture.height / CurrentImage.texture.width;
+                var p_rectt = this.transform.parent.transform.As<RectTransform>();
+                var p_temp_rect = p_rectt.GetRect();
+                float parentRatio = Mathf.Abs(p_temp_rect[0].y - p_temp_rect[1].y) / (float)Mathf.Abs(p_temp_rect[2].x - p_temp_rect[1].x);
+                this.transform.localPosition = Vector3.zero;
+                if (ratio > parentRatio)
+                {
+                    this.transform.As<RectTransform>().sizeDelta = new Vector2(p_rectt.sizeDelta.x, p_rectt.sizeDelta.x * ratio);
+                }
+                else
+                {
+                    this.transform.As<RectTransform>().sizeDelta = new Vector2(p_rectt.sizeDelta.y / ratio, p_rectt.sizeDelta.y);
+                }
             }
         }
 

@@ -130,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2016846935, guid: d9df967ddf031464c86db86642402b4a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6360728317407937346, guid: d9df967ddf031464c86db86642402b4a, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -217,6 +221,10 @@ PrefabInstance:
     - target: {fileID: 6360728317407937352, guid: d9df967ddf031464c86db86642402b4a, type: 3}
       propertyPath: m_Name
       value: SceneTrans Canvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 6360728317671282870, guid: d9df967ddf031464c86db86642402b4a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d9df967ddf031464c86db86642402b4a, type: 3}
@@ -1129,6 +1137,10 @@ PrefabInstance:
     - target: {fileID: 5245696046062010935, guid: a3e224bf62fc94e48969951685ab7f45, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5456263324767586362, guid: a3e224bf62fc94e48969951685ab7f45, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6629475248174179166, guid: a3e224bf62fc94e48969951685ab7f45, type: 3}
       propertyPath: m_AnchorMax.y

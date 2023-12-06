@@ -1,13 +1,10 @@
 using System;
 using System.Collections.Generic;
 using AD.BASE;
-using AD.Utility;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
-using static UnityEngine.Rendering.DebugUI;
 
 namespace AD.UI
 {
@@ -52,6 +49,8 @@ namespace AD.UI
         public string ElementName { get; set; } = "null";
         public int SerialNumber { get; set; } = 0;
         public string ElementArea = "null";
+
+        public virtual void TurnsActive(GameObject target) => target.gameObject.SetActive(!target.gameObject.activeSelf);
 
         public virtual void OnPointerEnter(PointerEventData eventData)
         {

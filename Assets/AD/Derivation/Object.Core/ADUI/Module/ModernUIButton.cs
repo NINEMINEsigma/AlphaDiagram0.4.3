@@ -173,6 +173,7 @@ namespace AD.UI
             if (normalCG == null && highlightedCG == null)
                 return;
 
+            UpdateUI();
             normalCG.alpha = 1;
             highlightedCG.alpha = 0;
         }

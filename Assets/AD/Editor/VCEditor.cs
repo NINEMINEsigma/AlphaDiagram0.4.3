@@ -9,6 +9,7 @@ public class VCEditor : IADUIEditor
 
     SerializedProperty SourcePairs;
     SerializedProperty IsKeepCoverParent;
+    SerializedProperty IsSetUpCoverParentAtStart;
 
     SerializedProperty _ViewImage;
 
@@ -25,6 +26,7 @@ public class VCEditor : IADUIEditor
 
         SourcePairs = serializedObject.FindProperty("SourcePairs");
         IsKeepCoverParent = serializedObject.FindProperty("IsKeepCoverParent");
+        IsSetUpCoverParentAtStart = serializedObject.FindProperty(nameof(IsSetUpCoverParentAtStart));
 
         _ViewImage = serializedObject.FindProperty("_ViewImage");
 
@@ -33,6 +35,7 @@ public class VCEditor : IADUIEditor
         _offset = serializedObject.FindProperty("_offset");
         _zoom = serializedObject.FindProperty("_zoom");
         _modifyVertices = serializedObject.FindProperty("_modifyVertices");
+
     }
 
     public override void OnContentGUI()
@@ -71,12 +74,8 @@ public class VCEditor : IADUIEditor
 
     public override void OnSettingsGUI()
     {
-        GUILayout.BeginHorizontal(EditorStyles.helpBox);
-
-        IsKeepCoverParent.boolValue = GUILayout.Toggle(IsKeepCoverParent.boolValue, new GUIContent("Is Keep Cover Parent"), customSkin.FindStyle("Toggle"));
-        IsKeepCoverParent.boolValue = GUILayout.Toggle(IsKeepCoverParent.boolValue, new GUIContent(""), customSkin.FindStyle("Toggle Helper"));
-
-        GUILayout.EndHorizontal();
+        Toggle(IsSetUpCoverParentAtStart, "Is Cover Parent When Start");
+        Toggle(IsKeepCoverParent, "Is Keep Cover Parent");
         GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
         EditorGUILayout.LabelField(new GUIContent("Gradient"), customSkin.FindStyle("Text"), GUILayout.Width(100));
