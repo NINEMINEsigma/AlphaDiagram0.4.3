@@ -69,18 +69,6 @@ namespace AD.UI
 
         #region Function 
 
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/Slider", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.Slider slider = GameObject.Instantiate(ADGlobalSystem.instance._Slider);
-            slider.name = "New Slider";
-            GameObjectUtility.SetParentAndAlign(slider.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(slider.gameObject, "Create " + slider.name);
-            Selection.activeObject = slider.gameObject;
-        }
-
-#endif
         public static AD.UI.Slider Generate(string name = "New Slider", Transform parent = null)
         {
             AD.UI.Slider slider = GameObject.Instantiate(ADGlobalSystem.instance._Slider);

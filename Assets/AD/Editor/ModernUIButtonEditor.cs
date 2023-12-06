@@ -72,14 +72,8 @@ public class ModernUIButtonEditor : ADUIEditor
         EditorGUILayout.PropertyField(buttonText, new GUIContent(""));
 
         GUILayout.EndHorizontal();
-
-        if (useCustomContent.boolValue == false && that.normalText != null)
-        {
-            that.normalText.text = buttonText.stringValue;
-            that.highlightedText.text = buttonText.stringValue;
-        }
-
-        else if (useCustomContent.boolValue == false && that.normalText == null)
+        
+        if (useCustomContent.boolValue == false && that.normalText == null)
         {
             GUILayout.Space(2);
             EditorGUILayout.HelpBox("'Text Object' is not assigned. Go to Resources tab and assign the correct variable.", MessageType.Error);

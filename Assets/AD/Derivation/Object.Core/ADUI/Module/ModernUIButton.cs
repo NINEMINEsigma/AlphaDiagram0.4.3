@@ -60,6 +60,43 @@ namespace AD.UI
     {
         //[Header("Context")]
         public string buttonText = "Button";
+        public string ButtonText
+        {
+            get
+            {
+                if(buttonText.Length>2&& buttonText[0] == '['&& buttonText[^1]==']')
+                {
+                    var strs = buttonText[1..^1].Split('|');
+                    return strs[0];
+                }
+                return buttonText;
+            }
+            set
+            {
+                buttonText = value;
+            }
+        }
+        public string SceneText
+        {
+            get
+            {
+                if (buttonText.Length > 2 && buttonText[0] == '[' && buttonText[^1] == ']')
+                {
+                    var strs = buttonText[1..^1].Split('|');
+                    return strs[1];
+                }
+                return buttonText;
+            }
+            set
+            {
+                if (buttonText.Length > 2 && buttonText[0] == '[' && buttonText[^1] == ']')
+                {
+                    var strs = buttonText[1..^1].Split('|');
+                    buttonText = '[' + strs[0] + "|" + value + "]";
+                }
+                else buttonText = value;
+            }
+        }
         public ADEvent clickEvent;
         public ADEvent hoverEvent;
         public AudioClip hoverSound;
@@ -134,6 +171,11 @@ namespace AD.UI
                 Destroy(rippleParent);
         }
 
+        private void OnValidate()
+        {
+            UpdateUI();
+        }
+
         public override void InitializeContext()
         {
             base.InitializeContext();
@@ -144,14 +186,14 @@ namespace AD.UI
 
         public ModernUIButton SetTitle(string title)
         {
-            buttonText = title;
+            ButtonText = title;
             UpdateUI();
             return this;
         }
 
         IButton IButton.SetTitle(string title)
         {
-            buttonText = title;
+            ButtonText = title;
             UpdateUI();
             return this;
         }
@@ -170,7 +212,7 @@ namespace AD.UI
 
         void OnEnable()
         {
-            if (normalCG == null && highlightedCG == null)
+            if (normalCG == null && highlightedCG == null || useCustomContent != false)
                 return;
 
             UpdateUI();
@@ -180,8 +222,8 @@ namespace AD.UI
 
         public void UpdateUI()
         {
-            normalText.text = buttonText;
-            highlightedText.text = buttonText;
+            normalText.text = ButtonText;
+            highlightedText.text = ButtonText;
         }
 
         public void CreateRipple(Vector2 pos)
@@ -319,7 +361,7 @@ namespace AD.UI
 
         public void SetADGlobalSystemTargetScene()
         {
-            ADGlobalSystem.instance.TargetSceneName = this.buttonText + "Scene";
+            ADGlobalSystem.instance.TargetSceneName = SceneText;
         }
     }
 }

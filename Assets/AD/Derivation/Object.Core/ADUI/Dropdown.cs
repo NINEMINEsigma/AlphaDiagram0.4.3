@@ -8,6 +8,7 @@ using UnityEngine.Events;
 
 namespace AD.UI
 {
+    [AddComponentMenu("UI/AD/Dropdown", 100)]
     public class Dropdown : ADUI, IDropdown
     {
         private TMP_Dropdown _source;
@@ -57,18 +58,6 @@ namespace AD.UI
             options.Clear();
             CurrentSelectOption = "Default";
         }
-
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/Dropdown", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.Dropdown dropDown = GameObject.Instantiate(ADGlobalSystem.instance._DropDown);
-            dropDown.name = "New Dropdown";
-            GameObjectUtility.SetParentAndAlign(dropDown.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(dropDown.gameObject, "Create " + dropDown.name);
-            Selection.activeObject = dropDown.gameObject;
-        }
-#endif
 
         public static AD.UI.Dropdown Generate(string name = "New Dropdown", Transform parent = null)
         {

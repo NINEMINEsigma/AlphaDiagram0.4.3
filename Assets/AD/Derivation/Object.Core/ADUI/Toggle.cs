@@ -100,19 +100,7 @@ namespace AD.UI
             mark.gameObject.SetActive(false);
         }
 
-        #region Function  
-
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/Toggle", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.Toggle toggle = GameObject.Instantiate(ADGlobalSystem.instance._Toggle);
-            toggle.name = "New Toggle";
-            GameObjectUtility.SetParentAndAlign(toggle.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(toggle.gameObject, "Create " + toggle.name);
-            Selection.activeObject = toggle.gameObject;
-        }
-#endif
+        #region Function
 
         public static AD.UI.Toggle Generate(string name = "New Toggle", Transform parent = null)
         {

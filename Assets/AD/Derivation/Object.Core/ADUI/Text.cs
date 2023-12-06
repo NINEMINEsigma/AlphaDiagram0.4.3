@@ -38,18 +38,6 @@ namespace AD.UI
         }
         public string text { get { return GetText(); } set { SetText(value); } }
 
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/Text", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.Text text = GameObject.Instantiate(ADGlobalSystem.instance._Text);
-            text.name = "New Text";
-            GameObjectUtility.SetParentAndAlign(text.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(text.gameObject, "Create " + text.name);
-            Selection.activeObject = text.gameObject;
-        }
-#endif
-
         public static AD.UI.Text Generate(string name = "New Text", string defaultText = "", Transform parent = null)
         {
             AD.UI.Text text = GameObject.Instantiate(ADGlobalSystem.instance._Text);

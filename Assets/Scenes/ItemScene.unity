@@ -1292,7 +1292,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: buttonText
-      value: Chapter
+      value: ChapterScene
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size

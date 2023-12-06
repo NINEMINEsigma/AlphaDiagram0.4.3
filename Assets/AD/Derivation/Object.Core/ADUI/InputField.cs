@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 namespace AD.UI
 {
     [Serializable, RequireComponent(typeof(TMP_InputField))]
+    [AddComponentMenu("UI/AD/InputField", 100)]
     public class InputField : AD.UI.ADUI
     {
         public override bool IsNeedContext => false;
@@ -28,18 +29,6 @@ namespace AD.UI
         {
             AD.UI.ADUI.Destory(this);
         }
-
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/InputField", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.InputField inputField = GameObject.Instantiate(ADGlobalSystem.instance._InputField);
-            inputField.name = "New InputField";
-            GameObjectUtility.SetParentAndAlign(inputField.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(inputField.gameObject, "Create " + inputField.name);
-            Selection.activeObject = inputField.gameObject;
-        }
-#endif
 
         public static AD.UI.InputField Generate(string name, string defaultText = "", string placeholderText = "Entr Text", Transform parent = null)
         {

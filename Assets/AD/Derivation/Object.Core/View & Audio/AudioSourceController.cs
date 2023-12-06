@@ -289,17 +289,6 @@ namespace AD.UI
             _m_LineRenderer.widthCurve = m_curve;
         }
 
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/AudioSource", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.AudioSourceController obj = new GameObject("New Text").AddComponent<AD.UI.AudioSourceController>();
-            GameObjectUtility.SetParentAndAlign(obj.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(obj.gameObject, "Create " + obj.name);
-            Selection.activeObject = obj.gameObject;
-        }
-#endif
-
         public static AudioSourceController Generate(string name = "New AudioSource", Transform parent = null, params System.Type[] components)
         {
             AudioSourceController source = new GameObject(name, components).AddComponent<AudioSourceController>();

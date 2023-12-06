@@ -6,6 +6,7 @@ using AD.Utility;
 
 namespace AD.UI
 {
+    [AddComponentMenu("UI/AD/TouchPanel", 100)]
     public class TouchPanel : AD.UI.ADUI
     {
         public TouchPanel()

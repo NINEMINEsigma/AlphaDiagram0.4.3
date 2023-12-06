@@ -283,4 +283,138 @@ namespace AD
         }
     }
 
+    public class MenuIniter
+    {
+        [MenuItem("GameObject/AD/AudioSource", false, 10)]
+        private static void AudioSource(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._AudioSource);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/Image", false, 10)]
+        private static void Image(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._Image);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ColorManager", false, 10)]
+        private static void ColorManager(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ColorManager);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/CustomWindowElement", false, 10)]
+        private static void CustomWindowElement(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._CustomWindowElement);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+
+        [MenuItem("GameObject/AD/ADUI/Slider", false, 10)]
+        private static void Slider(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._Slider);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ADUI/Button", false, 10)]
+        private static void Button(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._Button);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ADUI/DropDown", false, 10)]
+        private static void DropDown(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._DropDown);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ADUI/InputField", false, 10)]
+        private static void InputField(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._InputField);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ADUI/RawImage", false, 10)]
+        private static void RawImage(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._RawImage);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ADUI/Text", false, 10)]
+        private static void Text(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._Text);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ADUI/Toggle", false, 10)]
+        private static void Toggle(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._Toggle);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+
+        [MenuItem("GameObject/AD/ModernUI/Button", false, 10)]
+        private static void ModernButton(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernButton);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ModernUI/Dropdown", false, 10)]
+        private static void ModernUIDropdown(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUIDropdown);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ModernUI/FillBar", false, 10)]
+        private static void ModernUIFillBar(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUIFillBar);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ModernUI/InputField", false, 10)]
+        private static void ModernUIInputField(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUIInputField);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ModernUI/Switch", false, 10)]
+        private static void ModernUISwitch(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUISwitch);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+    }
+
 }

@@ -1,21 +1,36 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
-using AD.UI;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace AD.Utility
 {
     public static class TransformExtension
     {
+        public static List<GameObject> GetChilds(this GameObject self)
+        {
+            //只能用这种方法，有bug
+            return new List<Component>(self.GetComponentsInChildren(typeof(Transform))).ConvertAll(c => (Transform)c).GetSubList(T => true, T => T.gameObject);
+        }
+
+        public static List<GameObject> GetChilds(this Transform self)
+        {
+            //只能用这种方法，有bug
+            return new List<Component>(self.GetComponentsInChildren(typeof(Transform))).ConvertAll(c => (Transform)c).GetSubList(T => true, T => T.gameObject);
+        }
+
+        public static List<GameObject> GetChilds(this Component self)
+        {
+            //只能用这种方法，有bug
+            return new List<Component>(self.GetComponentsInChildren(typeof(Transform))).ConvertAll(c => (Transform)c).GetSubList(T => true, T => T.gameObject);
+        }
+
         private static Transform[] GetTransforms(this GameObject self, Comparison<Transform> comparison, bool IsActiveInHierarchy)
         {
-            List<Transform> transforms = new List<Component>(
-                self.GetComponentsInChildren(typeof(Transform))).ConvertAll(c => (Transform)c
-                );
+            //只能用这种方法，有bug
+            List<Transform> transforms = new List<Component>(self.GetComponentsInChildren(typeof(Transform))).ConvertAll(c => (Transform)c);
+            //List<Transform> transforms = self.GetComponentsInChildren<Transform>().ToList();
             transforms.RemoveAll(T => !(T.gameObject.activeInHierarchy || !IsActiveInHierarchy) && T == self.transform);
 
             transforms.Sort(comparison);

@@ -78,18 +78,6 @@ namespace AD.UI
             Context.OnPointerClickEvent = InitializeContextSingleEvent(Context.OnPointerClickEvent, OnPointerClick);
         }
 
-#if UNITY_EDITOR
-        [MenuItem("GameObject/AD/Button", false, 10)]
-        private static void ADD(UnityEditor.MenuCommand menuCommand)
-        {
-            AD.UI.Button button = GameObject.Instantiate(ADGlobalSystem.instance._Button);
-            button.name = "New Button";
-            GameObjectUtility.SetParentAndAlign(button.gameObject, menuCommand.context as GameObject);
-            Undo.RegisterCreatedObjectUndo(button.gameObject, "Create " + button.name);
-            Selection.activeObject = button.gameObject;
-        }
-#endif
-
         public static AD.UI.Button Generate(string name, string buttonText, Transform parent = null)
         {
             AD.UI.Button button = GameObject.Instantiate(ADGlobalSystem.instance._Button, parent);
