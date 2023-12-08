@@ -46,5 +46,35 @@ namespace AD.Utility
             return self;
         }
 
+        public static Vector2 AddX(this Vector2 self, float x)
+        {
+            self.x += x;
+            return self;
+        }
+
+        public static Vector2 AddY(this Vector2 self, float y)
+        {
+            self.y += y;
+            return self;
+        }
+
+        public static Vector3 AddX(this Vector3 self, float x)
+        {
+            self.x += x;
+            return self;
+        }
+
+        public static Vector3 AddY(this Vector3 self, float y)
+        {
+            self.y += y;
+            return self;
+        }
+
+        public static Vector3 AddZ(this Vector3 self, float z)
+        {
+            self.z += z;
+            return self;
+        }
+
     }
 }

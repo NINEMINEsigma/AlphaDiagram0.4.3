@@ -9,7 +9,7 @@ EditorBuildSettings:
     path: Assets/Scenes/AITestScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/ChapterScene.unity
+    path: Assets/Scenes/InterfaceScene.unity
     guid: 915d73d1ec997914e8eea385a4ee8db7
   - enabled: 1
     path: Assets/Scenes/SettingScene.unity

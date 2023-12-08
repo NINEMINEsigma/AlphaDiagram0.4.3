@@ -85,5 +85,35 @@ namespace AD.Utility
 
             self.localPosition = pos;
         }
+
+        public static void SetX(this Transform self, float x)
+        {
+            self.position = self.position.SetX(x);
+        }
+
+        public static void SetY(this Transform self, float y)
+        {
+            self.position = self.position.SetY(y);
+        }
+
+        public static void SetZ(this Transform self, float z)
+        {
+            self.position = self.position.SetZ(z);
+        }
+
+        public static void AddX(this Transform self, float x)
+        {
+            self.position = self.position.AddX(x);
+        }
+
+        public static void AddY(this Transform self, float y)
+        {
+            self.position = self.position.AddY(y);
+        }
+
+        public static void AddZ(this Transform self, float z)
+        {
+            self.position = self.position.AddZ(z);
+        }
     }
 }

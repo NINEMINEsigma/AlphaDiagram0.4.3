@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using AD.UI;
+using AD.Utility;
 using UnityEngine;
+using static AD.Utility.RayExtension;
 
 namespace AD.Experimental.Performance
 {
@@ -12,8 +14,18 @@ namespace AD.Experimental.Performance
     [ExecuteInEditMode,RequireComponent(typeof( Camera))]
     public class ConeAllegation : MonoBehaviour
     {
+        private const float Width = 0.001f;
         public float _farDistance = 10;//远视口距离
         public float _nearDistance = 3;//近视口距离
+
+        public bool IsNeedLineRenderer = false;
+        public bool IfJustRendererView = false;
+
+        public ADSerializableDictionary<int,RayInfo> RayInfos_OnDrawFarView = new();
+        public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawNearView = new();
+        public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawFOV = new();
+        public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawConeOfCameraVision = new();
+
 
         private Camera _camera;
         private Camera TargetCamera
@@ -24,57 +36,116 @@ namespace AD.Experimental.Performance
                 return _camera;
             }
         }
-
-        /// <summary>
-        /// 绘制图形
-        /// </summary>
-        void OnDrawGizmos()
+        
+        private void Update()
         {
-            OnDrawFarView();
-            OnDrawNearView();
-            OnDrawFOV();
-            OnDrawConeOfCameraVision();
+            OnDrawFarView(IsNeedLineRenderer);
+            OnDrawNearView(IsNeedLineRenderer);
+            OnDrawFOV(IsNeedLineRenderer);
+            OnDrawConeOfCameraVision(IsNeedLineRenderer);
+
+            if (IfJustRendererView) return;
+
+            foreach (var item in Items)
+            {
+                if (item.OnEnCone.GetPersistentEventCount() + item.OnQuCone.GetPersistentEventCount() == 0)
+                {
+                    item.gameObject.SetActive(true);
+                }
+                item.IsOnCone = true;
+            }
+
+            Plane[] planes = GetFrustumPlanes();
+
+            foreach (var plane in planes)
+            {
+                foreach (var item in Items)
+                {
+                    if (item.IsOnCone)
+                        foreach (var point in item.Pointers)
+                        {
+                            if (!plane.GetSide(point))
+                            {
+                                if (item.OnEnCone.GetPersistentEventCount() + item.OnQuCone.GetPersistentEventCount() == 0)
+                                {
+                                    item.gameObject.SetActive(false);
+                                }
+                                item.IsOnCone = false;
+                                break;
+                            }
+                        }
+                }
+            }
+
         }
 
         /// <summary>
         /// 绘制较远的视口
         /// </summary>
-        void OnDrawFarView()
+        void OnDrawFarView(bool IsR)
         {
             Vector3[] corners = GetCorners(_farDistance);
 
-            // for debugging
-            Debug.DrawLine(corners[0], corners[1], Color.red); // UpperLeft -> UpperRight
-            Debug.DrawLine(corners[1], corners[3], Color.red); // UpperRight -> LowerRight
-            Debug.DrawLine(corners[3], corners[2], Color.red); // LowerRight -> LowerLeft
-            Debug.DrawLine(corners[2], corners[0], Color.red); // LowerLeft -> UpperLeft
-
-
             //中心线
             Vector3 vecStart = TargetCamera.transform.position;
-            Vector3 vecEnd = vecStart;
-            vecEnd += TargetCamera.transform.forward * _farDistance;
-            Debug.DrawLine(vecStart, vecEnd, Color.red);
+            Vector3 vecEnd = vecStart + TargetCamera.transform.forward * _farDistance;
+
+            var current = RayInfos_OnDrawFarView;
+
+            if (IsR)
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(corners[0], corners[1], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(corners[1], corners[3], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(2)) current.Add(2, TargetCamera.GetRay()); current[2].Update(corners[3], corners[2], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(3)) current.Add(3, TargetCamera.GetRay()); current[3].Update(corners[2], corners[0], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(4)) current.Add(4, TargetCamera.GetRay()); current[4].Update(vecStart, vecEnd, Color.red, TargetCamera.transform, Width);
+            }
+            else
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(corners[0], corners[1], Color.red);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(corners[1], corners[3], Color.red);
+                if (!current.ContainsKey(2)) current.Add(2, TargetCamera.GetRay()); current[2].Update(corners[3], corners[2], Color.red);
+                if (!current.ContainsKey(3)) current.Add(3, TargetCamera.GetRay()); current[3].Update(corners[2], corners[0], Color.red);
+                if (!current.ContainsKey(4)) current.Add(4, TargetCamera.GetRay()); current[4].Update(vecStart, vecEnd, Color.red);
+                /*// for debugging
+                Debug.DrawLine(corners[0], corners[1], Color.red); // UpperLeft -> UpperRight
+                Debug.DrawLine(corners[1], corners[3], Color.red); // UpperRight -> LowerRight
+                Debug.DrawLine(corners[3], corners[2], Color.red); // LowerRight -> LowerLeft
+                Debug.DrawLine(corners[2], corners[0], Color.red); // LowerLeft -> UpperLeft
+
+                Debug.DrawLine(vecStart, vecEnd, Color.red);*/
+            }
         }
 
         /// <summary>
         /// 绘制较近的视口
         /// </summary>
-        void OnDrawNearView()
+        void OnDrawNearView(bool IsR)
         {
             Vector3[] corners = GetCorners(_nearDistance);
 
-            // for debugging
-            Debug.DrawLine(corners[0], corners[1], Color.green);//左上-右上
-            Debug.DrawLine(corners[1], corners[3], Color.green);//右上-右下
-            Debug.DrawLine(corners[3], corners[2], Color.green);//右下-左下
-            Debug.DrawLine(corners[2], corners[0], Color.green);//左下-左上
+            var current = RayInfos_OnDrawNearView;
+
+            if (IsR)
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(corners[0], corners[1], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(corners[1], corners[3], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(2)) current.Add(2, TargetCamera.GetRay()); current[2].Update(corners[3], corners[2], Color.red, TargetCamera.transform, Width);
+                if (!current.ContainsKey(3)) current.Add(3, TargetCamera.GetRay()); current[3].Update(corners[2], corners[0], Color.red, TargetCamera.transform, Width);
+            }
+            else
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(corners[0], corners[1], Color.red);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(corners[1], corners[3], Color.red);
+                if (!current.ContainsKey(2)) current.Add(2, TargetCamera.GetRay()); current[2].Update(corners[3], corners[2], Color.red);
+                if (!current.ContainsKey(3)) current.Add(3, TargetCamera.GetRay()); current[3].Update(corners[2], corners[0], Color.red);
+            }
         }
 
         /// <summary>
         /// 绘制 camera 的 FOV
         /// </summary>
-        void OnDrawFOV()
+        void OnDrawFOV(bool IsR)
         {
             float halfFOV = (_camera.fieldOfView * 0.5f) * Mathf.Deg2Rad;//一半fov
             float halfHeight = _farDistance * Mathf.Tan(halfFOV);//distance距离位置，相机视口高度的一半
@@ -92,23 +163,53 @@ namespace AD.Experimental.Performance
             vecBottomCenter.y += halfHeight;
             vecBottomCenter.z += _farDistance;
 
-            Debug.DrawLine(vecStart, vecUpCenter, Color.blue);
-            Debug.DrawLine(vecStart, vecBottomCenter, Color.blue);
+            var current = RayInfos_OnDrawFOV;
+
+            if (IsR)
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(vecStart, vecUpCenter, Color.blue, TargetCamera.transform, Width);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(vecStart, vecBottomCenter, Color.blue, TargetCamera.transform, Width);
+            }
+            else
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(vecStart, vecUpCenter, Color.blue);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(vecStart, vecBottomCenter, Color.blue);
+            }
+
+            /*Debug.DrawLine(vecStart, vecUpCenter, Color.blue);
+            Debug.DrawLine(vecStart, vecBottomCenter, Color.blue);*/
         }
 
         /// <summary>
         /// 绘制 camera 的视锥 边沿
         /// </summary>
-        void OnDrawConeOfCameraVision()
+        void OnDrawConeOfCameraVision(bool IsR)
         {
             Vector3[] corners = GetCorners(_farDistance);
 
             var CameraTransform = TargetCamera.transform;
-            // for debugging
+
+            var current = RayInfos_OnDrawConeOfCameraVision;
+
+            if (IsR)
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(CameraTransform.position, corners[1], Color.green, TargetCamera.transform, Width);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(CameraTransform.position, corners[3], Color.green, TargetCamera.transform, Width);
+                if (!current.ContainsKey(2)) current.Add(2, TargetCamera.GetRay()); current[2].Update(CameraTransform.position, corners[2], Color.green, TargetCamera.transform, Width);
+                if (!current.ContainsKey(3)) current.Add(3, TargetCamera.GetRay()); current[3].Update(CameraTransform.position, corners[0], Color.green, TargetCamera.transform, Width);
+            }
+            else
+            {
+                if (!current.ContainsKey(0)) current.Add(0, TargetCamera.GetRay()); current[0].Update(CameraTransform.position, corners[1], Color.green);
+                if (!current.ContainsKey(1)) current.Add(1, TargetCamera.GetRay()); current[1].Update(CameraTransform.position, corners[3], Color.green);
+                if (!current.ContainsKey(2)) current.Add(2, TargetCamera.GetRay()); current[2].Update(CameraTransform.position, corners[2], Color.green);
+                if (!current.ContainsKey(3)) current.Add(3, TargetCamera.GetRay()); current[3].Update(CameraTransform.position, corners[0], Color.green);
+            }
+            /*// for debugging
             Debug.DrawLine(CameraTransform.position, corners[1], Color.green); // UpperLeft -> UpperRight
             Debug.DrawLine(CameraTransform.position, corners[3], Color.green); // UpperRight -> LowerRight
             Debug.DrawLine(CameraTransform.position, corners[2], Color.green); // LowerRight -> LowerLeft
-            Debug.DrawLine(CameraTransform.position, corners[0], Color.green); // LowerLeft -> UpperLeft
+            Debug.DrawLine(CameraTransform.position, corners[0], Color.green); // LowerLeft -> UpperLeft*/
         }
 
         //获取相机视口四个角的坐标
@@ -209,39 +310,5 @@ namespace AD.Experimental.Performance
         }
 
         public List<ConeAllegationItem> Items = new();
-
-        private void Update()
-        {
-            foreach (var item in Items)
-            {
-                if (item.OnEnCone.GetPersistentEventCount() + item.OnQuCone.GetPersistentEventCount() == 0)
-                {
-                    item.gameObject.SetActive(true);
-                }
-                item.IsOnCone = true;
-            }
-
-            Plane[] planes = GetFrustumPlanes();
-
-            foreach(var plane in planes)
-            {
-                foreach (var item in Items)
-                {
-                    if (item.IsOnCone)
-                        foreach (var point in item.Pointers)
-                        {
-                            if (!plane.GetSide(point))
-                            {
-                                if (item.OnEnCone.GetPersistentEventCount() + item.OnQuCone.GetPersistentEventCount() == 0)
-                                {
-                                    item.gameObject.SetActive(false);
-                                }
-                                item.IsOnCone = false;
-                                break;
-                            }
-                        }
-                }
-            }
-        }
     }
 }

@@ -55,5 +55,35 @@ namespace AD.Utility
         {
             return Mathf.Clamp(value, min, max);
         }
+
+        public static bool ExecuteAll(params bool[] values)
+        {
+            bool result = true;
+            foreach (var value in values)
+            {
+                result = result && value;
+            }
+            return result;
+        }
+
+        public static bool ExecuteAny(params bool[] values)
+        {
+            bool result = false;
+            foreach (var value in values)
+            {
+                result = result || value;
+            }
+            return result;
+        }
+
+        public static int ExecuteCount(params bool[] values)
+        {
+            int result = 0;
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (values[i]) result++;
+            }
+            return result;
+        }
     }
 }

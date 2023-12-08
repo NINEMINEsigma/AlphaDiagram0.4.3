@@ -85,7 +85,7 @@ namespace AD.Utility
     }
 
     [System.Serializable]
-    public class ADSerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, ISerializationCallbackReceiver where TKey : class
+    public class ADSerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, ISerializationCallbackReceiver //where TKey : class
     {
         [Serializable]
         class Entry
@@ -131,8 +131,8 @@ namespace AD.Utility
                     {
                         if (!this.TryAdd(Data[i].Key, Data[i].Value))
                         {
-                            if (typeof(TKey) == typeof(string)) this.Add("New Key".As<TKey>(), Data[i].Value);
-                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) this.Add(0.As<TKey>(), Data[i].Value);
+                            if (typeof(TKey) == typeof(string)) this.Add(default, Data[i].Value);
+                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) this.Add(default, Data[i].Value);
                         }
                     }
                     catch { }
