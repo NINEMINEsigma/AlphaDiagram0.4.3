@@ -115,5 +115,25 @@ namespace AD.Utility
         {
             self.position = self.position.AddZ(z);
         }
+
+        /// <summary>
+        /// UI Face Will Backward Position
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="position"></param>
+        public static void FaceAt(this Transform self, Vector3 position)
+        {
+            self.LookAt(self.position.GetSymmetryPoint(position));
+        }
+
+        /// <summary>
+        /// UI Face Will Backward Position
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="position"></param>
+        public static void FaceAt(this Transform self, Transform to)
+        {
+            self.LookAt(self.position.GetSymmetryPoint(to.position));
+        }
     }
 }

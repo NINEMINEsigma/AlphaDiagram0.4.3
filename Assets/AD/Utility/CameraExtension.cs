@@ -89,14 +89,9 @@ namespace AD.Utility
             return current;
         }
 
-        public static RayInfo RayCatchUpdate(this Camera self, ButtonControl control)
-        {
-            return self.transform.position.GetRay(self.ScreenPointToWorldPoint(Mouse.current.position.ReadValue(), 1000));
-        }
-
         public static RayInfo RayCatchUpdate(this Camera self)
         {
-            return self.RayCatchUpdate( Mouse.current.leftButton);
+            return self.transform.position.GetRay(self.ScreenPointToWorldPoint(Mouse.current.position.ReadValue(), 1000));
         }
 
     }

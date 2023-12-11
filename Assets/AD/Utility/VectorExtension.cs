@@ -76,5 +76,10 @@ namespace AD.Utility
             return self;
         }
 
+        public static Vector3 GetSymmetryPoint(this Vector3 position, Vector3 symmetry)
+        {
+            return new Vector3(position.x * 2 - symmetry.x, position.y * 2 - symmetry.y, position.z * 2 - symmetry.z);
+        }
+
     }
 }

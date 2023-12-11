@@ -79,10 +79,11 @@ namespace AD.Utility
                 Update();
             }
 
-            public void Update()
+            public void Update(bool IsDraw=true)
             {
                 Physics.RaycastNonAlloc(RayForm, RaycastHitForms, far, mask);
                 Physics.Raycast(RayForm, out NearestRaycastHitForm);
+                if (!IsDraw) return;
                 if (Line == null)
                 {
                     Debug.DrawLine(RayForm.origin, RayForm.origin + RayForm.direction * far);

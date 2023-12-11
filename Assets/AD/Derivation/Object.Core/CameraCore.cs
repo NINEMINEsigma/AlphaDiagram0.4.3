@@ -45,8 +45,8 @@ namespace AD.Utility.Object
             }
             else
             {
-                bool isClearDirty = PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove());
-                if (isClearDirty) ClearDirty();
+                //Detect Clear
+                if (PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove())) ClearDirty();
             }
             if (
 #if UNITY_EDITOR
@@ -59,8 +59,11 @@ namespace AD.Utility.Object
 
         private void ClearCatch()
         {
-            if(Mouse.current.leftButton.wasReleasedThisFrame)
+            if (Mouse.current.leftButton.wasReleasedThisFrame)
             {
+                PastOneTarget = FoucsOneTarget;
+                var targetOOO = Target == null ? FoucsOneTarget : Target;
+                if (targetOOO != null && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, false);
                 FoucsOneTarget = null;
             }
         }
@@ -79,27 +82,24 @@ namespace AD.Utility.Object
 
         private void NotNoneMode()
         {
-            if (RayBehavourForm == RayBehavour.None) return;
-            if (Mouse.current.leftButton.wasPressedThisFrame)
+            if (RayBehavourForm == RayBehavour.None || Mouse.current.leftButton.wasReleasedThisFrame) return;
+            (RayForm = Core.RayCatchUpdate()).Update(false);
+            if (RayForm.NearestRaycastHitForm.collider != null)
             {
-                RayForm = Core.RayCatchUpdate();
-                RayForm.Update();
-                if (RayForm.NearestRaycastHitForm.collider != null)
+                if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    FoucsOneTarget = PastOneTarget = Target = RayForm.NearestRaycastHitForm.collider.gameObject;
+                    FoucsOneTarget = RayForm.NearestRaycastHitForm.collider.gameObject;
                 }
+                var cat = RayForm.NearestRaycastHitForm.collider.gameObject;
+                var targetOOO = Target == null ? FoucsOneTarget : Target;
+                if (targetOOO != null && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, true);
+                Target = cat;
             }
             else
             {
-                RayForm = Core.RayCatchUpdate();
-                RayForm.Update();
-                if (RayForm.NearestRaycastHitForm.collider != null && RayForm.NearestRaycastHitForm.collider.gameObject.TryGetComponent(out ColliderLayer layer))
-                {
-                    if (Mouse.current.leftButton.isPressed)
-                        Target = RayForm.NearestRaycastHitForm.collider.gameObject;
-                    layer.ParentGroup.DoUpdate(this);
-                }
-                else Target = null;
+                var targetOOO = Target == null ? FoucsOneTarget : Target;
+                if (targetOOO != null && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, FoucsOneTarget != null);
+                Target = null;
             }
         }
 
