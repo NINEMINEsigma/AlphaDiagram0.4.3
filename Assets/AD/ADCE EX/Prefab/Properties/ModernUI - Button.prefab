@@ -44,13 +44,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5669989027768753204}
     m_Modifications:
+    - target: {fileID: 1046171784709747282, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: OnPointerExitEvent.InvokeArray.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1651882684861800976, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: OnPointerExitEvent.InvokeArray.Array.size
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1700112587579632845, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_fontSize
-      value: 19.05
+      value: 19.65
       objectReference: {fileID: 0}
     - target: {fileID: 1700112588308198876, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_fontSize
-      value: 19.05
+      value: 19.65
       objectReference: {fileID: 0}
     - target: {fileID: 1700112589223663274, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_Pivot.x
@@ -139,6 +147,38 @@ PrefabInstance:
     - target: {fileID: 1700112589223663275, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: m_Name
       value: ModernUIButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 2459154617306750998, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: _effectGradient.key0.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2459154617306750998, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: _effectGradient.key0.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2459154617306750998, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: _effectGradient.key0.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2624006251377063392, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: OnPointerEnterEvent.InvokeArray.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3498369671746041177, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: _effectGradient.key0.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3498369671746041177, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: _effectGradient.key0.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3498369671746041177, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: _effectGradient.key0.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7969471325783006931, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: OnPointerEnterEvent.InvokeArray.Array.size
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}

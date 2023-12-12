@@ -132,6 +132,18 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3312011940275072085, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
+      propertyPath: _effectGradient.key0.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3312011940275072085, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
+      propertyPath: _effectGradient.key0.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3312011940275072085, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
+      propertyPath: _effectGradient.key0.r
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3586580907685560604, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
       propertyPath: m_Name
       value: Slider
@@ -147,3 +159,48 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1420897149340930476, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
   m_PrefabInstance: {fileID: 3992568409779214711}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7649651764970422987 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6719781932333702076, guid: e1f7008f05821744f8c98db9d09a2466, type: 3}
+  m_PrefabInstance: {fileID: 3992568409779214711}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6738444773458110419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7649651764970422987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7762485959258794323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7649651764970422987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 213f8197d2e780a4eb37503ae30823ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPointerEnterEvent:
+    InvokeArray: 00000000
+--- !u!114 &8992905858591418382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7649651764970422987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5977b725805788d429efc1ae02814fe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  OnPointerExitEvent:
+    InvokeArray: 00000000

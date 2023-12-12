@@ -2352,7 +2352,7 @@ namespace AD.BASE
 
         public static T PrefabInstantiate<T>(this T self) where T : Component
         {
-            return GameObject.Instantiate(self).GetComponent<T>();
+            return GameObject.Instantiate(self.gameObject).GetComponent<T>();
         }
     }
 

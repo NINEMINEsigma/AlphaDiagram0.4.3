@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
 using AD.UI;
@@ -162,6 +163,8 @@ namespace AD.Experimental.GameEditor
         //{
         //    T element = ADGlobalSystem.FinalCheck<T>(ADGlobalSystem.GenerateElement<T>(), "On PropertiesLayout , you try to obtain a null object with some error");
         //}
+
+        #region L
 
         public static IButton Button(string buttonText, bool isModernUI, string message, UnityAction action)
         {
@@ -348,6 +351,17 @@ namespace AD.Experimental.GameEditor
         public static void EndHorizontal()
         {
             IsNeedMulLine = true;
+        }
+
+        #endregion
+
+        //Extension by 12.12
+
+        //public static void Vector2
+
+        public static void Transform(Transform transform)
+        {
+
         }
     }
 }

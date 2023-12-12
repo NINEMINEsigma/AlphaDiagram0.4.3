@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.UI;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -26,7 +24,8 @@ namespace AD.Experimental.GameEditor
         public void AddOnTop(ISerializeHierarchyEditor editor)
         {
             TargetTopObjectEditors.Add(editor);
-            RefreshPanel();
+            //RefreshPanel();
+            ClearAndRefresh();
             Architecture.GetController<Properties>().ClearAndRefresh();
         }
 
@@ -34,7 +33,8 @@ namespace AD.Experimental.GameEditor
         {
             if (TargetTopObjectEditors.Remove(editor))
             {
-                RefreshPanel();
+                //RefreshPanel();
+                ClearAndRefresh();
                 Architecture.GetController<Properties>().ClearAndRefresh();
             }
         }

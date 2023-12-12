@@ -58,4 +58,13 @@ MonoBehaviour:
   - key:
       IdentifyID: Toggle(UI)
     data: {fileID: 11400000, guid: 75959e2417eaf6347b8db5ce23a1689f, type: 2}
+  - key:
+      IdentifyID: Vector2(UI)
+    data: {fileID: 11400000, guid: 4de6be35708380a499bd168e78ef4a8f, type: 2}
+  - key:
+      IdentifyID: Vector3(UI)
+    data: {fileID: 11400000, guid: 956188f0f78a3eb44a523c344ff58b0d, type: 2}
+  - key:
+      IdentifyID: Vector4(UI)
+    data: {fileID: 11400000, guid: 63fc86a5674d1d449ab9d520b6e40498, type: 2}
   isAutoUpdate: 0
