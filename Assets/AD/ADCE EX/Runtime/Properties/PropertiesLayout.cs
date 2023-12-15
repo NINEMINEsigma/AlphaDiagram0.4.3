@@ -217,9 +217,9 @@ namespace AD.Experimental.GameEditor
         {
             return isModernUI ? ModernUISwitch(label, initBool, message, action) : Toggle(label, initBool, message, action);
         }
-        public static ModernUISwitch ModernUISwitch(string label,  bool initBool, string message, UnityAction<bool> action)
+        public static ModernUISwitch ModernUISwitch(string label, bool initBool, string message, UnityAction<bool> action)
         {
-            var cat = GUIField(label,"Switch(ModernUI)", message) as ModernUISwitch;
+            var cat = GUIField(label, "Switch(ModernUI)", message) as ModernUISwitch;
             cat.isOn = initBool;
             cat.AddListener(action);
             return cat;
@@ -357,11 +357,70 @@ namespace AD.Experimental.GameEditor
 
         //Extension by 12.12
 
-        //public static void Vector2
+        public static Vector2UI Vector2(string label, Vector2 initVec, string message, UnityAction<Vector2> action)
+        {
+            var cat = GUIField(label, "Vector2(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y) as Vector2UI;
+            cat.action = action;
+            return cat;
+        }
+        public static Vector3UI Vector3(string label, Vector3 initVec, string message, UnityAction<Vector3> action)
+        {
+            var cat = GUIField(label, "Vector3(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z) as Vector3UI;
+            cat.action = action;
+            return cat;
+        }
+        public static Vector4UI Vector4(string label, Vector4 initVec, string message, UnityAction<Vector4> action)
+        {
+            var cat = GUIField(label, "Vector3(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z, initVec.w) as Vector4UI;
+            cat.action = action;
+            return cat;
+        }
+
+        public static Vector2UI Vector2(Vector2 initVec, string message, UnityAction<Vector2> action)
+        {
+            var cat = GUIField("Vector2(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y) as Vector2UI;
+            cat.action = action;
+            return cat;
+        }
+        public static Vector3UI Vector3(Vector3 initVec, string message, UnityAction<Vector3> action)
+        {
+            var cat = GUIField("Vector3(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z) as Vector3UI;
+            cat.action = action;
+            return cat;
+        }
+        public static Vector4UI Vector4(Vector4 initVec, string message, UnityAction<Vector4> action)
+        {
+            var cat = GUIField("Vector3(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z, initVec.w) as Vector4UI;
+            cat.action = action;
+            return cat;
+        }
 
         public static void Transform(Transform transform)
         {
+            EndHorizontal();
+            Title("Local", "Local Value");
+            var localPosition = Vector3("LocalPosition", transform.localPosition, "LocalPosition", T => transform.localPosition = T);
+            localPosition.ux = () => transform.localPosition.x;
+            localPosition.uy = () => transform.localPosition.y;
+            localPosition.uz = () => transform.localPosition.z;
+            var localEulerAngles = Vector3("LocalEulerAngles", transform.localEulerAngles, "LocalEulerAngles", T => transform.localEulerAngles = T);
+            localEulerAngles.ux = () => transform.localEulerAngles.x;
+            localEulerAngles.uy = () => transform.localEulerAngles.y;
+            localEulerAngles.uz = () => transform.localEulerAngles.z;
+            var localScale = Vector3("LocalScale", transform.localEulerAngles, "LocalScale", T => transform.localScale = T);
+            localScale.ux = () => transform.localScale.x;
+            localScale.uy = () => transform.localScale.y;
+            localScale.uz = () => transform.localScale.z;
 
+            Title("World", "World Value");
+            var Position = Vector3("Position", transform.position, "Position", T => transform.position = T);
+            Position.ux = () => transform.position.x;
+            Position.uy = () => transform.position.y;
+            Position.uz = () => transform.position.z;
+            var EulerAngles = Vector3("EulerAngles", transform.eulerAngles, "EulerAngles", T => transform.eulerAngles = T);
+            EulerAngles.ux = () => transform.eulerAngles.x;
+            EulerAngles.uy = () => transform.eulerAngles.y;
+            EulerAngles.uz = () => transform.eulerAngles.z;
         }
     }
 }

@@ -1,14 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using AD.Experimental.GameEditor;
 using AD.BASE;
-using AD.Utility;
 
 namespace AD.Experimental.HosterSystem.Diagram
 {
+    public class TransformDiagramKey : IHosterTag { }
+
     public class TransformDiagram : IHosterComponent
     {
+        public TransformDiagram() { }
+
         public TransformDiagram(IMainHoster that,Transform transform)
         {
             this.ThatTransform = transform;
@@ -34,6 +35,7 @@ namespace AD.Experimental.HosterSystem.Diagram
 
         public void OnSerialize()
         {
+            MatchItem.SetTitle("Transform");
             PropertiesLayout.Transform(this.ThatTransform);
         }
 

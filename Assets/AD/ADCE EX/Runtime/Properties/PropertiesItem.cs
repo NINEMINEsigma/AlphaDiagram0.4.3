@@ -16,7 +16,7 @@ namespace AD.Experimental.GameEditor
         public RectTransform SubPage;
         [SerializeField] RectTransform SubLinePerfab;
 
-        private bool IsLock = false;
+        public bool IsLock = false;
 
         public ISerializePropertiesEditor MatchEditor;
 

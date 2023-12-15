@@ -1,4 +1,4 @@
-using System.Numerics;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace AD.UI
@@ -13,12 +13,12 @@ namespace AD.UI
         {
             x = T =>
             {
-                Catcher.X = T;
+                Catcher.x = T;
                 action.Invoke(Catcher);
             };
             y = T =>
             {
-                Catcher.Y = T;
+                Catcher.y = T;
                 action.Invoke(Catcher);
             };
             base.Start();

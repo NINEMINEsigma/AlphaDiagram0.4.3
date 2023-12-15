@@ -5,6 +5,7 @@ using AD.Experimental.GameEditor;
 using AD.BASE;
 using AD.Utility;
 using System.Collections;
+using AD.Experimental.HosterSystem.Diagram;
 
 namespace AD.Experimental.HosterSystem
 {
@@ -53,11 +54,14 @@ namespace AD.Experimental.HosterSystem
         /// 不能撤销的调用，需要取消请自行操作StaticTags
         /// <para>一般这是不允许重新设置的</para>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <typeparam name="Key"></typeparam>
+        /// <typeparam name="T">HosterComponent类型</typeparam>
+        /// <typeparam name="Key">Tag类型</typeparam>
         public static void RegisterKey<T, Key>() where T : IHosterComponent, new() where Key : IHosterTag, new()
 		{
-			StaticTags.TryAdd(typeof(T), typeof(Key));
+			if(StaticTags.TryAdd(typeof(T), typeof(Key)))
+            {
+                HosterExtension.StaticTags.Add(typeof(Key), new Key());
+            }
 		}
 
 		/// <summary>
@@ -66,6 +70,7 @@ namespace AD.Experimental.HosterSystem
         public override void Init()
 		{
             this.StartCoroutine(MakeInit());
+            RegisterKey<TransformDiagram, TransformDiagramKey>();
 		}
 
         #endregion
@@ -186,6 +191,7 @@ namespace AD.Experimental.HosterSystem
         protected virtual void Start()
         {
 			GameEditorApp.instance.RegisterSystem(this);
+            AddHosterComponent<TransformDiagram>().SetParent(this);
         }
 
         private IEnumerator MakeInit()
