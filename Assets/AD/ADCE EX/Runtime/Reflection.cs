@@ -600,6 +600,7 @@ namespace AD.Experimental.GameEditor
             {
                 if (entry.methodName == ADSerializeAttribute.DefaultKey)
                 {
+                    /*
                     PropertiesLayout.Label(field.Name, entry.message);
                     var value = (Vector2)field.GetValue(that);
 
@@ -628,6 +629,9 @@ namespace AD.Experimental.GameEditor
                         }
                         else catX.SetTextWithoutNotify(value.y.ToString());
                     });
+                    */
+                    var value = (Vector2)field.GetValue(that);
+                    PropertiesLayout.Vector2(field.Name, value, entry.message, T => field.SetValue(that, T));
                 }
                 else
                 {
@@ -639,6 +643,7 @@ namespace AD.Experimental.GameEditor
             {
                 if (entry.methodName == ADSerializeAttribute.DefaultKey)
                 {
+                    /*
                     PropertiesLayout.Label(field.Name, entry.message);
                     var value = (Vector3)field.GetValue(that);
 
@@ -678,6 +683,9 @@ namespace AD.Experimental.GameEditor
                         }
                         else catX.SetTextWithoutNotify(value.z.ToString());
                     });
+                    */
+                    var value = (Vector3)field.GetValue(that);
+                    PropertiesLayout.Vector3(field.Name, value, entry.message, T => field.SetValue(that, T));
                 }
                 else
                 {
@@ -688,6 +696,7 @@ namespace AD.Experimental.GameEditor
             {
                 if (entry.methodName == ADSerializeAttribute.DefaultKey)
                 {
+                    /*
                     PropertiesLayout.Label(field.Name, entry.message);
                     var value = (Vector4)field.GetValue(that);
 
@@ -740,6 +749,9 @@ namespace AD.Experimental.GameEditor
                         }
                         else catX.SetTextWithoutNotify(value.w.ToString());
                     });
+                    */
+                    var value = (Vector4)field.GetValue(that);
+                    PropertiesLayout.Vector4(field.Name, value, entry.message, T => field.SetValue(that, T));
                 }
                 else
                 {
@@ -1042,6 +1054,7 @@ namespace AD.Experimental.GameEditor
             {
                 if (entry.methodName == ADSerializeAttribute.DefaultKey)
                 {
+                    /*
                     PropertiesLayout.Label(property.Name, entry.message);
                     var value = (Vector2)property.GetValue(that);
 
@@ -1070,6 +1083,9 @@ namespace AD.Experimental.GameEditor
                         }
                         else catX.SetTextWithoutNotify(value.y.ToString());
                     });
+                    */
+                    var value = (Vector2)property.GetValue(that);
+                    PropertiesLayout.Vector2(property.Name, value, entry.message, T => property.SetValue(that, T));
                 }
                 else
                 {
@@ -1080,6 +1096,7 @@ namespace AD.Experimental.GameEditor
             {
                 if (entry.methodName == ADSerializeAttribute.DefaultKey)
                 {
+                    /*
                     PropertiesLayout.Label(property.Name, entry.message);
                     var value = (Vector3)property.GetValue(that);
 
@@ -1119,6 +1136,9 @@ namespace AD.Experimental.GameEditor
                         }
                         else catX.SetTextWithoutNotify(value.z.ToString());
                     });
+                    */
+                    var value = (Vector3)property.GetValue(that);
+                    PropertiesLayout.Vector3(property.Name, value, entry.message, T => property.SetValue(that, T));
                 }
                 else
                 {
@@ -1129,6 +1149,7 @@ namespace AD.Experimental.GameEditor
             {
                 if (entry.methodName == ADSerializeAttribute.DefaultKey)
                 {
+                    /*
                     PropertiesLayout.Label(property.Name, entry.message);
                     var value = (Vector4)property.GetValue(that);
 
@@ -1181,6 +1202,9 @@ namespace AD.Experimental.GameEditor
                         }
                         else catX.SetTextWithoutNotify(value.w.ToString());
                     });
+                    */
+                    var value = (Vector4)property.GetValue(that);
+                    PropertiesLayout.Vector4(property.Name, value, entry.message, T => property.SetValue(that, T));
                 }
                 else
                 {

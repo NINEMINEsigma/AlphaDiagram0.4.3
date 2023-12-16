@@ -38,12 +38,22 @@ namespace AD.Experimental.HosterSystem
 
         public static Dictionary<Type, Type> StaticTags = new();
 
+        /// <summary>
+        /// 从这里获取Key单例
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
 		public static IHosterTag ObtainKey<T>() where T : IHosterComponent, new()
 		{
 			if (StaticTags.TryGetValue(typeof(T), out Type type)) return HosterExtension.StaticTags[type];
 			else return null;
 		}
 
+        /// <summary>
+        /// 从这里获取Key单例
+        /// </summary>
+        /// <param name="T"></param>
+        /// <returns></returns>
 		public static IHosterTag ObtainKey(Type T)
 		{
 			if (StaticTags.TryGetValue(T, out Type type)) return HosterExtension.StaticTags[type];
@@ -71,6 +81,7 @@ namespace AD.Experimental.HosterSystem
 		{
             this.StartCoroutine(MakeInit());
             RegisterKey<TransformDiagram, TransformDiagramKey>();
+            RegisterKey<AddDiagram, AddDiagramKey>();
 		}
 
         #endregion
@@ -188,10 +199,17 @@ namespace AD.Experimental.HosterSystem
 
         #endregion
 
+        #region Diagram
+
+        protected AddDiagram AddDiagramMenu => HosterComponents[HosterSystem.ObtainKey<AddDiagram>()] as AddDiagram;
+
+        #endregion
+
         protected virtual void Start()
         {
 			GameEditorApp.instance.RegisterSystem(this);
             AddHosterComponent<TransformDiagram>().SetParent(this);
+            AddHosterComponent<AddDiagram>();
         }
 
         private IEnumerator MakeInit()
@@ -420,11 +438,18 @@ namespace AD.Experimental.HosterSystem
             return false;
         }
 
-		#endregion
+        #endregion
+
+        #region Diagram
+
+        protected AddDiagram AddDiagramMenu => HosterComponents[HosterSystem.ObtainKey<AddDiagram>()] as AddDiagram;
+
+        #endregion
 
         public HosterBase(HosterAssets assets)
         {
             this.assets = assets;
+            AddHosterComponent<AddDiagram>();
         }
 
         public void Update()
@@ -440,4 +465,39 @@ namespace AD.Experimental.HosterSystem
             }
         }
     }
+
+    /// <summary>
+    /// Diagram组件的基本实现，是PropertiesBlock（Properties面板控件）与IHosterComponent的实现
+    /// </summary>
+    public abstract class BaseDiagram : IHosterComponent
+    {
+        public IMainHoster Parent { get; set; }
+
+        public bool Enable { get; set; }
+        public PropertiesItem MatchItem { get; set; }
+
+        public ICanSerializeOnCustomEditor MatchTarget => Parent;
+
+        public abstract bool IsDirty { get; set; }
+        public abstract int SerializeIndex { get; set; }
+
+        public virtual void DoCleanup() { }
+
+        public virtual void DoSetup() { }
+
+        public virtual void DoUpdate() { }
+
+        public virtual void OnSerialize() { }
+
+        #region Command
+
+        public virtual void SetParent(IMainHoster Parent)
+        {
+            this.Parent = Parent;
+        }
+
+        #endregion
+    }
+
+
 }

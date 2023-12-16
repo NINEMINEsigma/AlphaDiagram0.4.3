@@ -6,7 +6,7 @@ namespace AD.Experimental.HosterSystem.Diagram
 {
     public class TransformDiagramKey : IHosterTag { }
 
-    public class TransformDiagram : IHosterComponent
+    public class TransformDiagram : BaseDiagram
     {
         public TransformDiagram() { }
 
@@ -17,29 +17,21 @@ namespace AD.Experimental.HosterSystem.Diagram
         }
 
         private Transform ThatTransform;
-        public IMainHoster Parent { get; private set; }
 
-        public bool Enable { get; set; }
-        public PropertiesItem MatchItem { get; set; }
+        public override bool IsDirty { get => false; set { } } 
+        public override int SerializeIndex { get => -1; set => throw new ADException("Not Support"); }
 
-        public ICanSerializeOnCustomEditor MatchTarget => Parent;
-
-        public bool IsDirty { get => false; set { } } 
-        public int SerializeIndex { get => -1; set => throw new ADException("Not Support"); }
-
-        public void DoCleanup() { }
-
-        public void DoSetup() { }
-
-        public void DoUpdate() { }
-
-        public void OnSerialize()
+        public override void OnSerialize()
         {
+            PropertiesLayout.SetUpPropertiesLayout(this);
             MatchItem.SetTitle("Transform");
             PropertiesLayout.Transform(this.ThatTransform);
+            PropertiesLayout.ApplyPropertiesLayout();
         }
 
-        public void SetParent(IMainHoster Parent)
+        #region Command
+
+        public override void SetParent(IMainHoster Parent)
         {
             if (Parent is HosterSystem hosterSystem)
             {
@@ -56,5 +48,7 @@ namespace AD.Experimental.HosterSystem.Diagram
                 throw new ADException("Not Support");
             }
         }
+
+        #endregion
     }
 }

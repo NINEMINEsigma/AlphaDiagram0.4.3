@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
+using AD.Experimental.HosterSystem;
 using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
@@ -9,10 +11,22 @@ using UnityEngine.InputSystem;
 
 namespace AD.Experimental.GameEditor
 {
-    public class EditorSystem : MonoBehaviour, IADSystem
+    public class EditorSystem : MonoBehaviour, IADSystem,IMainHoster
     {
         #region IADSystem
         public IADArchitecture Architecture { get; protected set; } = null;
+
+        public Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; set; } = new();
+
+        public HierarchyItem MatchItem { get; set ; }
+
+        public ICanSerializeOnCustomEditor MatchTarget => this;
+
+        public bool IsOpenListView { get => false; set { } }
+        public int SerializeIndex { get => 1000031; set { } }
+        public ISerializeHierarchyEditor MatchHierarchyEditor { get; set; }
+        public List<ISerializePropertiesEditor> MatchPropertiesEditors { get; set; } = new();
+        public ICanSerializeOnCustomEditor ParentTarget { get; set; }
 
         public IADArchitecture ADInstance()
         {
@@ -49,6 +63,12 @@ namespace AD.Experimental.GameEditor
         public float DragSpeed = 5;
 
         public TouchPanel TouchPanel;
+
+        #endregion
+
+        #region ValueIndexSystem
+
+        public ADSerializableDictionary<string, float> ValueSource = new();
 
         #endregion
 
@@ -94,5 +114,100 @@ namespace AD.Experimental.GameEditor
         {
 
         }
+
+        #region IMainHoster
+
+        public T AddHosterComponent<T>() where T : IHosterComponent, new()
+        {
+            if (HosterComponents.TryGetValue(HosterSystem.HosterSystem.ObtainKey<T>(), out var component)) return (T)component;
+            else
+            {
+                T temp = new T();
+                temp.SetParent(this);
+                HosterComponents.Add(HosterSystem.HosterSystem.ObtainKey<T>(), temp);
+                MatchPropertiesEditors.Add(temp);
+                return temp;
+            }
+        }
+
+        public int AddHosterComponents(params Type[] components)
+        {
+            int count = 0;
+            foreach (var componentType in components)
+            {
+                if (!HosterComponents.TryGetValue(HosterSystem.HosterSystem.ObtainKey(componentType), out var component))
+                {
+                    IHosterComponent temp = componentType.CreateInstance<IHosterComponent>();
+
+                    temp.SetParent(this);
+                    HosterComponents.Add(HosterSystem.HosterSystem.ObtainKey(componentType), temp);
+                    MatchPropertiesEditors.Add(temp);
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public T GetHosterComponent<T>() where T : IHosterComponent, new()
+        {
+            if (HosterComponents.TryGetValue(HosterSystem.HosterSystem.ObtainKey<T>(), out var component)) return (T)component;
+            else return default;
+        }
+
+        public bool RemoveHosterComponent<T>() where T : IHosterComponent, new()
+        {
+            if (this.HosterComponents.ContainsKey(HosterSystem.HosterSystem.ObtainKey<T>()))
+            {
+                if (!MatchPropertiesEditors.Remove(HosterComponents[HosterSystem.HosterSystem.ObtainKey<T>()])) return false;
+                if (HosterComponents.Remove(HosterSystem.HosterSystem.ObtainKey<T>())) return true;
+                foreach (var component in HosterComponents)
+                {
+                    component.Value.Enable = false;
+                }
+            }
+            return false;
+        }
+
+        public bool RemoveHosterComponentByKey<Key>() where Key : IHosterTag, new()
+        {
+            if (this.HosterComponents.ContainsKey(HosterExtension.StaticTags[typeof(Key)]))
+            {
+                if (!MatchPropertiesEditors.Remove(HosterComponents[HosterExtension.StaticTags[typeof(Key)]])) return false;
+                if (HosterComponents.Remove(HosterExtension.StaticTags[typeof(Key)])) return true;
+                foreach (var component in HosterComponents)
+                {
+                    component.Value.Enable = false;
+                }
+            }
+            return false;
+        }
+
+        public void OnSerialize()
+        {
+            this.MatchItem.SetTitle("Editor System");
+        }
+
+        public List<ICanSerializeOnCustomEditor> GetChilds()
+        {
+            return null;
+        }
+
+        public void ClickOnLeft()
+        {
+
+        }
+
+        public void ClickOnRight()
+        {
+
+        }
+
+        public void DoUpdate()
+        {
+
+        }
+
+        #endregion
+
     }
 }

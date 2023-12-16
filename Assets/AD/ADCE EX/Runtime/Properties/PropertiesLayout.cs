@@ -68,7 +68,7 @@ namespace AD.Experimental.GameEditor
                 GUILayoutLineList.Add(new() { content });
             }
         }
-        public static IADUI GUIField(string text, string style, string message = "")
+        public static IADUI GUIField(string text, string style, string message = "", bool IsHorizontal = true)
         {
             GameObject root = ObtainGUIStyleInstance(style, out IADUI targeADUI);
             int extensionalSpaceLine = ((int)root.transform.As<RectTransform>().sizeDelta.y / (int)PropertiesItem.DefaultRectHightLevelSize) - 1;
@@ -77,7 +77,7 @@ namespace AD.Experimental.GameEditor
             {
                 EndHorizontal();
             }
-            BeginHorizontal();
+            if (IsHorizontal) BeginHorizontal();
             GameObject labelRoot = GUI.skin.FindStyle("Label(UI)").Prefab.PrefabInstantiate();
             DoGUILine(new GUIContent(labelRoot, labelRoot.GetComponentInChildren<AD.UI.Text>().SetText(text.Translate()), GUIContentType.Default, 0, message));
             if (extensionalSpaceLine > 0)
@@ -85,7 +85,7 @@ namespace AD.Experimental.GameEditor
                 EndHorizontal();
             }
             DoGUILine(content);
-            EndHorizontal();
+            if (IsHorizontal) EndHorizontal();
             return targeADUI;
         }
         public static IADUI GUIField(string style, string message = "")
@@ -241,9 +241,29 @@ namespace AD.Experimental.GameEditor
             cat.Select(initSelect);
             return cat;
         }
+        public static Dropdown Dropdown(string[] options, string initSelect, string message, UnityAction<string> action)
+        {
+            Dropdown cat = GUIField("Dropdown(UI)", message).As<Dropdown>();
+            cat.AddOption(options);
+            cat.AddListener(action);
+            cat.Select(initSelect);
+            return cat;
+        }
         public static ModernUIDropdown ModernUIDropdown(string label, string[] options, string[] initSelects, string message, UnityAction<string> action)
         {
             ModernUIDropdown cat = GUIField(label, "Dropdown(ModernUI)", message).As<ModernUIDropdown>();
+            cat.AddOption(options);
+            cat.AddListener(action);
+            cat.maxSelect = initSelects.Length;
+            foreach (var initSelect in initSelects)
+            {
+                cat.Select(initSelect);
+            }
+            return cat;
+        }
+        public static ModernUIDropdown ModernUIDropdown(string[] options, string[] initSelects, string message, UnityAction<string> action)
+        {
+            ModernUIDropdown cat = GUIField("Dropdown(ModernUI)", message).As<ModernUIDropdown>();
             cat.AddOption(options);
             cat.AddListener(action);
             cat.maxSelect = initSelects.Length;
@@ -359,19 +379,19 @@ namespace AD.Experimental.GameEditor
 
         public static Vector2UI Vector2(string label, Vector2 initVec, string message, UnityAction<Vector2> action)
         {
-            var cat = GUIField(label, "Vector2(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y) as Vector2UI;
+            var cat = GUIField(label, "Vector2(UI)", message, false).As<VectorBaseUI>().InitValue(initVec.x, initVec.y) as Vector2UI;
             cat.action = action;
             return cat;
         }
         public static Vector3UI Vector3(string label, Vector3 initVec, string message, UnityAction<Vector3> action)
         {
-            var cat = GUIField(label, "Vector3(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z) as Vector3UI;
+            var cat = GUIField(label, "Vector3(UI)", message, false).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z) as Vector3UI;
             cat.action = action;
             return cat;
         }
         public static Vector4UI Vector4(string label, Vector4 initVec, string message, UnityAction<Vector4> action)
         {
-            var cat = GUIField(label, "Vector3(UI)", message).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z, initVec.w) as Vector4UI;
+            var cat = GUIField(label, "Vector3(UI)", message, false).As<VectorBaseUI>().InitValue(initVec.x, initVec.y, initVec.z, initVec.w) as Vector4UI;
             cat.action = action;
             return cat;
         }
@@ -400,27 +420,42 @@ namespace AD.Experimental.GameEditor
             EndHorizontal();
             Title("Local", "Local Value");
             var localPosition = Vector3("LocalPosition", transform.localPosition, "LocalPosition", T => transform.localPosition = T);
-            localPosition.ux = () => transform.localPosition.x;
-            localPosition.uy = () => transform.localPosition.y;
-            localPosition.uz = () => transform.localPosition.z;
+            localPosition.xyz = () => transform.localPosition;
             var localEulerAngles = Vector3("LocalEulerAngles", transform.localEulerAngles, "LocalEulerAngles", T => transform.localEulerAngles = T);
-            localEulerAngles.ux = () => transform.localEulerAngles.x;
-            localEulerAngles.uy = () => transform.localEulerAngles.y;
-            localEulerAngles.uz = () => transform.localEulerAngles.z;
+            localEulerAngles.xyz = () => transform.localEulerAngles;
             var localScale = Vector3("LocalScale", transform.localEulerAngles, "LocalScale", T => transform.localScale = T);
-            localScale.ux = () => transform.localScale.x;
-            localScale.uy = () => transform.localScale.y;
-            localScale.uz = () => transform.localScale.z;
+            localScale.xyz = () => transform.localScale;
 
             Title("World", "World Value");
             var Position = Vector3("Position", transform.position, "Position", T => transform.position = T);
-            Position.ux = () => transform.position.x;
-            Position.uy = () => transform.position.y;
-            Position.uz = () => transform.position.z;
+            Position.xyz = () => transform.position;
             var EulerAngles = Vector3("EulerAngles", transform.eulerAngles, "EulerAngles", T => transform.eulerAngles = T);
-            EulerAngles.ux = () => transform.eulerAngles.x;
-            EulerAngles.uy = () => transform.eulerAngles.y;
-            EulerAngles.uz = () => transform.eulerAngles.z;
+            EulerAngles.xyz = () => transform.eulerAngles;
         }
+
+        public static Dropdown Enum<T>(string label, int initEnumValue, string message, UnityAction<string> action)
+        {
+            Type TargetEnum = typeof(T);
+            if (!TargetEnum.IsEnum) throw new ADException("No Enum");
+            var ops = TargetEnum.GetEnumNames();
+            if (!TargetEnum.IsEnumDefined(initEnumValue)) throw new ADException("Not Defined On This Enum");
+            return Dropdown(label, ops, TargetEnum.GetEnumName(initEnumValue), message, action);
+        }
+
+        public static ModernUIDropdown EnumByModern<T>(string label, int[] initEnumValue, string message, UnityAction<string> action)
+        {
+            Type TargetEnum = typeof(T);
+            if (!TargetEnum.IsEnum) throw new ADException("No Enum");
+            var ops = TargetEnum.GetEnumNames();
+            if (!TargetEnum.IsEnumDefined(initEnumValue)) throw new ADException("Not Defined On This Enum");
+            List<string> iniops = new();
+            foreach (var op in initEnumValue)
+            {
+                iniops.Add(TargetEnum.GetEnumName(op));
+            }
+            return ModernUIDropdown(label, ops, iniops.ToArray(), message, action);
+        }
+
+        //ListView
     }
 }
