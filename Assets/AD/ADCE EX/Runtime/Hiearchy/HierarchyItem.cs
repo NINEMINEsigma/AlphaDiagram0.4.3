@@ -47,7 +47,7 @@ namespace AD.Experimental.GameEditor
 
         private void OnRightClick()
         {
-            if (!ListToggle.Selected) return; 
+            if (!ListToggle.Selected) return;
             MatchEditor?.MatchTarget.ClickOnRight();
         }
 
@@ -61,9 +61,10 @@ namespace AD.Experimental.GameEditor
         }
 
         private int AddtionalLevel = 0;
+
         public void AddRectHightLevel(int t)
         {
-            if(t==0) return;
+            if (t == 0) return;
             Vector2 temp = this.transform.As<RectTransform>().sizeDelta;
             this.transform.As<RectTransform>().sizeDelta = new Vector2(temp.x, temp.y + DefaultHight * t);
             AddtionalLevel += t;
@@ -74,11 +75,9 @@ namespace AD.Experimental.GameEditor
         {
             Vector2 temp = this.transform.As<RectTransform>().sizeDelta;
             this.transform.As<RectTransform>().sizeDelta = new Vector2(temp.x, DefaultHight);
-            MatchEditor?.MatchTarget.ParentTarget?.MatchHierarchyEditor.MatchItem.AddRectHightLevel(-RealCountOfLineAdd);
+            MatchEditor?.MatchTarget.ParentTarget?.MatchHierarchyEditor.MatchItem.AddRectHightLevel(-AddtionalLevel);
             AddtionalLevel = 0;
         }
-
-        int RealCountOfLineAdd;
 
         private void OpenListView()
         {
@@ -86,7 +85,7 @@ namespace AD.Experimental.GameEditor
             int ChildsSum = ChildItems.Count;
             ListSubListView.gameObject.SetActive(true);
             int OpenSingleItemSum = MaxOpenSingleItemSum + ExtensionOpenSingleItemSum;
-            RealCountOfLineAdd = Mathf.Clamp(ChildsSum, 0, OpenSingleItemSum);
+            int RealCountOfLineAdd = Mathf.Clamp(ChildsSum, 0, OpenSingleItemSum);
             this.AddRectHightLevel(RealCountOfLineAdd);
             //this.AddRectHightLevel(OpenSingleItemSum);
             SetUpSubListView(ChildItems);
