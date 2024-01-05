@@ -9,9 +9,9 @@ using Unity.VisualScripting;
 
 namespace AD.Experimental.GameEditor
 {
-    public class HiearchyBlock<T> : ISerializeHierarchyEditor where T : ICanSerializeOnCustomEditor
+    public class HierarchyBlock<T> : ISerializeHierarchyEditor where T : ICanSerializeOnCustomEditor
     {
-        public HiearchyBlock(T that, string name)
+        public HierarchyBlock(T that, string name)
         {
             this.that = that;
             this.Title = name;
@@ -19,7 +19,15 @@ namespace AD.Experimental.GameEditor
 
         protected readonly T that;
 
-        public HierarchyItem MatchItem { get; set; }
+        private HierarchyItem _MatchItem;
+        public HierarchyItem MatchItem
+        {
+            get => _MatchItem; set
+            {
+                _MatchItem = value;
+                value.SetTitle(this.Title);
+            }
+        }
 
         public ICanSerializeOnCustomEditor MatchTarget { get => that; }
 
@@ -41,7 +49,7 @@ namespace AD.Experimental.GameEditor
             set
             {
                 _Title = value;
-                MatchItem.SetTitle(_Title);
+                MatchItem?.SetTitle(_Title);
             }
         }
     }

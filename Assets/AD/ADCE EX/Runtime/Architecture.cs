@@ -57,7 +57,8 @@ namespace AD.Experimental.GameEditor
             if (_Right != null)
             {
                 _Right.GetChilds().Add(self);
-                _Right.MatchHierarchyEditor.MatchItem.Refresh();
+                if (_Right.MatchHierarchyEditor != null && _Right.MatchHierarchyEditor.MatchItem != null)
+                    _Right.MatchHierarchyEditor.MatchItem.Refresh();
             }
         }
 

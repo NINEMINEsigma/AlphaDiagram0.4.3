@@ -1,0 +1,83 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using AD.BASE;
+using AD.UI;
+using UnityEngine;
+
+namespace AD.Experimental.Neuron
+{
+    [Serializable]
+    public class DestoryException : ADException
+    {
+        public DestoryException() : base("This Asset has been destory") { }
+    }
+
+    public abstract class VectorAsset : IComparable<VectorAsset>, IEquatable<VectorAsset>
+    {
+        public abstract VectorAsset Add(VectorAsset _Right);
+
+        public abstract int CompareTo(VectorAsset other);
+        public abstract bool Equals(VectorAsset other);
+
+        public bool IsDestory = false;
+
+        public virtual void Destory()
+        {
+            IsDestory = true;
+        }
+
+        public static implicit operator bool(VectorAsset other) { return other != null && other.IsDestory; }
+        public static VectorAsset operator +(VectorAsset a, VectorAsset b) { return a.Add(b); }
+    }
+
+    public abstract class Processor<_Variant>
+    {
+        public abstract _Variant Compute(_Variant source);
+    }
+
+    [Serializable]
+    public abstract class Neuron<_Variant, _Processor>
+#if NEURON_MONO
+        : MonoBehaviour
+#endif
+        where _Processor : Processor<_Variant>, new()
+    {
+#if NEURON_MONO
+        public virtual void Start()
+#else
+        public Neuron()
+#endif
+        {
+            this.instanceIndex = App.instance.InstanceTotalGenerated++;
+            this.Processor = new _Processor();
+        }
+
+        public ulong instanceIndex { get; private set; }
+        public _Processor Processor { get; private set; }
+        public _Variant Data;
+
+        public List<Neuron<_Variant, _Processor>> Childs = new();
+
+        public ADEvent<_Variant> OnUpdate;
+
+        protected virtual _Variant ObtainResult()
+        {
+            _Variant NewData = default(_Variant);
+            foreach (var child in Childs)
+            {
+                NewData = CountAdd(NewData, this.Processor.Compute(child.ObtainResult()));
+            }
+            OnUpdate.Invoke(NewData);
+            return Data = NewData;
+        }
+
+        protected abstract _Variant CountAdd(_Variant a, _Variant b);
+
+        private void OnDestroy()
+        {
+            Processor = default;
+            Data = default;
+        }
+    }
+}

@@ -39,9 +39,25 @@ namespace AD.Experimental.GameEditor
             }
         }
 
+        private bool IsRegister = false;
+
+        private void Awake()
+        {
+            if (!IsRegister)
+            {
+                try
+                {
+                    GameEditorApp.instance.RegisterController(this);
+                    IsRegister = true;
+                }
+                catch { }
+            }
+        }
+
         private void Start()
         {
-            GameEditorApp.instance.RegisterController(this);
+            if (!IsRegister)
+                GameEditorApp.instance.RegisterController(this);
         }
 
         public override void Init()

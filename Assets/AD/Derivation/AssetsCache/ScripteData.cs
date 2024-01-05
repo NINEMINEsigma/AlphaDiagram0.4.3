@@ -159,7 +159,7 @@ namespace AD.Experimental.EditorAsset.Cache
         }
 
         [SerializeField] List<SourcePair> AssetsData = new();
-        HashSet<Key> Keys;
+        [SerializeField] HashSet<Key> Keys;
 
         public IEnumerator<ICanCacheData> GetEnumerator()
         {
