@@ -109,7 +109,7 @@ namespace AD.UI
 
         public InputField SetText(string text)
         {
-            this.text =text;
+            this.text = text;
             return this;
         }
 

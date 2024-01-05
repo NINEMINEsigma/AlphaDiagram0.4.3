@@ -46,13 +46,22 @@ namespace AD.Experimental.GameEditor
         }
     }
 
-    public class PropertiesBlock<T> : ISerializePropertiesEditor where T : ICanSerializeOnCustomEditor
+    public class PropertiesBlock<T> : ISerializePropertiesEditor where T : class, ICanSerializeOnCustomEditor
     {
         public static readonly Type CanSerialize = typeof(ADSerializeAttribute);
         public static readonly Type CanSetupAction = typeof(ADActionButtonAttribute);
         public static readonly BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
 
+        protected PropertiesBlock(string layer, int index = 0)
+        {
+            SetUpSelf(this as T, layer, index);
+        }
         public PropertiesBlock(T that, string layer, int index = 0)
+        {
+            SetUpSelf(that, layer, index);
+        }
+
+        private void SetUpSelf(T that, string layer, int index = 0)
         {
             this.that = that;
             this.SerializeIndex = index;
@@ -160,7 +169,7 @@ namespace AD.Experimental.GameEditor
         private readonly Dictionary<ADSerializeEntry, MethodInfo> methods = new();
         private readonly List<ADSerializeEntry> maxLine = new();
 
-        protected readonly T that;
+        protected T that { get; private set; }
 
         public string LayerTitle { get; private set; }
 
@@ -795,6 +804,19 @@ namespace AD.Experimental.GameEditor
                     that.RunMethodByName(entry.methodName, bindings, null);
                 }
             }
+            else if (type == typeof(Transform))
+            {
+                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                {
+                    PropertiesLayout.BeginHorizontal();
+                    PropertiesLayout.Transform((Transform)field.GetValue(that));
+                    PropertiesLayout.EndHorizontal();
+                }
+                else
+                {
+                    that.RunMethodByName(entry.methodName, bindings, null);
+                }
+            }
             else if (entry.methodName == ADSerializeAttribute.DefaultKey) DoGUI_Field_Extension(entry, field);
             else that.RunMethodByName(entry.methodName, bindings, null);
         }
@@ -1243,6 +1265,19 @@ namespace AD.Experimental.GameEditor
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Image(property.Name, entry.message).CurrentImagePair = new() { SpriteSource = (Sprite)property.GetValue(that) };
+                    PropertiesLayout.EndHorizontal();
+                }
+                else
+                {
+                    that.RunMethodByName(entry.methodName, bindings, null);
+                }
+            }
+            else if (type == typeof(Transform))
+            {
+                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                {
+                    PropertiesLayout.BeginHorizontal();
+                    PropertiesLayout.Transform((Transform)property.GetValue(that));
                     PropertiesLayout.EndHorizontal();
                 }
                 else

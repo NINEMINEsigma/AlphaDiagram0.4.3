@@ -9,6 +9,7 @@ namespace AD.Utility.Object
     public class EditGroup : MonoBehaviour
     {
         private const string TitleKey = "Title";
+
         #region TopLayer
 
         public ColliderLayer ColliderLayer;

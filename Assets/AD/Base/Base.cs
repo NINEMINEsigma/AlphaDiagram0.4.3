@@ -1698,6 +1698,14 @@ namespace AD.BASE
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1> call) { this.AddListener(call); }
+
+        public ADEvent Close(T1 a)
+        {
+            ADEvent result = new();
+            result.AddListener(() => this.Invoke(a));
+            return result;
+        }
+
     }
     [Serializable]
     public class ADEvent<T1, T2> : UnityEvent<T1, T2>

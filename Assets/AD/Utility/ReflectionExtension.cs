@@ -4,7 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using AD.BASE;
+using AD.Experimental.GameEditor;
 using AD.Utility.Pipe;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AD.Utility
@@ -376,6 +378,16 @@ namespace AD.Utility
             }
         }
 
+        public static void AssembliesUpdate()
+        {
+            _assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        }
+
+        public static Assembly[] GetAssemblies()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies();
+        }
+
         /*	
 		 * 	Gets the element type of a collection or array.
 		 * 	Returns null if type is not a collection type.
@@ -624,6 +636,53 @@ namespace AD.Utility
                     from type in assembly.GetTypes()
                     where IsAssignableFrom(derivedType, type)
                     select type
+                ).ToList();
+        }
+
+        public static IList<Type> GetTagedTypes(Type attributeType)
+        {
+            return
+                (
+                    from assembly in Assemblies
+                    from type in assembly.GetTypes()
+                    where type.GetCustomAttributes(attributeType, false).Length == 1
+                    select type
+                ).ToList();
+        }
+
+        public static IList<Attribute> GetTagedTypesAttributes(Type attributeType)
+        {
+            return
+                (
+                    from assembly in Assemblies
+                    from type in assembly.GetTypes()
+                    where type.GetCustomAttribute(attributeType, false) != null
+                    select type.GetCustomAttribute(attributeType, false)
+                ).ToList();
+        }
+
+        public static IList<_AttributeType> GetTagedTypesAttributes<_AttributeType>() where _AttributeType : Attribute
+        {
+            var attributeType = typeof(_AttributeType);
+            return
+                (
+                    from assembly in Assemblies
+                    from type in assembly.GetTypes()
+                    where type.GetCustomAttribute(attributeType, false) != null
+                    select type.GetCustomAttribute(attributeType, false) as _AttributeType
+                ).ToList();
+        }
+
+        public static IList<CustomAttributeData> GetTagedTypesAttributeDatas<_AttributeType>()
+        {
+            var attributeType = typeof(_AttributeType);
+            return
+                (
+                    from assembly in Assemblies
+                    from type in assembly.GetTypes()
+                    from data in type.GetCustomAttributesData()
+                    where data.AttributeType == attributeType
+                    select data
                 ).ToList();
         }
 
@@ -959,8 +1018,7 @@ namespace AD.Utility
             }
         }
 
-        public static void _ShowAttributeData(
-        IList<CustomAttributeData> attributes)
+        public static void _ShowAttributeData(IList<CustomAttributeData> attributes)
         {
             foreach (CustomAttributeData cad in attributes)
             {
@@ -1000,6 +1058,16 @@ namespace AD.Utility
             {
                 Debug.Log("         Type: '" + cata.ArgumentType + "'  Value: '" + cata.Value + "'");
             }
+        }
+
+        public static CustomAttributeNamedArgument Find(this CustomAttributeData self, string name)
+        {
+            return self.NamedArguments.First(T => T.MemberName == name);
+        }
+
+        public static object GetValue(this CustomAttributeData self, string name)
+        {
+            return self.NamedArguments.First(T => T.MemberName == name).TypedValue.Value;
         }
 
     }

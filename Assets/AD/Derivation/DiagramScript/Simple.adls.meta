@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/AD/Derivation/DiagramScript/Simple.adls.meta
 guid: db89c80e0e4173a43ae17feda86b6f74
+========
+guid: 838919bf220ed094784782c70d945599
+>>>>>>>> master:Assets/StreamingAssets/Prefab/Icon.ichpfab.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

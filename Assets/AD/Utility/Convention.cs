@@ -264,6 +264,11 @@ namespace AD.Utility
 
         #endregion
 
+        public static _Sub As<_Sub>(this IConvention_As_interface<_Sub> self)
+        {
+            return (_Sub)self;
+        }
+
         public static bool IsConventionType(this Type self) => self.IsSubclassOf(ConventionTag);
         public static bool IsConventionPropertyType(this Type self) => self.IsSubclassOf(ConventionPropertyTag);
         public static bool IsConventionFunctionType(this Type self) => self.IsSubclassOf(ConventionFunctionTag);
@@ -335,6 +340,8 @@ namespace AD.Utility
     public interface IConvention_Tag { }
     public interface IConvention_Property_Tag : IConvention_Tag { }
     public interface IConvention_Function_Tag : IConvention_Tag { }
+
+    public interface IConvention_As_interface<_Sub> : IConvention_Tag { }
 
     public interface IProperty_Value_get : IConvention_Property_Tag { object Value { get; } }
     public interface IProperty_Value_set : IConvention_Property_Tag { object Value { set; } }

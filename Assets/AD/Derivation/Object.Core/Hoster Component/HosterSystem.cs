@@ -6,6 +6,7 @@ using AD.BASE;
 using AD.Utility;
 using System.Collections;
 using AD.Experimental.HosterSystem.Diagram;
+using System.Linq;
 
 namespace AD.Experimental.HosterSystem
 {
@@ -207,8 +208,8 @@ namespace AD.Experimental.HosterSystem
 
         protected virtual void Start()
         {
-			GameEditorApp.instance.RegisterSystem(this);
-            AddHosterComponent<TransformDiagram>().SetParent(this);
+			GameEditorApp.instance.RegisterSystem<HosterSystem>(this);
+            AddHosterComponent<TransformDiagram>();
             AddHosterComponent<AddDiagram>();
         }
 
@@ -230,7 +231,6 @@ namespace AD.Experimental.HosterSystem
                 child.Update();
             }
         }
-
     }
 
     /// <summary>
@@ -319,6 +319,7 @@ namespace AD.Experimental.HosterSystem
 		#region IMainHoster Assets
 
 		public Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; set; } = new();
+        public List<IHosterComponent> NoMatchHosterComponents = new();
 
 		public List<ISerializePropertiesEditor> MatchPropertiesEditors { get; set; } = new();
 		public bool IsOpenListView { get; set; } = false;
@@ -330,62 +331,82 @@ namespace AD.Experimental.HosterSystem
 
         #region 注意，这些序号需要使用接口来获取确定的属性
 
-        public int SerializeIndex { get; set; }
+        public virtual int SerializeIndex { get; set; }
 		int ICanSerializeOnCustomEditor.SerializeIndex => this.SerializeIndex;
         int ICanSerialize.SerializeIndex { get; set; }
 
 		#endregion
 
-		#endregion
-
-		#region Resources
-
 		private List<HosterBase> childs = new();
-
-		public HosterAssets assets = null;
-
-		public interface IHosterAssets { }
-
-		[Serializable, ES3Serializable]
-		public class HosterAssets : IHosterAssets
-		{
-			[ES3Serializable] public string Name;
-			[ES3Serializable] public Dictionary<string, IHosterAssets> Assets;
-		}
 
         #endregion
 
         #region IMainHoster Func
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>如果槽位已有对象，返回该对象，否则新生成对象并返回</returns>
         public T AddHosterComponent<T>() where T : IHosterComponent, new()
         {
-			if (HosterComponents.TryGetValue(HosterSystem.ObtainKey<T>(), out var component)) return (T)component;
-			else
-			{
-				T temp = new T();
-				temp.SetParent(this);
-				HosterComponents.Add(HosterSystem.ObtainKey<T>(),temp);
-				MatchPropertiesEditors.Add(temp);
-				return temp;
-			}
+            var tag_key = HosterSystem.ObtainKey<T>();
+            //存在Tag
+            //存在Tag且已经存在组件，有两种情况，一种是T就是目标类型
+            //另一种则是T是基类，这种情况下Tag应该也是多类同时使用的
+            if (tag_key != null && HosterComponents.TryGetValue(tag_key, out var component)) return (T)component;
+            //否则不限制槽位
+            return DoAdd(tag_key);
+
+            T DoAdd(IHosterTag tag_key)
+            {
+                T temp = new T();
+                temp.SetParent(this);
+                if (tag_key != null) HosterComponents.Add(tag_key, temp);
+                else NoMatchHosterComponents.Add(temp);
+                MatchPropertiesEditors.Add(temp);
+                temp.DoSetup();
+                return temp;
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="components"></param>
+        /// <returns>成功添加的数量</returns>
         public int AddHosterComponents(params Type[] components)
         {
-			int count = 0;
-			foreach (var componentType in components)
-			{
-				if (!HosterComponents.TryGetValue(HosterSystem.ObtainKey(componentType), out var component))
-				{
-					IHosterComponent temp = componentType.CreateInstance<IHosterComponent>();
+            int count = 0;
+            foreach (var componentType in components)
+            {
+                var tag_key = HosterSystem.ObtainKey(componentType);
+                if (tag_key != null)
+                {
+                    if (!HosterComponents.TryGetValue(tag_key, out var component))
+                    {
+                        count++;
+                        DoAdd(componentType, tag_key);
+                    }
+                }
+                else
+                {
+                    count++;
+                    DoAdd(componentType, tag_key);
+                }
+            }
+            return count;
 
-                    temp.SetParent(this);
-					HosterComponents.Add(HosterSystem.ObtainKey(componentType), temp);
-					MatchPropertiesEditors.Add(temp);
-					count++;
-				}
-			}
-			return count;
+            void DoAdd(Type componentType, IHosterTag tag_key)
+            {
+                IHosterComponent temp = componentType.CreateInstance<IHosterComponent>();
+
+                temp.SetParent(this);
+                if (tag_key != null) HosterComponents.Add(tag_key, temp);
+                else NoMatchHosterComponents.Add(temp);
+                MatchPropertiesEditors.Add(temp);
+                temp.DoSetup();
+            }
         }
 
 		public virtual void ClickOnLeft() { }
@@ -405,35 +426,89 @@ namespace AD.Experimental.HosterSystem
 			else return default;
         }
 
-        public void OnSerialize()
-        {
-			this.MatchItem.SetTitle(assets.Name);
-        }
+        public abstract void OnSerialize();
 
-		public bool RemoveHosterComponent<T>() where T : IHosterComponent, new()
+        public bool RemoveHosterComponent<T>() where T : IHosterComponent, new()
 		{
-			if (this.HosterComponents.ContainsKey(HosterSystem.ObtainKey<T>()))
-			{
-				if (!MatchPropertiesEditors.Remove(HosterComponents[HosterSystem.ObtainKey<T>()])) return false;
-				if (HosterComponents.Remove(HosterSystem.ObtainKey<T>())) return true;
-				foreach (var component in HosterComponents)
-				{
-					component.Value.Enable = false;
-				}
-			}
-			return false;
-		}
-
-        public bool RemoveHosterComponentByKey<Key>() where Key : IHosterTag, new()
-        {
-            if (this.HosterComponents.ContainsKey(HosterExtension.StaticTags[typeof(Key)]))
+            try
             {
-                if (!MatchPropertiesEditors.Remove(HosterComponents[HosterExtension.StaticTags[typeof(Key)]])) return false;
-                if (HosterComponents.Remove(HosterExtension.StaticTags[typeof(Key)])) return true;
+                IHosterTag key = HosterSystem.ObtainKey<T>();
+                if (key != null)
+                {
+                    if (this.HosterComponents.ContainsKey(key))
+                    {
+                        MatchPropertiesEditors.Remove(HosterComponents[key]);
+                        HosterComponents[key].DoCleanup();
+                        HosterComponents.Remove(key);
+                        return true;
+                    }
+                }
+                else
+                {
+                    NoMatchHosterComponents.RemoveAll(T => T.GetType() == typeof(T));
+                    this.MatchPropertiesEditors.RemoveAll(T => T.GetType() == typeof(T));
+                }
+            }
+            catch
+            {
                 foreach (var component in HosterComponents)
                 {
                     component.Value.Enable = false;
                 }
+                ADGlobalSystem.ThrowLogicError("RemoveHosterComponent");
+            }
+			return false;
+		}
+
+        /// <summary>
+        /// 补充函数
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public bool RemoveHosterComponent<T>(T target) where T : IHosterComponent, new()
+        {
+            try
+            {
+                IHosterTag key = HosterSystem.ObtainKey<T>();
+                if (key != null)
+                {
+                    if (this.HosterComponents.ContainsKey(key))
+                    {
+                        MatchPropertiesEditors.Remove(HosterComponents[key]);
+                        HosterComponents[key].DoCleanup();
+                        HosterComponents.Remove(key);
+                        return true;
+                    }
+                }
+                else
+                {
+                    if (target != null)
+                    {
+                        NoMatchHosterComponents.Remove(target);
+                        this.MatchPropertiesEditors.Remove(target);
+                    }
+                }
+            }
+            catch
+            {
+                foreach (var component in HosterComponents)
+                {
+                    component.Value.Enable = false;
+                }
+                ADGlobalSystem.ThrowLogicError("RemoveHosterComponent");
+            }
+            return false;
+        }
+
+        public bool RemoveHosterComponentByKey<Key>() where Key : IHosterTag, new()
+        {
+            IHosterTag tag_key = HosterExtension.StaticTags[typeof(Key)];
+            if (tag_key == null) return false;
+            if (this.HosterComponents.ContainsKey(tag_key))
+            {
+                MatchPropertiesEditors.Remove(HosterComponents[tag_key]);
+                HosterComponents[tag_key].DoCleanup();
+                HosterComponents.Remove(tag_key);
             }
             return false;
         }
@@ -446,9 +521,8 @@ namespace AD.Experimental.HosterSystem
 
         #endregion
 
-        public HosterBase(HosterAssets assets)
+        public HosterBase()
         {
-            this.assets = assets;
             AddHosterComponent<AddDiagram>();
         }
 
@@ -458,6 +532,10 @@ namespace AD.Experimental.HosterSystem
             foreach (var component in HosterComponents)
             {
                 if (component.Value.Enable) component.Value.DoUpdate();
+            }
+            foreach (var component in NoMatchHosterComponents)
+            {
+                if (component.Enable) component.DoUpdate();
             }
             foreach (var child in childs)
             {
@@ -499,5 +577,32 @@ namespace AD.Experimental.HosterSystem
         #endregion
     }
 
+    /// <summary>
+    /// Diagram组件的扩展实现，是PropertiesBlock（Properties面板控件）与IHosterComponent的实现
+    /// </summary>
+    public abstract class BaseDiagram<T> :PropertiesBlock<T>, IHosterComponent where T:class,ICanSerializeOnCustomEditor
+    {
+        protected BaseDiagram(string layer, int index = 0) : base( layer, index)
+        {
+        }
 
+        public IMainHoster Parent { get; set; }
+
+        public bool Enable { get; set; }
+
+        public virtual void DoCleanup() { }
+
+        public virtual void DoSetup() { }
+
+        public virtual void DoUpdate() { }
+
+        #region Command
+
+        public virtual void SetParent(IMainHoster Parent)
+        {
+            this.Parent = Parent;
+        }
+
+        #endregion
+    }
 }

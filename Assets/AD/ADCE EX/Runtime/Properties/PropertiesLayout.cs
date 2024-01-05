@@ -42,6 +42,8 @@ namespace AD.Experimental.GameEditor
 
     public static class PropertiesLayout
     {
+        private static bool IsApply = true;
+
         private static ISerializePropertiesEditor _CurrentEditorThat;
         public static ISerializePropertiesEditor CurrentEditorThat
         {
@@ -122,6 +124,17 @@ namespace AD.Experimental.GameEditor
             CurrentEditorThat = ADGlobalSystem.FinalCheck(target);
             CurrentEditorThat.MatchItem.Init();
             IsNeedMulLine = true;
+            if (!IsApply)
+            {
+                foreach (var GUILine in GUILayoutLineList)
+                {
+                    foreach (var content in GUILine)
+                    {
+                        GameObject.Destroy(content.RootObject);
+                    }
+                }
+            }
+            IsApply = false;
         }
 
         public static void ApplyPropertiesLayout()
@@ -157,12 +170,26 @@ namespace AD.Experimental.GameEditor
             CurrentEditorThat = null;
             GUILayoutLineList.Clear();
             EndHorizontal();
+            IsApply = true;
         }
 
         //public static T GenerateElement<T>() where T : ADUI
         //{
         //    T element = ADGlobalSystem.FinalCheck<T>(ADGlobalSystem.GenerateElement<T>(), "On PropertiesLayout , you try to obtain a null object with some error");
         //}
+
+        public static IADUI ObjectField(string text, string style, string message = "", bool IsHorizontal = true) => GUIField(text, style, message, IsHorizontal);
+        public static IADUI ObjectField(string style, string message = "") => GUIField(style, message);
+
+        public static T CField<T>(string text, string message = "", bool IsHorizontal = true) where T : IADUI
+        {
+            return (T)GUIField(text, typeof(T).Name, message, IsHorizontal);
+        }
+        public static T CField<T>(string message = "") where T : IADUI
+        {
+            return (T)GUIField(typeof(T).Name, message);
+        }
+
 
         #region L
 
@@ -191,6 +218,10 @@ namespace AD.Experimental.GameEditor
         public static Text Label(string text, string message)
         {
             return Text(text, TextType.Label, message);
+        }
+        public static Text Label(string text)
+        {
+            return Text(text, TextType.Label, text);
         }
         public static Text Title(string text, string message)
         {
@@ -456,6 +487,51 @@ namespace AD.Experimental.GameEditor
             return ModernUIDropdown(label, ops, iniops.ToArray(), message, action);
         }
 
+        public static ModernUIInputField ModernUIInputField(string text, string message)
+        {
+            var cat = GUIField("InputField(ModernUI)", message).As<ModernUIInputField>().SetText(text);
+            return cat;
+        }
+
         //ListView
+
+        //Tie Value
+
+        public static InputField FloatField(string label, float initValue, string message, UnityAction<float> action)
+        {
+            EndHorizontal();
+            BeginHorizontal();
+            Label(label, message);
+            var input = InputField(initValue.ToString(), label, message);
+            input.AddListener(T =>
+            {
+                if (float.TryParse(T, out var value))
+                    action.Invoke(value);
+                else
+                {
+                    input.SetTextWithoutNotify("0");
+                    action.Invoke(0);
+                }
+            });
+            EndHorizontal();
+            return input;
+        }
+
+        public static InputField IntField(string label, int initValue, string message, UnityAction<int> action)
+        {
+            Label(label, message);
+            var input = InputField(initValue.ToString(), label, message);
+            input.AddListener(T =>
+            {
+                if (int.TryParse(T, out var value))
+                    action.Invoke(value);
+                else
+                {
+                    input.SetTextWithoutNotify("0");
+                    action.Invoke(0);
+                }
+            });
+            return input;
+        }
     }
 }

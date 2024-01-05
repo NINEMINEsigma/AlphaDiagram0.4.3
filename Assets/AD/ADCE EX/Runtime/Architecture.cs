@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using AD.BASE;
 using AD.UI;
+using AD.Utility;
 
 namespace AD.Experimental.GameEditor
 {
@@ -44,8 +45,11 @@ namespace AD.Experimental.GameEditor
 
         public static void SetParent(this ICanSerializeOnCustomEditor self, ICanSerializeOnCustomEditor _Right)
         {
+            if (self == null && _Right == null) return;
+            if (_Right == self) throw new ADException("Loop Serialize Editor");
             if (self.ParentTarget != null)
             {
+                if (self.GetChilds().Contains(_Right)) return;
                 self.ParentTarget.GetChilds().Remove(self);
                 self.ParentTarget.MatchHierarchyEditor.MatchItem.Refresh();
             }

@@ -6,7 +6,7 @@ namespace AD.Utility
 {
     public static class VectorExtension
     {
-        public static Vector3 ToVector3 (this Vector2 self)
+        public static Vector3 ToVector3(this Vector2 self)
         {
             return self;
         }
@@ -16,7 +16,7 @@ namespace AD.Utility
             return self;
         }
 
-        public static Vector2 SetX(this Vector2 self,float x)
+        public static Vector2 SetX(this Vector2 self, float x)
         {
             self.x = x;
             return self;
@@ -73,6 +73,49 @@ namespace AD.Utility
         public static Vector3 AddZ(this Vector3 self, float z)
         {
             self.z += z;
+            return self;
+        }
+
+        public static Vector2 SetXY(this Vector2 self, float x, float y)
+        {
+            self.x = x;
+            self.y = y;
+            return self;
+        }
+
+        public static Vector2 AddXY(this Vector2 self, float x, float y)
+        {
+            self.x += x;
+            self.y += y;
+            return self;
+        }
+
+        public static Vector3 SetXY(this Vector3 self, float x, float y)
+        {
+            self.x = x;
+            self.y = y;
+            return self;
+        }
+
+        public static Vector3 SetYZ(this Vector3 self, float y, float z)
+        {
+            self.y = y;
+            self.z = z;
+            return self;
+        }
+
+        public static Vector3 SetXZ(this Vector3 self, float x, float z)
+        {
+            self.x = x;
+            self.z = z;
+            return self;
+        }
+
+        public static Vector3 SetXYZ(this Vector3 self, float x, float y, float z)
+        {
+            self.x = x;
+            self.y = y;
+            self.z = z;
             return self;
         }
 
