@@ -63,6 +63,7 @@ namespace AD.Experimental.GameEditor
         private int AddtionalLevel = 0;
         public void AddRectHightLevel(int t)
         {
+            if(t==0) return;
             Vector2 temp = this.transform.As<RectTransform>().sizeDelta;
             this.transform.As<RectTransform>().sizeDelta = new Vector2(temp.x, temp.y + DefaultHight * t);
             AddtionalLevel += t;
@@ -73,19 +74,21 @@ namespace AD.Experimental.GameEditor
         {
             Vector2 temp = this.transform.As<RectTransform>().sizeDelta;
             this.transform.As<RectTransform>().sizeDelta = new Vector2(temp.x, DefaultHight);
-            MatchEditor?.MatchTarget.ParentTarget?.MatchHierarchyEditor.MatchItem.AddRectHightLevel(-AddtionalLevel);
+            MatchEditor?.MatchTarget.ParentTarget?.MatchHierarchyEditor.MatchItem.AddRectHightLevel(-RealCountOfLineAdd);
             AddtionalLevel = 0;
         }
+
+        int RealCountOfLineAdd;
 
         private void OpenListView()
         {
             List<ICanSerializeOnCustomEditor> ChildItems = MatchEditor.MatchTarget.GetChilds();
-            int ChildsSum = MatchEditor.MatchTarget.GetChilds().Count;
-
+            int ChildsSum = ChildItems.Count;
             ListSubListView.gameObject.SetActive(true);
             int OpenSingleItemSum = MaxOpenSingleItemSum + ExtensionOpenSingleItemSum;
-            int t = Mathf.Clamp(ChildsSum, 1, OpenSingleItemSum);
-            this.AddRectHightLevel(t);
+            RealCountOfLineAdd = Mathf.Clamp(ChildsSum, 0, OpenSingleItemSum);
+            this.AddRectHightLevel(RealCountOfLineAdd);
+            //this.AddRectHightLevel(OpenSingleItemSum);
             SetUpSubListView(ChildItems);
         }
 

@@ -36,6 +36,7 @@ namespace AD.Experimental.GameEditor
 
         public virtual void OnSerialize()
         {
+            CustomEditorUtility.BaseHierarchyItemSerialize(this);
             MatchItem.SetTitle(Title);
         }
 
@@ -437,6 +438,18 @@ namespace AD.Experimental.GameEditor
                         {
                             cat.SetTextWithoutNotify(((float)field.GetValue(that)).ToString());
                         }
+                    });
+                    PropertiesLayout.EndHorizontal();
+                }
+                else if (entry.message[0] == '$')
+                {
+                    PropertiesLayout.BeginHorizontal();
+                    var str = entry.message[1..].Split(',');
+                    float min = float.Parse(str[0]), max = float.Parse(str[1]);
+                    PropertiesLayout.Label(field.Name, str[2]);
+                    var cat = PropertiesLayout.Slider(min, max, (float)field.GetValue(that), true, str[2], T =>
+                    {
+                        field.SetValue(that, T);
                     });
                     PropertiesLayout.EndHorizontal();
                 }
@@ -904,6 +917,18 @@ namespace AD.Experimental.GameEditor
                         {
                             cat.SetTextWithoutNotify(((float)property.GetValue(that)).ToString());
                         }
+                    });
+                    PropertiesLayout.EndHorizontal();
+                }
+                else if (entry.message[0] == '$')
+                {
+                    PropertiesLayout.BeginHorizontal();
+                    var str = entry.message[1..].Split(',');
+                    float min = float.Parse(str[0]), max = float.Parse(str[1]);
+                    PropertiesLayout.Label(property.Name, str[2]);
+                    var cat = PropertiesLayout.Slider(min, max, (float)property.GetValue(that), true, str[2], T =>
+                    {
+                        property.SetValue(that, T);
                     });
                     PropertiesLayout.EndHorizontal();
                 }

@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.UI;
 using AD.Utility;
 using Mono.Cecil.Cil;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AD.Experimental.Neuron.AudioSampling
@@ -54,6 +56,7 @@ namespace AD.Experimental.Neuron.AudioSampling
         }
     }*/
 
+    [Serializable]
     public sealed class DataProcessor : Processor<float>
     {
         public override float Compute(float source)
@@ -61,15 +64,15 @@ namespace AD.Experimental.Neuron.AudioSampling
             return Sigmoid(source);
         }
 
-        public static float Sigmoid(float v)
+        public float Sigmoid(float v)
         {
-            return 1.0f / Mathf.Exp((-v) / T);
+            return 1.0f / (1 + Mathf.Exp(-(v / T)));
         }
 
         /// <summary>
         /// Î±ÎÂ¶È
         /// </summary>
-        public static float T = 0.637582f;
+        public float T = 0.637582f;
     }
 
     [Serializable]
@@ -80,7 +83,7 @@ namespace AD.Experimental.Neuron.AudioSampling
 
         public ISerializeHierarchyEditor MatchHierarchyEditor { get; set; }
         public List<ISerializePropertiesEditor> MatchPropertiesEditors { get; set; } = new();
-        public ICanSerializeOnCustomEditor ParentTarget { get; set ; }
+        public ICanSerializeOnCustomEditor ParentTarget { get; set; }
 
         public int SerializeIndex => (int)this.instanceIndex;
 
@@ -88,7 +91,10 @@ namespace AD.Experimental.Neuron.AudioSampling
         private IEnumerator InitializeMonoMode()
         {
             yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
             MatchHierarchyEditor = new HierarchyBlock<LinearNeuron>(this, this.instanceIndex.ToString());
+            this.gameObject.name = this.instanceIndex.ToString();
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
             {
                 new PropertiesBlock<LinearNeuron>(this,"Info",0)
@@ -101,16 +107,10 @@ namespace AD.Experimental.Neuron.AudioSampling
         public override void Start()
         {
             base.Start();
-            foreach (var tchild in transform)
-            {
-                tchild.As<Transform>().GetComponent<LinearNeuron>().SetParent(this);
-            }
             ADGlobalSystem.instance.StartCoroutine(InitializeMonoMode());
 #else
-        public Neuron()
+        public Neuron() :base()
         {
-            meshRenderer.material = new Material(meshRenderer.material);
-            HierarchyItem.MaxOpenSingleItemSum = 35;
             MatchHierarchyEditor = new HierarchyBlock<LinearNeuron>(this, this.instanceIndex.ToString());
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
             {
@@ -118,41 +118,66 @@ namespace AD.Experimental.Neuron.AudioSampling
             };
             if (IsMainTop) GameEditorApp.instance.GetController<Hierarchy>().AddOnTop(this.MatchHierarchyEditor);
 #endif
+            meshRenderer.material = new Material(meshRenderer.material);
+            HierarchyItem.MaxOpenSingleItemSum = 10;
         }
 
         private void DoUpdate()
         {
-            meshRenderer.material.color = ColorExtension.LerpTo(Color.white, Color.black, Data);
+            meshRenderer.material.color = ColorExtension.LerpTo(Color.black, Color.white, (this.Childs.Count == 0) ? Data : ((Data - 0.5f) * 2));
         }
 
         public void ClickOnLeft()
         {
-
+            this.ObtainResult();
         }
 
         public void ClickOnRight()
         {
-            this.ObtainResult();
         }
 
         protected override float ObtainResult()
         {
             base.ObtainResult();
+            //Debug.Log(this.instanceIndex.ToString()+"/"+ Data.ToString());
             DoUpdate();
             return this.Data;
         }
 
         public List<LinearNeuron> NeuronChilds => Childs.GetSubList<Neuron<float, DataProcessor>, LinearNeuron>();
 
-        [ADSerialize(layer = "Info", index = 0, message = "Value", methodName = ADSerializeAttribute.DefaultKey)]
+        [ADSerialize(layer = "Info", index = 0, message = "$0,1,Value", methodName = "")]
         public float NeuronValue
         {
             get => base.Data;
             set
             {
                 base.Data = value;
+                GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.All(T =>
+                {
+                    T.MatchTarget.As<LinearNeuron>().ObtainResult();
+                    return true;
+                });
+                //ObtainResult();
             }
         }
+
+        [ADSerialize(layer = "Info", index = 0, message = "$0,3,T", methodName = "")]
+        public float NeuronT
+        {
+            get => Processor.T;
+            set
+            {
+                Processor.T = value;
+                GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.All(T =>
+                {
+                    T.MatchTarget.As<LinearNeuron>().ObtainResult();
+                    return true;
+                });
+                //ObtainResult();
+            }
+        }
+
 
         public List<ICanSerializeOnCustomEditor> GetChilds()
         {
