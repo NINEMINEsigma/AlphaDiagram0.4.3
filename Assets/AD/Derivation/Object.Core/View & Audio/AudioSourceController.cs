@@ -237,7 +237,9 @@ namespace AD.UI
             {
                 if (!IsPause)
                 {
-                    CurrentClock += UnityEngine.Time.deltaTime;
+                    //CurrentClock += UnityEngine.Time.deltaTime;
+                    CurrentClock = (float)Source.timeSamples / (float)Source.clip.frequency;
+                    /*
                     if (!IsDelayToStart)
                     {
                         float cat = Mathf.Abs(CurrentClock - Source.time);
@@ -247,6 +249,7 @@ namespace AD.UI
                             Debug.LogWarning("音频计时出现误差(" + cat.ToString() + " S)，已尝试同步");
                         }
                     }
+                    */
                 }
             }
 

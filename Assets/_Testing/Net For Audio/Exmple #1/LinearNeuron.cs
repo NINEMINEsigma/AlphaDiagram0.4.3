@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
 using AD.Experimental.GameEditor;
-using AD.UI;
 using AD.Utility;
-using Mono.Cecil.Cil;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AD.Experimental.Neuron.AudioSampling
@@ -146,10 +143,10 @@ namespace AD.Experimental.Neuron.AudioSampling
 
         public List<LinearNeuron> NeuronChilds => Childs.GetSubList<Neuron<float, DataProcessor>, LinearNeuron>();
 
-        [ADSerialize(layer = "Info", index = 0, message = "$0,1,Value", methodName = "")]
+        [ADSerialize(layer = "Info", index = 0, message = "$0,1,Value")]
         public float NeuronValue
         {
-            get => base.Data;
+            get => ObtainResult();
             set
             {
                 base.Data = value;
@@ -162,7 +159,7 @@ namespace AD.Experimental.Neuron.AudioSampling
             }
         }
 
-        [ADSerialize(layer = "Info", index = 0, message = "$0,3,T", methodName = "")]
+        [ADSerialize(layer = "Info", index = 0, message = "$0,3,T")]
         public float NeuronT
         {
             get => Processor.T;
@@ -177,16 +174,21 @@ namespace AD.Experimental.Neuron.AudioSampling
                 //ObtainResult();
             }
         }
-
+        [ADSerialize(layer = "Info", index = 2, message = "Weight")]
+        public float NeuronWeight
+        {
+            get => base.weight;
+            set { base.weight = value; }
+        }
 
         public List<ICanSerializeOnCustomEditor> GetChilds()
         {
             return Childs.GetSubList<Neuron<float, DataProcessor>, ICanSerializeOnCustomEditor>();
         }
 
-        protected override float CountAdd(float a, float b)
+        protected override float CountAdd(float a, float b, float weight)
         {
-            return a + b;
+            return a + b * weight;
         }
     }
 }

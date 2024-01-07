@@ -22,8 +22,26 @@ namespace AD.Experimental.GameEditor
                 GameEditorApp.instance.GetController<Information>()?.Refresh();
             }
         }
-        public Vector2 Range = new Vector2(0, 1);
-        public bool IsInt;
+        public float TaskValue
+        {
+            get => TaskPercent * RangeDic + Range.x;
+            set
+            {
+                TaskPercent = (value - Range.x) / RangeDic;
+            }
+        }
+        private Vector2 _Range = new(0, 1);
+        public Vector2 Range
+        {
+            get => _Range;
+            set
+            {
+                _Range = value;
+                RangeDic = value.y - value.x;
+            }
+        }
+        private float RangeDic = 1;
+        public bool IsInt = false;
 
         public TaskInfo() { }
         public TaskInfo(string taskName, int taskIndex, float taskPercent, Vector2 range, bool isInt)
@@ -102,6 +120,7 @@ namespace AD.Experimental.GameEditor
             {
                 Tasks.Add(task);
             }
+            else Current = task;
             AddTaskCallBack.Invoke(task);
             Update();
         }
@@ -113,6 +132,7 @@ namespace AD.Experimental.GameEditor
                 if (Tasks.Count > 0)
                 {
                     Current = Tasks[0];
+                    Tasks.RemoveAt(0);
                 }
                 else Current = null;
             }
@@ -280,7 +300,7 @@ namespace AD.Experimental.GameEditor
         public void Refresh()
         {
             var _m_TaskList = Architecture.GetModel<TaskList>();
-            _m_TaskList.Update();
+            //_m_TaskList.Update();
             if (_m_TaskList.Current == null)
             {
                 TaskPanelTitle.SetText("");

@@ -263,6 +263,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Neuron Block
       objectReference: {fileID: 0}
+    - target: {fileID: 6010199292217037871, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
 --- !u!1001 &94377629
@@ -753,10 +757,62 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1468548486}
     m_Modifications:
-    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
-      propertyPath: Sampling
+    - target: {fileID: -8087593338958053233, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: b960b3fdeb9b8bf4ab580ee2bd610cf5, type: 3}
+    - target: {fileID: -8087593338958053233, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: Sampling
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: BandCount
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: LoopAtAll
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: decreasing
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: increasing
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: decreasingType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: increasingType
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: bands.Array.size
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: SourcePairs.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: normalizedBands.Array.size
+      value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: SourcePairs.Array.data[0].Clip
+      value: 
+      objectReference: {fileID: 8300000, guid: b960b3fdeb9b8bf4ab580ee2bd610cf5, type: 3}
+    - target: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+      propertyPath: SourcePairs.Array.data[1].Clip
+      value: 
+      objectReference: {fileID: 8300000, guid: b960b3fdeb9b8bf4ab580ee2bd610cf5, type: 3}
     - target: {fileID: 3573331516725623937, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -944,6 +1000,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
+--- !u!114 &864194884 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 405991629, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
+  m_PrefabInstance: {fileID: 1291269110}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29b74242fe954e848a582a6005d36e46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &980035223 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3600339561391242971, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
@@ -1248,6 +1315,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1252718397}
+  - component: {fileID: 1252718398}
   m_Layer: 0
   m_Name: Neuron Layer
   m_TagString: Untagged
@@ -1271,6 +1339,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1252718398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1252718396}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 603d9db2917b3814aaffbcb8f016d0d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioSourceController: {fileID: 1685893881}
+  root: {fileID: 0}
+  prefab: {fileID: 1107302876236027746, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
+  Value: 0
+  end: 0
 --- !u!4 &1270239297 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3600339561391242971, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
@@ -1344,7 +1429,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4538837733359995695, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00012564659
+      value: -0.013344526
       objectReference: {fileID: 0}
     - target: {fileID: 6317214945934734524, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -1516,6 +1601,7 @@ GameObject:
   - component: {fileID: 1468548485}
   - component: {fileID: 1468548484}
   - component: {fileID: 1468548487}
+  - component: {fileID: 1468548488}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1624,6 +1710,61 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!114 &1468548488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468548483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d214fe628cef7de41b13c9f80a6de5df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Core: {fileID: 1468548485}
+  Target: {fileID: 0}
+  PastOneTarget: {fileID: 0}
+  FoucsOneTarget: {fileID: 0}
+  RayForm:
+    RendererColor: {r: 0, g: 0, b: 0, a: 0}
+    width: 0
+    far: 0
+    mask:
+      serializedVersion: 2
+      m_Bits: 0
+    Line: {fileID: 0}
+  TouchPanel: {fileID: 864194884}
+  RayBehavourForm: 0
+  FollowCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  dalte: 0
+  PastPosition: {x: 0, y: 0, z: 0}
+  PastEulerAngle: {x: 0, y: 0, z: 0}
+  moveSpeed: 10
+  rotionSpeed: 10
 --- !u!1001 &1569984068
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1681,6 +1822,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b33a9d0a62253094ab6abf9b1f0f0ca7, type: 3}
+--- !u!114 &1685893881 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
+  m_PrefabInstance: {fileID: 670391712}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f022ede4737c096489813705081d6c42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1788157037
 PrefabInstance:
   m_ObjectHideFlags: 0

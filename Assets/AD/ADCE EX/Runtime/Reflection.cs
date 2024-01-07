@@ -170,7 +170,11 @@ namespace AD.Experimental.GameEditor
             public string layer;
             public int index;
             public string message;
-            public string methodName;
+            private string _methodName;
+            public string methodName
+            {
+                get => (string.IsNullOrEmpty(_methodName)) ? ADSerializeAttribute.DefaultKey : _methodName; set => _methodName = value;
+            }
         }
 
         private readonly Dictionary<ADSerializeEntry, FieldInfo> fields = new();
@@ -368,9 +372,10 @@ namespace AD.Experimental.GameEditor
         private void DoGUI_Field(ADSerializeEntry entry, FieldInfo field)
         {
             Type type = field.FieldType;
+            bool isDefaultMethodName = entry.methodName == ADSerializeAttribute.DefaultKey;
             if (type == typeof(bool))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                     PropertiesLayout.ModernUISwitch(field.Name, (bool)field.GetValue(that), entry.message, T => field.SetValue(that, T));
                 else
                 {
@@ -379,7 +384,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(char))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -398,7 +403,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(double))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -423,7 +428,19 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(float))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (entry.message[0] == '$')
+                {
+                    PropertiesLayout.BeginHorizontal();
+                    var str = entry.message[1..].Split(',');
+                    float min = float.Parse(str[0]), max = float.Parse(str[1]);
+                    PropertiesLayout.Label(field.Name, str[2]);
+                    var cat = PropertiesLayout.Slider(min, max, (float)field.GetValue(that), true, str[2], T =>
+                    {
+                        field.SetValue(that, T);
+                    });
+                    PropertiesLayout.EndHorizontal();
+                }
+                else if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -441,18 +458,6 @@ namespace AD.Experimental.GameEditor
                     });
                     PropertiesLayout.EndHorizontal();
                 }
-                else if (entry.message[0] == '$')
-                {
-                    PropertiesLayout.BeginHorizontal();
-                    var str = entry.message[1..].Split(',');
-                    float min = float.Parse(str[0]), max = float.Parse(str[1]);
-                    PropertiesLayout.Label(field.Name, str[2]);
-                    var cat = PropertiesLayout.Slider(min, max, (float)field.GetValue(that), true, str[2], T =>
-                    {
-                        field.SetValue(that, T);
-                    });
-                    PropertiesLayout.EndHorizontal();
-                }
                 else
                 {
                     that.RunMethodByName(entry.methodName, bindings, null);
@@ -460,7 +465,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(int))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name + "(integer)", entry.message);
@@ -485,7 +490,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(uint))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name + "(unsigned integer)", entry.message);
@@ -510,7 +515,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(long))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name + "(integer)", entry.message);
@@ -535,7 +540,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(ulong))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name + "(unsigned integer)", entry.message);
@@ -560,7 +565,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(short))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name + "(integer)", entry.message);
@@ -585,7 +590,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(ushort))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name + "(unsigh integer)", entry.message);
@@ -610,7 +615,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(string))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -628,7 +633,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Vector2))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     /*
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -671,7 +676,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Vector3))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     /*
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -724,7 +729,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Vector4))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     /*
                     PropertiesLayout.Label(field.Name, entry.message);
@@ -790,7 +795,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Color))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.ColorPanel(field.Name, (Color)field.GetValue(that), entry.message, T =>
                 {
@@ -804,7 +809,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Texture2D))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.Label(field.Name, entry.message);
                     PropertiesLayout.RawImage((Texture2D)field.GetValue(that), entry.message);
@@ -816,7 +821,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Sprite))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.Image(field.Name, entry.message).CurrentImagePair = new() { SpriteSource = (Sprite)field.GetValue(that) };
                 }
@@ -827,7 +832,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Transform))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Transform((Transform)field.GetValue(that));
@@ -838,16 +843,17 @@ namespace AD.Experimental.GameEditor
                     that.RunMethodByName(entry.methodName, bindings, null);
                 }
             }
-            else if (entry.methodName == ADSerializeAttribute.DefaultKey) DoGUI_Field_Extension(entry, field);
+            else if (isDefaultMethodName) DoGUI_Field_Extension(entry, field);
             else that.RunMethodByName(entry.methodName, bindings, null);
         }
 
         private void DoGUI_Property(ADSerializeEntry entry, PropertyInfo property)
         {
             Type type = property.PropertyType;
+            bool isDefaultMethodName = entry.methodName == ADSerializeAttribute.DefaultKey;
             if (type == typeof(bool))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.ModernUISwitch(property.Name, (bool)property.GetValue(that), entry.message, T => property.SetValue(that, T));
                 }
@@ -858,7 +864,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(char))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -877,7 +883,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(double))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -902,7 +908,19 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(float))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (entry.message[0] == '$')
+                {
+                    PropertiesLayout.BeginHorizontal();
+                    var str = entry.message[1..].Split(',');
+                    float min = float.Parse(str[0]), max = float.Parse(str[1]);
+                    PropertiesLayout.Label(property.Name, str[2]);
+                    var cat = PropertiesLayout.Slider(min, max, (float)property.GetValue(that), true, str[2], T =>
+                    {
+                        property.SetValue(that, T);
+                    });
+                    PropertiesLayout.EndHorizontal();
+                }
+                else if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -920,18 +938,6 @@ namespace AD.Experimental.GameEditor
                     });
                     PropertiesLayout.EndHorizontal();
                 }
-                else if (entry.message[0] == '$')
-                {
-                    PropertiesLayout.BeginHorizontal();
-                    var str = entry.message[1..].Split(',');
-                    float min = float.Parse(str[0]), max = float.Parse(str[1]);
-                    PropertiesLayout.Label(property.Name, str[2]);
-                    var cat = PropertiesLayout.Slider(min, max, (float)property.GetValue(that), true, str[2], T =>
-                    {
-                        property.SetValue(that, T);
-                    });
-                    PropertiesLayout.EndHorizontal();
-                }
                 else
                 {
                     that.RunMethodByName(entry.methodName, bindings, null);
@@ -939,7 +945,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(int))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name + "(integer)", entry.message);
@@ -964,7 +970,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(uint))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name + "(unsigned integer)", entry.message);
@@ -989,7 +995,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(long))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name + "(integer)", entry.message);
@@ -1014,7 +1020,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(ulong))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name + "(unsigned integer)", entry.message);
@@ -1039,7 +1045,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(short))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name + "(integer)", entry.message);
@@ -1064,7 +1070,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(ushort))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name + "(unsigh integer)", entry.message);
@@ -1089,7 +1095,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(string))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -1107,7 +1113,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Vector2))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     /*
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -1149,7 +1155,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Vector3))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     /*
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -1202,7 +1208,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Vector4))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     /*
                     PropertiesLayout.Label(property.Name, entry.message);
@@ -1268,7 +1274,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Color))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.ColorPanel(property.Name, (Color)property.GetValue(that), entry.message, T =>
                 {
@@ -1282,7 +1288,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Texture2D))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.Label(property.Name, entry.message);
                     PropertiesLayout.RawImage((Texture2D)property.GetValue(that), entry.message);
@@ -1294,7 +1300,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Sprite))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Image(property.Name, entry.message).CurrentImagePair = new() { SpriteSource = (Sprite)property.GetValue(that) };
@@ -1307,7 +1313,7 @@ namespace AD.Experimental.GameEditor
             }
             else if (type == typeof(Transform))
             {
-                if (entry.methodName == ADSerializeAttribute.DefaultKey)
+                if (isDefaultMethodName)
                 {
                     PropertiesLayout.BeginHorizontal();
                     PropertiesLayout.Transform((Transform)property.GetValue(that));
@@ -1318,7 +1324,7 @@ namespace AD.Experimental.GameEditor
                     that.RunMethodByName(entry.methodName, bindings, null);
                 }
             }
-            else if (entry.methodName == ADSerializeAttribute.DefaultKey) DoGUI_Property_Extension(entry, property);
+            else if (isDefaultMethodName) DoGUI_Property_Extension(entry, property);
             else that.RunMethodByName(entry.methodName, bindings, null);
         }
 
@@ -1338,7 +1344,7 @@ namespace AD.Experimental.GameEditor
     {
         public string layer;
         public int index;
-        public string message = DefaultKey;
+        public string message = "---";
         public string methodName = DefaultKey;
         public const string DefaultKey = "Default";
 

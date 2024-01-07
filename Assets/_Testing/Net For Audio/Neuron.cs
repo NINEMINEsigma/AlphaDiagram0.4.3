@@ -56,6 +56,7 @@ namespace AD.Experimental.Neuron
         public ulong instanceIndex { get; private set; }
         public _Processor Processor;
         public _Variant Data;
+        public float weight = 0.36781f;
 
         public List<Neuron<_Variant, _Processor>> Childs = new();
 
@@ -67,14 +68,14 @@ namespace AD.Experimental.Neuron
             _Variant NewData = default(_Variant);
             foreach (var child in Childs)
             {
-                NewData = CountAdd(NewData,child.ObtainResult());
+                NewData = CountAdd(NewData, child.ObtainResult(), child.weight);
             }
             NewData = this.Processor.Compute(NewData);
             OnUpdate.Invoke(NewData);
             return Data = NewData;
         }
 
-        protected abstract _Variant CountAdd(_Variant a, _Variant b);
+        protected abstract _Variant CountAdd(_Variant a, _Variant b, float weight);
 
         private void OnDestroy()
         {
