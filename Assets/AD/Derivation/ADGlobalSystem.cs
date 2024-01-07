@@ -975,6 +975,7 @@ namespace AD
 
         protected override IEnumerator HowToLoadScene()
         {
+            if (CurrentAsyncOperation != null) yield break;
             if (isAsyncToLoadNextScene)
             {
                 float waitClock = WaitTime;
