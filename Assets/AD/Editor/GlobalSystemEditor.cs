@@ -3,6 +3,8 @@ using AD.BASE;
 using UnityEditor;
 using UnityEngine;
 using AD.UI;
+using System.Linq;
+using UnityEngine.Playables;
 
 namespace AD
 {
@@ -55,6 +57,8 @@ namespace AD
         SerializedProperty FloatValues;
         SerializedProperty StringValues;
 
+        SerializedProperty CastListeners;
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -99,6 +103,7 @@ namespace AD
             IntValues = serializedObject.FindProperty(nameof(IntValues));
             FloatValues = serializedObject.FindProperty(nameof(FloatValues));
             StringValues = serializedObject.FindProperty(nameof(StringValues));
+            CastListeners = serializedObject.FindProperty(nameof(CastListeners));
         }
 
         public override void OnContentGUI()
@@ -168,6 +173,41 @@ namespace AD
                     that.SaveRecord();
                 }
             }
+
+            this.VerticalBlockWithBox(() =>
+            {
+                EditorGUILayout.Space(5);
+                if (that.IsPermittedBroadcast)
+                {
+                    EditorGUILayout.PropertyField(CastListeners);
+                    if (GUILayout.Button("-- Delete Broadcast Listeners -- "))
+                    {
+                        that.CastListeners = null;
+                        that.IsPermittedBroadcast = false;
+                    }
+                    this.HorizontalBlock(() =>
+                    {
+                        if (GUILayout.Button("-- Add -- "))
+                        {
+                            that.CastListeners.TryAdd("New Key", new());
+                        }
+                        if (GUILayout.Button("-- Remove -- "))
+                        {
+                            that.CastListeners.RemoveNullValues();
+                            if (that.CastListeners.Count > 0) that.CastListeners.Remove(that.CastListeners.Last().Key);
+                        }
+                    });
+                }
+                else
+                {
+                    if (GUILayout.Button("-- Create Broadcast Listeners -- "))
+                    {
+                        that.CastListeners = new();
+                        that.IsPermittedBroadcast = true;
+                    }
+                }
+                EditorGUILayout.Space(5);
+            });
         }
 
         public override void OnResourcesGUI()
@@ -285,7 +325,7 @@ namespace AD
 
     public class MenuIniter
     {
-        [MenuItem("GameObject/AD/AudioSource", false, 10)]
+        [MenuItem("GameObject/AD/AudioSource", false, 30)]
         private static void AudioSource(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._AudioSource);
@@ -293,7 +333,7 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/Image", false, 10)]
+        [MenuItem("GameObject/AD/Image", false, 30)]
         private static void Image(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._Image);
@@ -301,7 +341,7 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/ColorManager", false, 10)]
+        [MenuItem("GameObject/AD/ColorManager", false, 30)]
         private static void ColorManager(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ColorManager);
@@ -309,10 +349,21 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/CustomWindowElement", false, 10)]
+        [MenuItem("GameObject/AD/CustomWindowElement", false, 30)]
         private static void CustomWindowElement(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._CustomWindowElement);
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+
+
+        [MenuItem("GameObject/AD/TimeLine", false, 50)]
+        private static void TimeLine(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = new GameObject("Timeline");
+            target.AddComponent<PlayableDirector>();
             GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
@@ -375,7 +426,7 @@ namespace AD
             Selection.activeObject = target.gameObject;
         }
 
-        [MenuItem("GameObject/AD/ModernUI/Button", false, 10)]
+        [MenuItem("GameObject/AD/ModernUI/Button", false, 11)]
         private static void ModernButton(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernButton);
@@ -383,7 +434,7 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/ModernUI/Dropdown", false, 10)]
+        [MenuItem("GameObject/AD/ModernUI/Dropdown", false, 11)]
         private static void ModernUIDropdown(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUIDropdown);
@@ -391,7 +442,7 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/ModernUI/FillBar", false, 10)]
+        [MenuItem("GameObject/AD/ModernUI/FillBar", false, 11)]
         private static void ModernUIFillBar(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUIFillBar);
@@ -399,7 +450,7 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/ModernUI/InputField", false, 10)]
+        [MenuItem("GameObject/AD/ModernUI/InputField", false, 11)]
         private static void ModernUIInputField(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUIInputField);
@@ -407,7 +458,7 @@ namespace AD
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
         }
-        [MenuItem("GameObject/AD/ModernUI/Switch", false, 10)]
+        [MenuItem("GameObject/AD/ModernUI/Switch", false, 11)]
         private static void ModernUISwitch(UnityEditor.MenuCommand menuCommand)
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ModernUISwitch);

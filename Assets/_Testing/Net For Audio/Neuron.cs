@@ -8,9 +8,9 @@ using UnityEngine;
 namespace AD.Experimental.Neuron
 {
     [Serializable]
-    public class DestoryException : ADException
+    public class DestroyException : ADException
     {
-        public DestoryException() : base("This Asset has been destory") { }
+        public DestroyException() : base("This Asset has been destroy") { }
     }
 
     public abstract class VectorAsset : IComparable<VectorAsset>, IEquatable<VectorAsset>

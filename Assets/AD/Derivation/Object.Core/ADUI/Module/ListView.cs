@@ -15,6 +15,7 @@ namespace AD.UI
         public ListViewItem()
         {
             this.ElementArea = nameof(ListViewItem);
+
         }
 
         public abstract ListViewItem Init();
@@ -109,13 +110,19 @@ namespace AD.UI
 
         public void Clear()
         {
-            List<int> indexs = new();
+            foreach (var child in Childs)
+            {
+                LetChildDestroy(child.Value);
+            }
+            Childs.Clear();
+            /*List<int> indexs = new();
             indexs.AddRange(from KeyValuePair<int, GameObject> item in Childs
                             select item.Key);
             foreach (int index in indexs)
             {
                 Remove(index);
             }
+            */
         }
     }
 }

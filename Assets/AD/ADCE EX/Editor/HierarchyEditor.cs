@@ -26,6 +26,10 @@ public class TestObject : AD.Experimental.GameEditor.ICanSerializeOnCustomEditor
         };
         color = Random.ColorHSV();
     }
+    ~TestObject()
+    {
+        Debug.Log(this.SerializeIndex.ToString() + " TestObject Is Destroy");
+    }
 
     [ADSerialize(layer = "test", index = 0, message = "color")]
     public Color color;
@@ -151,19 +155,21 @@ public class HierarchyEditor : AbstractCustomADEditor
         EditorGUILayout.PropertyField(EditorAssets);
     }
 
-    readonly List<TestObject> TestObjects = new();
+    public static List<TestObject> TestObjects = new();
 
     public override void OnSettingsGUI()
     {
-        if (GUILayout.Button("Generate One"))
+        if (GUILayout.Button("Generate One[Test]"))
         {
-            TestObject temp = new TestObject();
-            temp.SerializeIndex = currentIndex++;
-            that.TargetTopObjectEditors.Add(temp.MatchHierarchyEditor);
+            TestObject temp = new()
+            {
+                SerializeIndex = currentIndex++
+            };
+            that.AddOnTop(temp.MatchHierarchyEditor);
             TestObjects.Add(temp);
             that.ClearAndRefresh();
         }
-        if (GUILayout.Button("Delete All"))
+        if (GUILayout.Button("Delete All[Test]"))
         {
             that.Init();
             TestObjects.Clear();

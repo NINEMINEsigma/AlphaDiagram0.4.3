@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using AD.BASE;
+using AD.Experimental.Neuron;
+using AD.Experimental.Runtime;
 using AD.UI;
 using AD.Utility;
 using Newtonsoft.Json;
@@ -234,7 +236,7 @@ namespace AD
         }
 
 #if UNITY_EDITOR
-        [MenuItem("GameObject/AD/GlobalSystem", false, 10)]
+        [MenuItem("GameObject/AD/GlobalSystem", false, -100)]
         public static void ADD(MenuCommand menuCommand)
         {
             if (instance != null)
@@ -1030,6 +1032,90 @@ namespace AD
 
         #endregion
 
+        #region Broadcast
+
+        public ADSerializableDictionary<string, List<MonoBehaviour>> CastListeners;
+        public bool IsPermittedBroadcast = true;
+
+        public static void AddMessageListener(string layer, MonoBehaviour listener)
+        {
+            instance.CastListeners ??= new();
+            RemoveMessageListener(listener);
+            instance.CastListeners.TryAdd(layer, new());
+            instance.CastListeners[layer].Add(listener);
+        }
+
+        public static string RemoveMessageListener(MonoBehaviour listener)
+        {
+            if (instance.CastListeners != null)
+            {
+                foreach (var lay in instance.CastListeners)
+                {
+                    if (lay.Value.Remove(listener))
+                    {
+                        string result = lay.Key;
+                        if(lay.Value.Count!=0) return result;
+                        instance.CastListeners.Remove(lay.Key);
+                        if (instance.CastListeners.Count == 0) instance.CastListeners = null;
+                        return result;
+                    }
+                }
+            }
+            return null;
+        }
+
+        public HashSet<object> SendMessage(string key, params object[] args)
+        {
+            if (CastListeners.TryGetValue(key, out var value))
+            {
+                HashSet<object> result = new();
+                foreach (var item in value)
+                {
+                    object data = item.RunMethodByName(key, ReflectionExtension.AllBindingFlags, args);
+                    result.Add(data);
+                }
+                return result;
+            }
+            else return null;
+        }
+
+        #endregion
+
+        #region Debug
+
+        public enum DebugMessageTypeKey
+        {
+            Message,Warning,Error
+        }
+
+        public static void DebugMessage(string message)
+        {
+#if UNITY_EDITOR
+            Debug.Log(message);
+#endif
+        }
+
+        public static void DebugMessage(string message, DebugMessageTypeKey mode)
+        {
+#if UNITY_EDITOR
+            switch (mode)
+            {
+                case DebugMessageTypeKey.Message:
+                    Debug.Log(message);
+                    break;
+                case DebugMessageTypeKey.Warning:
+                    Debug.LogWarning(message);
+                    break;
+                case DebugMessageTypeKey.Error:
+                    Debug.LogError(message);
+                    break;
+                default:
+                    break;
+            }
+#endif
+        }
+
+        #endregion
     }
 
     public static class MethodBaseExtension

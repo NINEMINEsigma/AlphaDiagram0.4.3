@@ -32,7 +32,7 @@ namespace AD.Experimental.EditorAsset.Cache
     /// <para>继承并重写Equals与GetHashCode以实现更加扩展性的功能</para>
     /// </summary>
     [Serializable]
-    public class CacheAssetsKey:IComparable<CacheAssetsKey> 
+    public class CacheAssetsKey : IComparable<CacheAssetsKey>
     {
         public CacheAssetsKey() { }
 
@@ -46,6 +46,11 @@ namespace AD.Experimental.EditorAsset.Cache
         public override bool Equals(object obj)
         {
             return IdentifyID.Equals(obj);
+        }
+
+        public bool Equals(CacheAssetsKey other)
+        {
+            return IdentifyID.Equals(other.IdentifyID);
         }
 
         public bool Equals(string key)
@@ -85,10 +90,10 @@ namespace AD.Experimental.EditorAsset.Cache
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    public class AbstractScriptableObject: ScriptableObject, ICanCacheData, ICanBeCatched 
+    public class AbstractScriptableObject : ScriptableObject, ICanCacheData, ICanBeCatched
     {
         public AbstractScriptableObject()
-        { 
+        {
         }
 
         public AbstractScriptableObject(string key)
@@ -98,7 +103,7 @@ namespace AD.Experimental.EditorAsset.Cache
 
         public string CacheKey => BindKey;
 
-        [SerializeField]protected string BindKey; 
+        [SerializeField] protected string BindKey;
 
         public virtual bool Deserialize(string source)
         {
@@ -147,7 +152,7 @@ namespace AD.Experimental.EditorAsset.Cache
         }
 
         [Serializable]
-        public class SourcePair:IComparable<SourcePair>
+        public class SourcePair : IComparable<SourcePair>
         {
             public Key key;
             public _AbstractScriptableObject data;
@@ -159,7 +164,6 @@ namespace AD.Experimental.EditorAsset.Cache
         }
 
         [SerializeField] List<SourcePair> AssetsData = new();
-        [SerializeField] HashSet<Key> Keys;
 
         public IEnumerator<ICanCacheData> GetEnumerator()
         {
@@ -185,10 +189,9 @@ namespace AD.Experimental.EditorAsset.Cache
 
         public bool TryAdd(Key key, _AbstractScriptableObject cache)
         {
-            if (!Keys.Contains(key))
+            if (AssetsData.Find(T => T.key.Equals(key)) == null)
             {
                 AssetsData.Add(new SourcePair() { key = key, data = cache });
-                Keys.Add(key);
                 return true;
             }
             return false;
@@ -198,7 +201,7 @@ namespace AD.Experimental.EditorAsset.Cache
         public bool AddOrGet(Key key, _AbstractScriptableObject cache, out _AbstractScriptableObject result_slot)
         {
             result_slot = null;
-            bool result = Keys.Contains(key);
+            bool result = AssetsData.Find(T => T.key.Equals(key)) == null;
             if (result)
             {
                 Add(key, cache);
@@ -210,29 +213,20 @@ namespace AD.Experimental.EditorAsset.Cache
         public void Clear()
         {
             AssetsData.Clear();
-            Keys.Clear();
         }
 
         public bool Contains(Key key)
         {
-            return Keys.Contains(key);
+            return AssetsData.Find(T => T.key.Equals(key)) == null;
         }
 
         public bool TryGetValue(Key key, out _AbstractScriptableObject result)
         {
             result = null;
-            if (Contains(key))
-            {
-                foreach (var data in AssetsData)
-                {
-                    if (data.key.Equals(key))
-                    {
-                        result = data.data as _AbstractScriptableObject;
-                        return true;
-                    }
-                }
-            }
-            return false;
+            var temp = AssetsData.Find(T => T.key.Equals(key));
+            if (temp == null) return false;
+            result = temp.data as _AbstractScriptableObject;
+            return true;
         }
 
         public bool Contains(_AbstractScriptableObject value)
@@ -266,7 +260,6 @@ namespace AD.Experimental.EditorAsset.Cache
         public void Remove(Key key)
         {
             AssetsData.Remove(AssetsData.Find(_K => _K.key.Equals(key)));
-            Keys.Remove(key);
         }
     }
 

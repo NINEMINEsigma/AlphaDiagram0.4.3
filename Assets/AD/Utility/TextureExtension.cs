@@ -129,7 +129,22 @@ namespace AD.Utility
             Sprite result = Sprite.Create(self, new Rect(0, 0, self.width, self.height), Vector2.zero);
             return result;
         }
+
+        public static byte[] Save(this Texture2D self, FileType type = FileType.PNG)
+        {
+            return type switch
+            {
+                FileType.EXR => self.EncodeToEXR(),
+                FileType.TGA => self.EncodeToTGA(),
+                FileType.JPG => self.EncodeToJPG(),
+                FileType.PNG => self.EncodeToPNG(),
+                _ => null,
+            };
+        }
+
+        public enum FileType
+        {
+            PNG, JPG, EXR, TGA
+        }
     }
-
-
 }

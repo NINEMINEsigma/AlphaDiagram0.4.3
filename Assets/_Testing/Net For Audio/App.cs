@@ -28,7 +28,7 @@ namespace AD.Experimental.Neuron
             }
             else if(asset.IsDestory)
             {
-                throw new DestoryException();
+                throw new DestroyException();
             }
         }
 

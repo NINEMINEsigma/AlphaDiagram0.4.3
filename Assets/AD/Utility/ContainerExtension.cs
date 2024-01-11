@@ -131,8 +131,8 @@ namespace AD.Utility
                     {
                         if (!this.TryAdd(Data[i].Key, Data[i].Value))
                         {
-                            if (typeof(TKey) == typeof(string)) this.Add(default, Data[i].Value);
-                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) this.Add(default, Data[i].Value);
+                            if (typeof(TKey) == typeof(string)) this.Add(default, default);
+                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) this.Add(default, default);
                         }
                     }
                     catch { }
