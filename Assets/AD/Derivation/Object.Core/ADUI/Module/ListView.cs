@@ -47,7 +47,9 @@ namespace AD.UI
 
         public static Comparison<Transform> StaticSortChildComparison = null;
         public Comparison<Transform> SortChildComparison = null;
-        
+
+        public bool IsNeedHoldMyself = false;//because it sometime used as a sub-object hider when start
+
         public ScrollRect.ScrollRectEvent onValueChanged
         {
             get => _Scroll.onValueChanged;
@@ -57,7 +59,8 @@ namespace AD.UI
         protected override void Start()
         {
             base.Start();
-            Init();
+            //this.Init();
+            if (IsNeedHoldMyself) this.gameObject.SetActive(false);
         }
 
         public void Init()

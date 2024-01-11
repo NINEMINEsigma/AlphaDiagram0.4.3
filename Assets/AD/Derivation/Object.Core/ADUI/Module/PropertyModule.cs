@@ -9,7 +9,23 @@ namespace AD.UI
     public abstract class PropertyModule : ADUI
     {
         [Header("PropertyModule")]
-        public Dictionary<int, GameObject> Childs = new();
+        public bool IsChildAllLinkAtMyTransformAsChild = false;
+        private Dictionary<int, GameObject> _Childs = new();
+        public Dictionary<int, GameObject> Childs
+        {
+            get => _Childs;
+            set
+            {
+                _Childs = value;
+                if (IsChildAllLinkAtMyTransformAsChild)
+                {
+                    for (int i = 0,e= transform.childCount; i < e; i++)
+                    {
+                        GameObject.Destroy(transform.GetChild(i).gameObject);
+                    }
+                }
+            }
+        }
         private GridLayoutGroup _GridLayoutGroup = null;
         public virtual GridLayoutGroup GridLayoutGroup => IsNeedLayoutGourp ? _GridLayoutGroup : null;
 
