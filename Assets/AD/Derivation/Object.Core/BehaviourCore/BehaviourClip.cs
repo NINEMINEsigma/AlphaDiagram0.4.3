@@ -186,7 +186,10 @@ namespace AD.Experimental.Runtime
         }
 
         [Serializable]
-        public class Vector3Entry : ISerializationCallbackReceiver
+        public class Vector3Entry
+#if UNITY_EDITOR
+            : ISerializationCallbackReceiver
+#endif
         {
             private const string DefaultWhenValueNotSame = " --- ";
 
@@ -210,6 +213,8 @@ namespace AD.Experimental.Runtime
             public Vector3Entry() : this(new(), new(), new())
             {
             }
+
+#if UNITY_EDITOR
 
             public void OnAfterDeserialize()
             {
@@ -242,6 +247,8 @@ namespace AD.Experimental.Runtime
                     new(x.EndValue, y.EndValue, z.EndValue));
                 _x = x.Temp(); _y = y.Temp(); _z = z.Temp();
             }
+
+#endif
 
             public static implicit operator Vector3(Vector3Entry source)
             {

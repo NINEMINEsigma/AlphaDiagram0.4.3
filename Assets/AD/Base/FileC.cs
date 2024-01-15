@@ -253,6 +253,11 @@ namespace AD.BASE
             return result.Count != 0 ? result : null;
         }
 
+        public static FileInfo First(DirectoryInfo direction, string name)
+        {
+            return First(direction, T => Path.GetFileNameWithoutExtension(T) == name);
+        }
+
         public static FileInfo First(string dictionary, string name)
         {
             return First(dictionary, T => Path.GetFileNameWithoutExtension(T) == name);
@@ -266,7 +271,15 @@ namespace AD.BASE
                 if (_Right(it.Name)) return it;
             return null;
         }
-         
+
+        public static FileInfo First(DirectoryInfo direction, Predicate<string> _Right)
+        {
+            FileInfo[] files = direction.GetFiles("*");
+            foreach (var it in files)
+                if (_Right(it.Name)) return it;
+            return null;
+        }
+
         public static AssetBundle LoadAssetBundle(string path)
         { 
             return AssetBundle.LoadFromFile(path); ;

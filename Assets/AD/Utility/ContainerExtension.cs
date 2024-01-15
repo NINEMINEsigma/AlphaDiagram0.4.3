@@ -105,6 +105,8 @@ namespace AD.Utility
         [SerializeField]
         private List<Entry> Data;
 
+        public ADEvent<TKey> OnAdd = new(), OnTryAdd = new(), OnRemove = new();
+
         public void OnBeforeSerialize()
         {
             Data = new();
@@ -122,17 +124,17 @@ namespace AD.Utility
         public void OnAfterDeserialize()
         {
             if (Data == null) return;
-            this.Clear();
+            base.Clear();
             for (int i = 0; i < Data.Count; i++)
             {
                 if (Data[i] != null)
                 {
                     try
                     {
-                        if (!this.TryAdd(Data[i].Key, Data[i].Value))
+                        if (!base.TryAdd(Data[i].Key, Data[i].Value))
                         {
-                            if (typeof(TKey) == typeof(string)) this.Add(default, default);
-                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) this.Add(default, default);
+                            if (typeof(TKey) == typeof(string)) base.Add(default, default);
+                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) base.Add(default, default);
                         }
                     }
                     catch { }
@@ -148,8 +150,41 @@ namespace AD.Utility
                 .Select(pair => pair.Key)
                 .ToList();
             foreach (var nullKey in nullKeys)
-                Remove(nullKey);
+                base.Remove(nullKey);
             return nullKeys.Count;
+        }
+
+        public new void Add(TKey key, TVal value)
+        {
+            base.Add(key, value);
+            OnAdd.Invoke(key);
+        }
+
+        public new bool TryAdd(TKey key, TVal value)
+        {
+            bool result = base.TryAdd(key, value);
+            OnTryAdd.Invoke(key);
+            return result;
+        }
+
+        public new bool Remove(TKey key)
+        {
+            bool result = base.Remove(key);
+            OnRemove.Invoke(key);
+            return result;
+        }
+
+        public new TVal this[TKey key]
+        {
+            get
+            {
+                return base[key];
+            }
+            set
+            {
+                base[key] = value;
+                this.OnTryAdd.Invoke(key);
+            }
         }
     }
 }

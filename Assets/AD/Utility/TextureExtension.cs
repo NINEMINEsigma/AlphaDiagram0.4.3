@@ -1,6 +1,11 @@
 using System;
+using System.Collections;
 using System.IO;
+using AD.UI;
+using DG.Tweening.Plugins.Core.PathCore;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Networking;
 
 namespace AD.Utility
 {
@@ -145,6 +150,23 @@ namespace AD.Utility
         public enum FileType
         {
             PNG, JPG, EXR, TGA
+        }
+
+        public static IEnumerator GetTexture(this FileInfo self,UnityAction<Texture2D> action)
+        {
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(self.FullName);
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                action.Invoke(texture);
+            }
+            else
+            {
+                Debug.LogError("Failed To Load " + request.result.ToString());
+                action.Invoke(null);
+            }
         }
     }
 }

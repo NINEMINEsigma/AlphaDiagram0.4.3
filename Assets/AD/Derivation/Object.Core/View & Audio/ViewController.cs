@@ -264,6 +264,7 @@ namespace AD.UI
                 SetupCoverParent();
             }
         }
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -273,6 +274,7 @@ namespace AD.UI
             }
             if (ViewImage != null) ViewImage.sprite = CurrentImage;
         }
+#endif
         private void Update()
         {
             if (IsKeepCoverParent)

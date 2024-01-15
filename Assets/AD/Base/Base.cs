@@ -1342,7 +1342,7 @@ namespace AD.BASE
         {
             foreach (var index in InvokeArray)
             {
-                if (index > 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
                 {
                     Debug.LogWarning("you like to try invoke a error action");
                     continue;
@@ -1419,7 +1419,7 @@ namespace AD.BASE
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
-                    if (index > 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
@@ -1498,7 +1498,7 @@ namespace AD.BASE
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
-                    if (index > 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
@@ -1579,7 +1579,7 @@ namespace AD.BASE
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
-                    if (index > 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
@@ -1662,7 +1662,7 @@ namespace AD.BASE
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
-                    if (index > 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
