@@ -1086,6 +1086,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Selected: 0
   ElementArea: PropertyModule
+  IsChildAllLinkAtMyTransformAsChild: 0
   characters:
   - key: 0
     Item: {fileID: 8256797280158047090}
@@ -1536,8 +1537,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SceneOpenEvent:
     Data: []
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
   SceneCloseEvent:
     Data: []
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
   SceneOpenAnimation:
     Data:
     - Key: EntryScene
@@ -1550,6 +1569,15 @@ MonoBehaviour:
       Value: ZoomOut
     - Key: StoryScene
       Value: StoryScene
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
   SceneCloseAnimation:
     Data:
     - Key: EntryScene
@@ -1562,6 +1590,15 @@ MonoBehaviour:
       Value: ZoomIn
     - Key: StoryScene
       Value: StorySceneOut
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
   animator: {fileID: 6360728317407937353}
 --- !u!223 &6360728317407937348
 Canvas:

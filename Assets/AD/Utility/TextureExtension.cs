@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.IO;
-using AD.UI;
-using DG.Tweening.Plugins.Core.PathCore;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;

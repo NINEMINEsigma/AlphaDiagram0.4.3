@@ -30,6 +30,11 @@ namespace AD.Utility
             yield return results_asyncInfo.asyncOperation;
         }
 
+        public static Scene CreateNewScene(this string newSceneName)
+        {
+            return SceneManager.CreateScene(newSceneName);
+        }
+
         #endregion
 
         public static UnityEngine.SceneManagement.Scene Get()
