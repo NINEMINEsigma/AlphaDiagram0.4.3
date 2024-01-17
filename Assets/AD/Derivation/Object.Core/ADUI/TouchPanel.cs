@@ -20,6 +20,7 @@ namespace AD.UI
         protected virtual void Start()
         {
             ADUI.Initialize(this);
+            if (TargetCamera == null) TargetCamera = Camera.main;
             LeftRegisterInfo = ADGlobalSystem.AddListener(Mouse.current.leftButton,
                 () =>
                 {

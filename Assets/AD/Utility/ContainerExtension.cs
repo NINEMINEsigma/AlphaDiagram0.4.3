@@ -134,7 +134,7 @@ namespace AD.Utility
                     {
                         if (!base.TryAdd(Data[i].Key, Data[i].Value))
                         {
-                            if (typeof(TKey) == typeof(string)) base.Add(default, default);
+                            if (typeof(TKey) == typeof(string)||typeof(TKey).IsSubclassOf(typeof(object))) base.Add(default, default);
                             else if (ReflectionExtension.IsPrimitive(typeof(TKey))) base.Add(default, default);
                         }
                     }

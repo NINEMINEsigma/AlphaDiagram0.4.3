@@ -1,19 +1,19 @@
+using System;
 using System.Collections;
 using AD.BASE;
 using AD.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static AD.Utility.Object.CameraCore;
 using static AD.Utility.RayExtension;
 
 namespace AD.Utility.Object
 {
-    public class CameraCore : MonoBehaviour, ICanInitialize
+    [Serializable]
+    public class CameraCoreInfomation
     {
-        public Camera Core;
         public GameObject Target, PastOneTarget, FoucsOneTarget;
         public RayInfo RayForm;
-
-        public TouchPanel TouchPanel;
 
         public RayBehavour RayBehavourForm;
 
@@ -24,9 +24,106 @@ namespace AD.Utility.Object
 
         public float moveSpeed = 2.5f, rotionSpeed = 1;
 
+        public TouchPanelRotatingButton UserButton = TouchPanelRotatingButton.Right;
+    }
+
+    public class CameraCore : MonoBehaviour, ICanInitialize
+    {
+        public Camera Core;
+        [SerializeField] private TouchPanel touchPanel;
+        public TouchPanel TouchPanel
+        {
+            get => touchPanel;
+            set
+            {
+                if (TouchPanel != null)
+                {
+                    touchPanel.OnEvent.RemoveListener(Rotating);
+                }
+                touchPanel = value;
+                if (TouchPanel != null)
+                {
+                    touchPanel.OnEvent.AddListener(Rotating);
+                }
+            }
+        }
+        [SerializeField] private CameraCoreInfomation Infomation = new();
+
+        public GameObject Target
+        {
+            get => Infomation.Target;
+            set => Infomation.Target = value;
+        }
+        public GameObject PastOneTarget
+        {
+            get => Infomation.PastOneTarget;
+            set => Infomation.PastOneTarget = value;
+        }
+        public GameObject FoucsOneTarget
+        {
+            get => Infomation.FoucsOneTarget;
+            set => Infomation.FoucsOneTarget = value;
+        }
+        public RayInfo RayForm
+        {
+            get => Infomation.RayForm;
+            set => Infomation.RayForm = value;
+        }
+
+        public RayBehavour RayBehavourForm
+        {
+            get => Infomation.RayBehavourForm;
+            set => Infomation.RayBehavourForm = value;
+        }
+
+        public AnimationCurve FollowCurve
+        {
+            get => Infomation.FollowCurve;
+            set => Infomation.FollowCurve = value;
+        }
+        public float dalte
+        {
+            get => Infomation.dalte;
+            set => Infomation.dalte = value;
+        }
+        public Vector3 PastPosition
+        {
+            get => Infomation.PastPosition;
+            set => Infomation.PastPosition = value;
+        }
+        public Vector3 PastEulerAngle
+        {
+            get => Infomation.PastEulerAngle;
+            set => Infomation.PastEulerAngle = value;
+        }
+
+        public float moveSpeed
+        {
+            get => Infomation.moveSpeed;
+            set => Infomation.moveSpeed = value;
+        }
+        public float rotionSpeed
+        {
+            get => Infomation.rotionSpeed;
+            set => Infomation.rotionSpeed = value;
+        }
+
+        private bool CanIDragRotating = true;
+
+        public TouchPanelRotatingButton UserButton
+        {
+            get => Infomation.UserButton;
+            set => Infomation.UserButton = value;
+        }
+
         public enum RayBehavour
         {
             None, Follow, JustCatch
+        }
+
+        public enum TouchPanelRotatingButton
+        {
+            Left, Right
         }
 
         private void Start()
@@ -34,16 +131,14 @@ namespace AD.Utility.Object
             RayForm = Core.GetRay();
             RayForm.mask = LayerMask.GetMask("Default");
             UpdateDirty();
+            TouchPanel.OnEvent.AddListener(Rotating);
         }
 
         void Update()
         {
             NotNoneMode(); FollowMode(); ClearCatch();
-            if (Mouse.current.leftButton.isPressed != false)
-            {
-                if (FoucsOneTarget == null) Rotating();
-            }
-            else
+            CheakCanIRotating();
+            if (Mouse.current.leftButton.isPressed == false)
             {
                 //Detect Clear
                 if (PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove())) ClearDirty();
@@ -55,6 +150,12 @@ namespace AD.Utility.Object
                 Keyboard.current.leftCtrlKey.isPressed && Keyboard.current.zKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame
 #endif
                 ) UndoPast();
+        }
+
+        private void CheakCanIRotating()
+        {
+            //No FoucsOneTarget and UserButton is Pressed
+            CanIDragRotating = FoucsOneTarget == null && (UserButton == TouchPanelRotatingButton.Left ? Mouse.current.leftButton : Mouse.current.rightButton).isPressed;
         }
 
         private void ClearCatch()
@@ -122,15 +223,10 @@ namespace AD.Utility.Object
             PastEulerAngle = Core.transform.transform.eulerAngles;
         }
 
-        private void Rotating()
+        private void Rotating(Vector2 dragVec)
         {
-            if (TouchPanel != null)
-            {
-                Core.transform.localEulerAngles
-                    = new Vector3(Core.transform.localEulerAngles.x + TouchPanel.dragVec.y * Time.deltaTime * rotionSpeed
-                    , Core.transform.localEulerAngles.y - TouchPanel.dragVec.x * Time.deltaTime * rotionSpeed,
-                    Core.transform.localEulerAngles.z);
-            }
+            if (CanIDragRotating)
+                Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(dragVec.y * Time.deltaTime * rotionSpeed).AddY(-dragVec.x * Time.deltaTime * rotionSpeed);
         }
 
         private bool DownMove()

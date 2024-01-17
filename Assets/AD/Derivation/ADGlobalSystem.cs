@@ -262,8 +262,7 @@ namespace AD
 
         #region InputSystem
 
-        public Dictionary<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> multipleInputController
-        { get; private set; } = new();
+        public Dictionary<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> multipleInputController { get; private set; } = new();
 
         public List<MulHitSameControl> mulHitControls { get; private set; } = new();
 
@@ -279,7 +278,7 @@ namespace AD
             }
             catch (System.Exception ex)
             {
-                AddError("ReleaseThisFrameUpdate(key) key=" + key.ToString() + "\nException:" + ex.Message + "\nStackTrace:" + ex.StackTrace);
+                AddError("ReleaseThisFrameUpdate(key) key=" + key.ToString() + "\nException:" + ex.Message + "\nStackTrace:" + ex.StackTrace, ex);
             }
         }
         private static void PressThisFrameUpdate(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> key)
@@ -294,7 +293,7 @@ namespace AD
             }
             catch (System.Exception ex)
             {
-                AddError("PressThisFrameUpdate(key) key=" + key.ToString() + "\nException:" + ex.Message + "\nStackTrace:" + ex.StackTrace);
+                AddError("PressThisFrameUpdate(key) key=" + key.ToString() + "\nException:" + ex.Message + "\nStackTrace:" + ex.StackTrace, ex);
             }
         }
         private static void PressButtonUpdate(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> key)
@@ -309,7 +308,7 @@ namespace AD
             }
             catch (System.Exception ex)
             {
-                AddError("PressButtonUpdate(key) key=" + key.ToString() + "\nException:" + ex.Message + "\nStackTrace:" + ex.StackTrace);
+                AddError("PressButtonUpdate(key) key=" + key.ToString() + "\nException:" + ex.Message + "\nStackTrace:" + ex.StackTrace, ex);
             }
         }
 
@@ -869,7 +868,18 @@ namespace AD
             }
             UtilityPackage cMessage = new UtilityPackage(message, state);
             instance.record.Add(cMessage);
-            if (state == "Error") Debug.LogError(cMessage.ObtainResult());
+            if (state == "Error") Debug.LogErrorFormat(cMessage.ObtainResult());
+        }
+
+        public static void AddError(string message,Exception exception, string state = "Error")
+        {
+            if (instance.record.Count > 0 && instance.record[^1].message == message && instance.record[^1].state == state)
+            {
+                instance.record[^1].times++;
+            }
+            UtilityPackage cMessage = new UtilityPackage(message, state);
+            instance.record.Add(cMessage);
+            if (state == "Error") Debug.LogException(exception);
         }
 
         public static void ThrowLogicError(string message, string state = "LogicError")
@@ -910,13 +920,13 @@ namespace AD
         public static T Error<T>(string message, Exception ex, T result) where T : class, new()
         {
             if (IsKeepException) throw new ADException(message, ex);
-            AddError(message + "\nError: " + ex.Message + "\nStackTrace: " + ex.StackTrace);
+            AddError(message + "\nError: " + ex.Message + "\nStackTrace: " + ex.StackTrace,ex);
             return result;
         }
         public static T Error<T>(string message, Exception ex = null) where T : class, new()
         {
             if (IsKeepException) throw new ADException(message, ex);
-            AddError(message + "\nError: " + ex.Message + "\nStackTrace: " + ex.StackTrace);
+            AddError(message + "\nError: " + ex.Message + "\nStackTrace: " + ex.StackTrace,ex);
             return default(T);
         }
         public static T Error<T>(string message) where T : class, new()
