@@ -218,7 +218,7 @@ namespace AD.Experimental.Runtime
 
             public void OnAfterDeserialize()
             {
-                if (_x.Equals(x) && _y.Equals(y) && _z.Equals(z))
+                if (_x != null && _y != null && _z != null && _x.Equals(x) && _y.Equals(y) && _z.Equals(z))
                 {
                     if (xyz.StartTime != DefaultWhenValueNotSame && float.TryParse(xyz.StartTime, out var StartTime))
                     {

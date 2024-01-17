@@ -106,6 +106,7 @@ namespace AD.Utility
         private List<Entry> Data;
 
         public ADEvent<TKey> OnAdd = new(), OnTryAdd = new(), OnRemove = new();
+        public ADEvent<TKey,bool> OnReplace = new();
 
         public void OnBeforeSerialize()
         {
@@ -182,8 +183,9 @@ namespace AD.Utility
             }
             set
             {
+                var result = base.ContainsKey(key);
                 base[key] = value;
-                this.OnTryAdd.Invoke(key);
+                this.OnReplace.Invoke(key, result);
             }
         }
     }
