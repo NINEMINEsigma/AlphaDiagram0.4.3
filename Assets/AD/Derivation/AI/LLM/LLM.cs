@@ -74,7 +74,7 @@ namespace AD.Experimental.LLM
 
         public override void Init()
         {
-
+            m_DataList = new List<SendData>();
         }
 
         [Serializable]

@@ -79,6 +79,7 @@ namespace AD.Experimental.LLM
                     else
                     {
                         Debug.Log(_msg);
+                        _callback(_msg);
                     }
                 }
 
