@@ -26,6 +26,8 @@ namespace AD.Utility
             ADGlobalSystem.Output(self, str);
         }
 
+        #region Translate
+
         public static bool Install(string path, bool isSetCurrent = true)
         {
             if (ADGlobalSystem.Input<Package>(path, out object obj))
@@ -100,7 +102,19 @@ namespace AD.Utility
                     return defualt;
                 else return Packages[CurrentIndex];
             }
-        } 
+        }
+
+        #endregion
+
+        public static string Link(this string[] self,int first,int end)
+        {
+            string result = "";
+            while (first<end)
+            {
+                result += self[first++] + " ";
+            }
+            return result;
+        }
     }
 }
 

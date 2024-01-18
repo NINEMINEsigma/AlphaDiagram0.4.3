@@ -11,7 +11,7 @@ namespace AD.Experimental.Performance
     /// Debug 绘制camera的 视口、视锥 和 FOV
     /// </summary>
     /// 
-    [ExecuteInEditMode,RequireComponent(typeof( Camera))]
+    [ExecuteInEditMode, RequireComponent(typeof(Camera))]
     public class ConeAllegation : MonoBehaviour
     {
         private const float Width = 0.001f;
@@ -21,7 +21,7 @@ namespace AD.Experimental.Performance
         public bool IsNeedLineRenderer = false;
         public bool IfJustRendererView = false;
 
-        public ADSerializableDictionary<int,RayInfo> RayInfos_OnDrawFarView = new();
+        public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawFarView = new();
         public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawNearView = new();
         public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawFOV = new();
         public ADSerializableDictionary<int, RayInfo> RayInfos_OnDrawConeOfCameraVision = new();
@@ -36,7 +36,7 @@ namespace AD.Experimental.Performance
                 return _camera;
             }
         }
-        
+
         private void Update()
         {
             OnDrawFarView(IsNeedLineRenderer);

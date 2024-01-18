@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
@@ -134,7 +135,8 @@ namespace AD.Utility
                     {
                         if (!base.TryAdd(Data[i].Key, Data[i].Value))
                         {
-                            if (typeof(TKey) == typeof(string)||typeof(TKey).IsSubclassOf(typeof(object))) base.Add(default, default);
+                            if (typeof(TKey) == typeof(string)) (this as Dictionary<string, TVal>).Add("New Key", default);
+                            if (typeof(TKey).IsSubclassOf(typeof(object))) base.Add(default, default);
                             else if (ReflectionExtension.IsPrimitive(typeof(TKey))) base.Add(default, default);
                         }
                     }

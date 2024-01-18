@@ -2,29 +2,31 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneTemplate;
 using UnityEngine;
 
-namespace AD.Utility
+public class SceneTemplatePipeline : ISceneTemplatePipeline
 {
-    public class SceneTemplatePipeline : ISceneTemplatePipeline
+    public virtual bool IsValidTemplateForInstantiation(SceneTemplateAsset sceneTemplateAsset)
     {
-        public virtual bool IsValidTemplateForInstantiation(SceneTemplateAsset sceneTemplateAsset)
-        {
-            return true;
-        }
+        return true;
+    }
 
-        public void BeforeTemplateInstantiation(SceneTemplateAsset sceneTemplateAsset, bool isAdditive, string sceneName)
+    public void BeforeTemplateInstantiation(SceneTemplateAsset sceneTemplateAsset, bool isAdditive, string sceneName)
+    {
+        if (sceneTemplateAsset)
         {
-            if (sceneTemplateAsset)
-            {
-                Debug.Log($"Before Template Pipeline {sceneTemplateAsset.name} isAdditive: {isAdditive} sceneName: {sceneName}");
-            }
+            Debug.Log($"Before Template Pipeline {sceneTemplateAsset.name} isAdditive: {isAdditive} sceneName: {sceneName}");
         }
+    }
 
-        public void AfterTemplateInstantiation(SceneTemplateAsset sceneTemplateAsset, Scene scene, bool isAdditive, string sceneName)
+    public void AfterTemplateInstantiation(SceneTemplateAsset sceneTemplateAsset, Scene scene, bool isAdditive, string sceneName)
+    {
+        if (sceneTemplateAsset)
         {
-            if (sceneTemplateAsset)
-            {
-                Debug.Log($"After Template Pipeline {sceneTemplateAsset.name} scene: {scene} isAdditive: {isAdditive} sceneName: {sceneName}");
-            }
+            Debug.Log($"After Template Pipeline {sceneTemplateAsset.name} scene: {scene} isAdditive: {isAdditive} sceneName: {sceneName}");
         }
+    }
+
+    public static void CreateNewScene()
+    {
+
     }
 }

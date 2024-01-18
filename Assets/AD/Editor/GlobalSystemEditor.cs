@@ -358,7 +358,6 @@ namespace AD
             Selection.activeObject = target.gameObject;
         }
 
-
         [MenuItem("GameObject/AD/TimeLine", false, 50)]
         private static void TimeLine(UnityEditor.MenuCommand menuCommand)
         {
@@ -367,6 +366,16 @@ namespace AD
             GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
+        }
+
+        [MenuItem("GameObject/AD/TemplateSceneManager", false, 70)]
+        private static void TemplateSceneManager(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = new GameObject("TemplateSceneManager");
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+            target.AddComponent<TemplateSceneManager>().LoadAllKeyLayer();
         }
 
         [MenuItem("GameObject/AD/ADUI/Slider", false, 10)]

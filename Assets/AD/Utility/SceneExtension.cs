@@ -1,4 +1,7 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -37,14 +40,50 @@ namespace AD.Utility
 
         #endregion
 
-        public static UnityEngine.SceneManagement.Scene Get()
+        public static Scene Get()
         {
             return SceneManager.GetActiveScene();
         }
 
-        public static UnityEngine.SceneManagement.Scene GetCurrent()
+        public static Scene GetCurrent()
         {
             return Get();
+        }
+
+        public static GameObject[] GetCurrentRootGameObject()
+        {
+            try
+            {
+                return GetCurrent().GetRootGameObjects();
+            }
+            catch
+            {
+                return new GameObject[] { };
+            }
+        }
+
+        public static GameObject[] Find(this Scene self,Predicate<GameObject> predicate)
+        {
+            List<GameObject> allGameObject = self.GetRootGameObjects().ToList();
+            List<GameObject> found = new();
+            found.AddRange(allGameObject);
+            while(found.Count!=0)
+            {
+                List<GameObject> temp = new();
+                foreach (var single in found)
+                {
+                    foreach (Transform child in single.transform)
+                    {
+                        if (predicate(child.gameObject))
+                        {
+                            temp.Add(child.gameObject);
+                            allGameObject.Add(child.gameObject);
+                        }
+                    }
+                }
+                found = temp;
+            }
+            return allGameObject.ToArray();
         }
 
         /*
