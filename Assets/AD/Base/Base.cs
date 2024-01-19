@@ -2118,11 +2118,12 @@ namespace AD.BASE
     {
         public static T GetOriginal<T, P>(this IPropertyHasGet<T, P> self) where P : PropertyAsset<T>, new()
         {
-            return self.Property._m_value._m_data.value;
+            return self.Property._m_value._m_data == null ? default : self.Property._m_value._m_data.value;
         }
 
         public static T SetOriginal<T, P>(this IPropertyHasSet<T, P> self, T value) where P : PropertyAsset<T>, new()
         {
+            if (self.Property._m_value._m_data == null) self.Property._m_value._m_data = new();
             self.Property._m_value._m_data.value = value;
             return self.Property._m_value._m_data.value;
         }

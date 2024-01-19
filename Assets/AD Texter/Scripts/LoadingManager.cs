@@ -10,7 +10,7 @@ namespace AD.Simple.Texter
     {
         public static string ES3Key => "AD_Assests";
         public static string Extension => "texter";
-        public static string ProntExtension => "." + Extension;
+        public static string PointExtension => "." + Extension;
         public static string FilePath => Path.Combine(Application.streamingAssetsPath, "Texter");
 
         //Scene Name
@@ -20,7 +20,7 @@ namespace AD.Simple.Texter
 
         #region Load
 
-        public static List<FileInfo> AllFile => FileC.FindAll(FilePath, ProntExtension);
+        public static List<FileInfo> AllFile => FileC.FindAll(FilePath, PointExtension);
 
         private static DataAssets CurrentTransform;
         public static List<DataAssets> GetDatas(List<FileInfo> files)

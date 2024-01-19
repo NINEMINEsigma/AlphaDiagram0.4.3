@@ -61,7 +61,7 @@ namespace AD.Simple.Texter
 
         public DataAssets Save()
         {
-            Save(AssetsName + LoadingManager.ProntExtension);
+            Save(AssetsName + LoadingManager.PointExtension);
             return this;
         }
         public override void Save(string path)

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
+using AD.Utility;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -34,18 +35,20 @@ namespace AD.Experimental.Localization.Cache
         BindProperty<T> MatchElement { get; set; }
         BindProperty<P> MatchElementBM { get; set; }
     }
+    [Serializable]
     /// <summary>
     /// 以一个字符串作为识别ID的Key类
     /// <para>继承并重写Equals与GetHashCode以实现更加扩展性的功能</para>
     /// </summary>
     public class CacheAssetsKey
     {
+        public CacheAssetsKey() : this("New Key") { }
         public CacheAssetsKey(string key)
         {
             IdentifyID = key;
         }
 
-        string IdentifyID { get; set; }
+        [SerializeField] private string IdentifyID;
 
         public override bool Equals(object obj)
         {
@@ -75,6 +78,7 @@ namespace AD.Experimental.Localization.Cache
         IPropertyHasGet<string, P> CacheKey { get; }
     }
 
+    [Serializable]
     /// <summary>
     /// 这个类的缓存方式使用IBase&IBaseMap的虚拟的序列化和反序列化方式来实现本地化和内存化
     /// </summary>
@@ -138,6 +142,7 @@ namespace AD.Experimental.Localization.Cache
         }
     }
 
+    [Serializable]
     public class CacheAssets<Key, T, P> : ICanOrganizeData<Key, T, P>
         where Key : CacheAssetsKey
         where T : class, IBase<P>, new()
@@ -173,9 +178,21 @@ namespace AD.Experimental.Localization.Cache
             }
         }
 
-        public class Context : Dictionary<CacheAssetsKey, ICanCacheData<T, P>> { }
+        [Serializable]
+        public class Context : ADSerializableDictionary<CacheAssetsKey, ICanCacheData<T, P>>, ISerializationCallbackReceiver
+        {
+            public override void OnAfterDeserialize()
+            {
+                base.OnAfterDeserialize();
+            }
 
-        Context datas = new();
+            public override void OnBeforeSerialize()
+            {
+                base.OnBeforeSerialize();
+            }
+        }
+
+        [SerializeField] private Context datas = new();
 
         public IEnumerator<ICanCacheData<T, P>> GetEnumerator()
         {
@@ -237,6 +254,143 @@ namespace AD.Experimental.Localization.Cache
         }
 
         public bool TryGetKey(ICanCacheData<T, P> value, out List<CacheAssetsKey> result)
+        {
+            result = null;
+            bool isFind = false;
+            foreach (var data in datas)
+            {
+                if (data.Value.Equals(value))
+                {
+                    result ??= new();
+                    result.Add(data.Key);
+                    isFind = true;
+                }
+            }
+            return isFind;
+        }
+
+        public void Remove(CacheAssetsKey key)
+        {
+            datas.Remove(key);
+        }
+
+
+
+    }
+
+    [Serializable]
+    public class CacheAssets<Key, Value, T, P> : ICanOrganizeData<Key, T, P>
+        where Key : CacheAssetsKey
+        where Value : AbstractCache<T, P>
+        where T : class, IBase<P>, new()
+        where P : class, IBaseMap<T>, new()
+    {
+        public class Enumerator : IEnumerator<Value>, IEnumerator, IDisposable
+        {
+            public Enumerator(
+                Context.Enumerator enumerator)
+            {
+                this.enumerator = enumerator;
+            }
+
+            Context.Enumerator enumerator;
+
+            public Value Current => enumerator.Current.Value;
+
+            object IEnumerator.Current => enumerator.Current.Value;
+
+            public void Dispose()
+            {
+                enumerator.Dispose();
+            }
+
+            public bool MoveNext()
+            {
+                return enumerator.MoveNext();
+            }
+
+            public void Reset()
+            {
+                enumerator.Dispose();
+            }
+        }
+
+        [Serializable]
+        public class Context : ADSerializableDictionary<CacheAssetsKey, Value>, ISerializationCallbackReceiver
+        {
+            public override void OnAfterDeserialize()
+            {
+                base.OnAfterDeserialize();
+            }
+
+            public override void OnBeforeSerialize()
+            {
+                base.OnBeforeSerialize();
+            }
+        }
+
+        [SerializeField] private Context datas = new();
+
+        public IEnumerator<ICanCacheData<T, P>> GetEnumerator()
+        {
+            return new Enumerator(datas.GetEnumerator());
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        public ICollection<KeyValuePair<CacheAssetsKey, Value>> GetReadOnlyData()
+        {
+            return datas.AsReadOnlyCollection();
+        }
+
+        public Context GetData()
+        {
+            return datas;
+        }
+
+        public void Add(CacheAssetsKey key, Value cache) => TryAdd(key, cache);
+
+        public bool TryAdd(CacheAssetsKey key, Value cache)
+        {
+            return datas.TryAdd(key, cache);
+        }
+
+        //返回值为尝试Add之前尝试获取的结果
+        public bool AddOrGet(CacheAssetsKey key, Value cache, out Value result_slot)
+        {
+            bool result = datas.TryGetValue(key, out result_slot);
+            if (!result)
+            {
+                datas.Add(key, result_slot);
+                result_slot = cache;
+            }
+            return result;
+        }
+
+        public void Clear()
+        {
+            datas.Clear();
+        }
+
+        public bool Contains(CacheAssetsKey key)
+        {
+            return datas.ContainsKey(key);
+        }
+
+        public bool TryGetValue(CacheAssetsKey key, out Value result)
+        {
+            return datas.TryGetValue(key, out result);
+        }
+
+        public bool Contains(Value value)
+        {
+            return datas.ContainsValue(value);
+        }
+
+        public bool TryGetKey(Value value, out List<CacheAssetsKey> result)
         {
             result = null;
             bool isFind = false;

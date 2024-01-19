@@ -109,7 +109,7 @@ namespace AD.Utility
         public ADEvent<TKey> OnAdd = new(), OnTryAdd = new(), OnRemove = new();
         public ADEvent<TKey,bool> OnReplace = new();
 
-        public void OnBeforeSerialize()
+        public virtual void OnBeforeSerialize()
         {
             Data = new();
             foreach (KeyValuePair<TKey, TVal> pair in this)
@@ -123,7 +123,7 @@ namespace AD.Utility
         }
 
         // load dictionary from lists
-        public void OnAfterDeserialize()
+        public virtual void OnAfterDeserialize()
         {
             if (Data == null) return;
             base.Clear();
@@ -131,16 +131,15 @@ namespace AD.Utility
             {
                 if (Data[i] != null)
                 {
-                    try
+                    if (!base.TryAdd(Data[i].Key, Data[i].Value))
                     {
-                        if (!base.TryAdd(Data[i].Key, Data[i].Value))
-                        {
-                            if (typeof(TKey) == typeof(string)) (this as Dictionary<string, TVal>).Add("New Key", default);
-                            if (typeof(TKey).IsSubclassOf(typeof(object))) base.Add(default, default);
-                            else if (ReflectionExtension.IsPrimitive(typeof(TKey))) base.Add(default, default);
-                        }
+                        Type typeTkey = typeof(TKey);
+                        if (typeTkey == typeof(string)) (this as Dictionary<string, TVal>).Add("New Key", default);
+                        else if (typeTkey.IsSubclassOf(typeof(Experimental.Localization.Cache.CacheAssetsKey)) || typeTkey == typeof(Experimental.Localization.Cache.CacheAssetsKey))
+                            (this as Dictionary<Experimental.Localization.Cache.CacheAssetsKey, TVal>).Add(new("New Key"), default);
+                        else if (typeTkey.IsSubclassOf(typeof(object))) base.Add(default, default);
+                        else if (ReflectionExtension.IsPrimitive(typeTkey)) base.Add(default, default);
                     }
-                    catch { }
                 }
             }
 
