@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AD Texter/Scenes/EntryScene.unity
     guid: 47869cbdc9a6aea43abd9c47ff730a96
+  - enabled: 1
+    path: Assets/AD Texter/Scenes/ProjectScene.unity
+    guid: 57fde834e23dcbd43a9289f18383d9a3
   m_configObjects: {}

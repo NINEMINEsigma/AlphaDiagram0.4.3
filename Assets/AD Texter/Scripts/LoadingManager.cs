@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using AD.BASE;
 using AD.Utility;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AD.Simple.Texter
@@ -32,9 +31,10 @@ namespace AD.Simple.Texter
         {
             return new DataAssets(source);
         }
-        public static DataAssets LoadDataAssets(string source)
+        public static Data.DataFile LoadDataAssets(string path)
         {
-            return ADGlobalSystem.Deserialize<DataAssets>(source, out object result) ? result as DataAssets : null;
+            ADGlobalSystem.Input<Data.DataFile>(path, out object result);
+            return ADGlobalSystem.FinalCheck(result as Data.DataFile, path + " is load failed");
         }
 
         #endregion
@@ -43,7 +43,7 @@ namespace AD.Simple.Texter
 
         public static void SaveDataAssets(string fileName, DataAssets data)
         {
-            ADGlobalSystem.Output<DataAssets>(Path.Combine(FilePath, fileName), data);
+            ADGlobalSystem.Output<Data.DataFile>(Path.Combine(FilePath, fileName), new(data));
         }
 
         #endregion

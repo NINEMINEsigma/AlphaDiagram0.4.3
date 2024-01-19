@@ -1,6 +1,8 @@
 using System.Collections;
 using AD.Experimental.Performance;
+using AD.Experimental.SceneTrans;
 using AD.UI;
+using AD.Utility.Object;
 using UnityEngine;
 
 namespace AD.Simple.Texter
@@ -11,16 +13,19 @@ namespace AD.Simple.Texter
 
         public void Setup(DataAssets assets)
         {
+            CurrentLink = assets;
             CreaterName.SetText(assets.CreaterName);
             Description.SetText(assets.Description);
             DateTime.SetText(assets.DateTime);
+            AssetsName.SetText(assets.AssetsName);
             SureCilck.AddListener(delegate
             {
-                assets.CreaterName = CreaterName.text;
                 assets.Description = Description.text;
-                ADGlobalSystem.instance.StringValues[LoadingManager.CurrentCreateNameKey] = CreaterName.text;
-                ADGlobalSystem.instance.SaveNumericManager();
+                assets.Save();
+                ADGlobalSystem.instance.OnEnd();
+                SceneTrans.instance.SceneOpenAnimation["EntryScene"] = "ZoomIn";
             });
+            CameraCore.IsLockKeyBoardDetectForMove = true;
         }
 
         public void UnloadClick()
@@ -31,12 +36,15 @@ namespace AD.Simple.Texter
 
         private IEnumerator RealUnload()
         {
-            yield return new WaitForSeconds(1f);
+            CameraCore.IsLockKeyBoardDetectForMove = false;
+            yield return new WaitForSeconds(0.5f);
             MainLoadAssets.Unload(this.SceneName);
         }
 
+        public DataAssets CurrentLink;
         public Button SureCilck;
-        public InputField CreaterName;
+        public Text CreaterName;
+        public Text AssetsName;
         public ModernUIInputField Description;
         public Text DateTime;
     }

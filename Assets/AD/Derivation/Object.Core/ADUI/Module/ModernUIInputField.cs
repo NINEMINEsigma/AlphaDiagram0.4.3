@@ -33,7 +33,8 @@ namespace AD.UI
         }
 
         [Header("Setting")]
-        public string NumericManagerName = "DefaultInput";
+        public string NumericManagerName = DefaultNumericManagerName;
+        public static string DefaultNumericManagerName => "DefaultInput";
 
         // Hidden variables
         private readonly string inAnim = "In";
@@ -47,8 +48,11 @@ namespace AD.UI
             Source.source.onEndEdit.AddListener(delegate { AnimateOut(); });
             UpdateState();
 
-            ADGlobalSystem.instance.StringValues.TryGetValue(this.NumericManagerName, out string str);
-            this.text = str;
+            if (this.NumericManagerName != DefaultNumericManagerName)
+            {
+                ADGlobalSystem.instance.StringValues.TryGetValue(this.NumericManagerName, out string str);
+                this.text = str;
+            }
         }
 
         public ModernUIInputField SetTitle(string title)

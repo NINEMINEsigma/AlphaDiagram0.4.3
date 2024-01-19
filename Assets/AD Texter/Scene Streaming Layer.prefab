@@ -549,7 +549,7 @@ MonoBehaviour:
     Data:
     - Key: EntryScene
       Value: StartGame
-    - Key: Open A New Scene
+    - Key: ProjectScene
       Value: ZoomIn
     OnAdd:
       m_PersistentCalls:
@@ -566,6 +566,8 @@ MonoBehaviour:
   SceneCloseAnimation:
     Data:
     - Key: EntryScene
+      Value: ZoomOut
+    - Key: ProjectScene
       Value: ZoomOut
     OnAdd:
       m_PersistentCalls:

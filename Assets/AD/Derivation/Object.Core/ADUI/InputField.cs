@@ -30,7 +30,7 @@ namespace AD.UI
             AD.UI.ADUI.Destory(this);
         }
 
-        public static AD.UI.InputField Generate(string name, string defaultText = "", string placeholderText = "Entr Text", Transform parent = null)
+        public static AD.UI.InputField Generate(string name, string defaultText = "", string placeholderText = "Enter Text", Transform parent = null)
         {
             AD.UI.InputField inputField = GameObject.Instantiate(ADGlobalSystem.instance._InputField);
             inputField.name = name;

@@ -620,7 +620,7 @@ namespace AD
             {
                 try
                 {
-                    obj = ES3.Load(Path.GetFileNameWithoutExtension(filePath), filePath);
+                    obj = ES3.Load(filePath.Split('.')[^1], filePath);
                     if (obj != null) return true;
                     else return false;
                 }

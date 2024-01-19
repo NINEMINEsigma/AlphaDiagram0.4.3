@@ -15,17 +15,16 @@ namespace AD.Simple.Texter
         {
             if (!ADGlobalSystem.instance.StringValues.TryGetValue(LoadingManager.CurrentCreateNameKey, out var CurrentCreater)) CurrentCreater = "New Creater";
             CreaterName.SetText(CurrentCreater);
-            Description.SetText("");
-            DateTimeStr = System.DateTime.Now.ToShortDateString();
+            DateTimeStr = System.DateTime.Now.ToString();
             DateTime.SetText(DateTimeStr);
         }
 
         public void SureCilckSetup()
         {
-            DataAssets assets = new(CreaterName.text, Description.text, DateTimeStr);
+            DataAssets assets = new(CreaterName.text, Description.text, DateTimeStr, AssetsName.text);
             ADGlobalSystem.instance.StringValues[LoadingManager.CurrentCreateNameKey] = CreaterName.text;
             ADGlobalSystem.instance.SaveNumericManager();
-            assets.CreateInstance(Prefab, Canvas);
+            assets.Save().CreateInstance(Prefab, Canvas);
             this.gameObject.SetActive(false);
         }
 
@@ -37,12 +36,13 @@ namespace AD.Simple.Texter
 
         private IEnumerator RealUnload()
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.75f);
             MainLoadAssets.Unload(this.SceneName);
         }
 
         public Button SureCilck;
         public InputField CreaterName;
+        public InputField AssetsName;
         public ModernUIInputField Description;
         public Text DateTime;
 

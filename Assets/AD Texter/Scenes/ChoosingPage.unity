@@ -413,10 +413,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChoosingPage SubManager
       objectReference: {fileID: 0}
-    - target: {fileID: 8931867144071729471, guid: 5564564056f9f8d46b64c933f58e6f86, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5564564056f9f8d46b64c933f58e6f86, type: 3}
 --- !u!1001 &9027794642432909057
@@ -429,6 +425,10 @@ PrefabInstance:
     - target: {fileID: 5956512731225296186, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
       propertyPath: m_Name
       value: CreaterPage SubManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 5956512731225296186, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5956512731225296191, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
       propertyPath: m_Pivot.x

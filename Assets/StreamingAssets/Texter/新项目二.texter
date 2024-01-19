@@ -1,0 +1,11 @@
+{
+	"texter" : {
+		"__type" : "AD.Simple.Texter.Data.DataFile,Assembly-CSharp",
+		"value" : {
+			"CreaterName" : "留白",
+			"Description" : "第二次测试",
+			"DateTime" : "2024\/1\/19 14:10:48",
+			"AssetsName" : "新项目二"
+		}
+	}
+}

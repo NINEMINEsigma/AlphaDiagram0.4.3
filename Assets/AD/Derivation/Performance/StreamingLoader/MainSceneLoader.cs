@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AD.BASE;
 using AD.Utility;
 using UnityEngine;
@@ -47,6 +48,15 @@ namespace AD.Experimental.Performance
             SubBlocks.Remove(sceneName);
             SceneManager.UnloadSceneAsync(sceneName);
         }
+
+        public virtual void UnloadAll()
+        {
+            List<string> keyList = SubBlocks.GetSubListAboutKey();
+            foreach (var key in keyList)
+            {
+                Unload(key);
+            }
+        }
     }
 
     public class MainSceneLoader : ADController
@@ -73,9 +83,19 @@ namespace AD.Experimental.Performance
             sceneLoadAssets.Unload(sceneName);
         }
 
+        public virtual void UnloadAll()
+        {
+            sceneLoadAssets.UnloadAll();
+        }
+
+        private void OnDestroy()
+        {
+            UnloadAll();
+        }
+
         public override void Init()
         {
-
+            UnloadAll();
         }
     }
 }

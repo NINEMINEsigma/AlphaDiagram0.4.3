@@ -27,7 +27,7 @@ namespace AD.Utility.Object
         public TouchPanelRotatingButton UserButton = TouchPanelRotatingButton.Right;
     }
 
-    public class CameraCore : MonoBehaviour, ICanInitialize
+    public class CameraCore : ADController, ICanInitialize
     {
         public Camera Core;
         [SerializeField] private TouchPanel touchPanel;
@@ -134,6 +134,13 @@ namespace AD.Utility.Object
             TouchPanel.OnEvent.AddListener(Rotating);
         }
 
+        public static bool IsLockKeyBoardDetectForMove = false;
+
+        public void SetCameraCoreLockKeyBoardDetect(bool boolen)
+        {
+            IsLockKeyBoardDetectForMove = boolen;
+        }
+
         void Update()
         {
             NotNoneMode(); FollowMode(); ClearCatch();
@@ -141,7 +148,9 @@ namespace AD.Utility.Object
             if (Mouse.current.leftButton.isPressed == false)
             {
                 //Detect Clear
-                if (PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove())) ClearDirty();
+                if (IsLockKeyBoardDetectForMove == false &&
+                    PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove())) 
+                    ClearDirty();
             }
             if (
 #if UNITY_EDITOR
@@ -231,14 +240,14 @@ namespace AD.Utility.Object
 
         private bool DownMove()
         {
-            if (!Keyboard.current.leftShiftKey.isPressed) return false;
+            if (!Keyboard.current.leftShiftKey.isPressed && !Keyboard.current.qKey.isPressed) return false;
             Core.transform.position -= moveSpeed * Time.deltaTime * Core.transform.up;
             return true;
         }
 
         private bool UpMove()
         {
-            if (!Keyboard.current.spaceKey.isPressed) return false;
+            if (!Keyboard.current.spaceKey.isPressed && !Keyboard.current.eKey.isPressed) return false;
             Core.transform.position += moveSpeed * Time.deltaTime * Core.transform.up;
             return true;
         }
@@ -285,7 +294,7 @@ namespace AD.Utility.Object
 
         #endregion
 
-        public void Init()
+        public override void Init()
         {
             RayForm = null;
             Target = null;
