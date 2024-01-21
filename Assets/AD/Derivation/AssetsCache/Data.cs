@@ -130,15 +130,25 @@ namespace AD.Experimental.Localization.Cache
 
         public virtual string Serialize()
         {
-#if UNITY_EDITOR
-            if (this.GetType().GetAttribute<SerializableAttribute>() == null)
-            {
-                Debug.LogWarning("this type is not use SerializableAttribute but you now is try to serialize it");
-            }
-#endif
             MatchElement.Get().ToMap(out var value);
             MatchElementBM.Set(value);
             return MatchElementBM.Get().Serialize();
+        }
+
+        public virtual bool UpdataMatchBaseByBM()
+        {
+            if (MatchElementBM.GetOriginal() == null) return false;
+            MatchElementBM.Get().ToObject(out T result);
+            MatchElement.Set(result);
+            return true;
+        }
+
+        public virtual bool UpdataMatchBMByBase()
+        {
+            if (MatchElement.GetOriginal() == null) return false;
+            MatchElement.Get().ToMap(out P result);
+            MatchElementBM.Set(result);
+            return true;
         }
     }
 

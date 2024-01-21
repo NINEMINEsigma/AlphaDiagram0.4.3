@@ -4,17 +4,28 @@ using System.Collections.Generic;
 using System.IO;
 using AD.BASE;
 using AD.Simple.Texter.Data;
+using TMPro;
 using UnityEngine;
 
 namespace AD.Simple.Texter
 {
-    [EaseSave3]
     [Serializable]
     public class ProjectData : AD.Experimental.Localization.Cache.CacheAssets<AD.Experimental.Localization.Cache.CacheAssetsKey, ProjectItemDataCache, ProjectItemData, ProjectData_BaseMap>
     {
-        public static string ProjectItemDataPointExtension = ".projitem";
+        public static string ProjectItemDataExtension => "projitem";
+        public static string ProjectItemDataPointExtension = "." + ProjectItemDataExtension;
 
         public DataAssets DataAssetsForm;
+
+        private static ProjectData_BaseMap Load(FileInfo file)
+        {
+            return ES3.Load<ProjectData_BaseMap>(ProjectItemDataExtension, file.FullName);
+        }
+
+        private static void Save(AD.Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> cacheDataForm)
+        {
+            ES3.Save<ProjectData_BaseMap>(ProjectItemDataPointExtension, cacheDataForm.MatchElementBM.Get());
+        }
 
         public void Load()
         {
@@ -23,37 +34,39 @@ namespace AD.Simple.Texter
             var fileList = FileC.FindAll(fileListPath, ProjectItemDataPointExtension);
             if (fileListPath != null)
             {
-
+                foreach (var file in fileList)
+                {
+                    ProjectData_BaseMap bmap = Load(file);
+                    string key = Path.GetFileNameWithoutExtension(file.Name);
+                    bmap.ToObject(out ProjectItemData projcetdata);
+                    this.Add(
+                        new AD.Experimental.Localization.Cache.CacheAssetsKey(key)
+                        , new ProjectItemDataCache(key, projcetdata, bmap));
+                }
             }
         }
 
         public void Save()
         {
-
+            string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
+            FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
+            foreach (AD.Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> item in this)
+            {
+                Save(item);
+            }
         }
     }
 
     [Serializable]
-    public class ProjectItemDataCache : AD.Experimental.Localization.Cache.AbstractCache<ProjectItemData, ProjectData_BaseMap>, ISerializationCallbackReceiver
+    public class ProjectItemDataCache : AD.Experimental.Localization.Cache.AbstractCache<ProjectItemData, ProjectData_BaseMap>
+#if UNITY_EDITOR
+        , ISerializationCallbackReceiver
+#endif
     {
+#if UNITY_EDITOR
+
         [SerializeField] private ProjectItemData m_ProjectItemData;
         [SerializeField] private ProjectData_BaseMap m_ProjectData_BaseMap;
-
-        public ProjectItemDataCache()
-        {
-            this.MatchElement = new();
-            this.MatchElementBM = new();
-        }
-
-        public override bool FromObject(ProjectItemData from)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool FromObject(IBase from)
-        {
-            throw new NotImplementedException();
-        }
 
         public void OnAfterDeserialize()
         {
@@ -67,9 +80,39 @@ namespace AD.Simple.Texter
             m_ProjectData_BaseMap = this.MatchElementBM.Get();
         }
 
+#endif
+
+        public ProjectItemDataCache(string key, ProjectItemData baseData, ProjectData_BaseMap mapData) : base(key)
+        {
+            this.MatchElement = new();
+            if (baseData != null) this.MatchElement.Set(baseData);
+            this.MatchElementBM = new();
+            if (mapData != null) this.MatchElementBM.Set(mapData);
+        }
+        public ProjectItemDataCache(string key) : this(key, null, null) { }
+        public ProjectItemDataCache() : this("Empty New Key") { }
+
+        public override bool FromObject(ProjectItemData from)
+        {
+            this.MatchElement.Set(from);
+            UpdataMatchBMByBase();
+            return true;
+        }
+
+        public override bool FromObject(IBase from)
+        {
+            bool result = false;
+            if (from is ProjectItemData projectItemData)
+            {
+                result = FromObject(projectItemData);
+                UpdataMatchBMByBase();
+            }
+            return result;
+        }
+
         public override void ToObject(out ProjectItemData obj)
         {
-            throw new NotImplementedException();
+            obj = this.MatchElement.Get();
         }
     }
 
@@ -78,22 +121,32 @@ namespace AD.Simple.Texter
     {
         public long ProjectItemID;
 
-        public bool FromMap(ProjectData_BaseMap from)
-        {
-            throw new NotImplementedException();
-        }
+        #region IBase
 
         public bool FromMap(IBaseMap from)
         {
-            throw new NotImplementedException();
-        }
-
-        public void ToMap(out ProjectData_BaseMap BM)
-        {
-            throw new NotImplementedException();
+            if(from is ProjectData_BaseMap projectData_BaseMap)
+            {
+                return FromMap(projectData_BaseMap);
+            }
+            return false;
         }
 
         public void ToMap(out IBaseMap BM)
+        {
+            ToMap(out ProjectData_BaseMap projectData_BaseMap);
+            BM = projectData_BaseMap;
+        }
+
+        #endregion
+
+        public virtual bool FromMap(ProjectData_BaseMap from)
+        {
+            this.ProjectItemID = from.ProjectItemID;
+            return true;
+        }
+
+        public virtual void ToMap(out ProjectData_BaseMap BM)
         {
             throw new NotImplementedException();
         }
@@ -101,40 +154,60 @@ namespace AD.Simple.Texter
 
     namespace Data
     {
+        [EaseSave3]
         [Serializable]
         public class ProjectData_BaseMap : IBaseMap<ProjectItemData>
         {
             public long ProjectItemID;
 
-            public virtual bool Deserialize(string source)
+            #region NotSupport
+
+            public bool Deserialize(string source)
             {
-                throw new NotImplementedException();
+                throw new ADException("Not Support");
             }
 
-            public virtual bool FromObject(ProjectItemData from)
+            public string Serialize()
             {
-                throw new NotImplementedException();
+                throw new ADException("Not Support");
             }
 
-            public virtual bool FromObject(IBase from)
+            #endregion
+
+            #region IBaseMap
+
+            public bool FromObject(IBase from)
             {
-                throw new NotImplementedException();
+                if(from is ProjectItemData projectItemData)
+                {
+                    return FromObject(projectItemData);
+                }
+                return false;
             }
 
-            public virtual string Serialize()
+            public void ToObject(out IBase obj)
             {
-                throw new NotImplementedException();
+                ToObject(out ProjectItemData projectItemData);
+                obj = projectItemData;
             }
+
+            #endregion
+
+            #region IBaseMap<ProjectItemData>
 
             public virtual void ToObject(out ProjectItemData obj)
             {
                 throw new NotImplementedException();
             }
 
-            public virtual void ToObject(out IBase obj)
+            public virtual bool FromObject(ProjectItemData from)
             {
-                throw new NotImplementedException();
+                this.ProjectItemID = from.ProjectItemID;
+                return true;
             }
+
+            #endregion
+
         }
     }
 }

@@ -23,6 +23,18 @@ namespace AD.Simple.Texter
             {
                 DataAssetsForm = Architecture.GetModel<DataAssets>()
             };
+            CurrentProjectData.Load();
+        }
+
+        public void SaveProjectData()
+        {
+            CurrentProjectData.Save();
+        }
+
+        public void BackToEntry()
+        {
+            SaveProjectData();
+            ADGlobalSystem.instance.OnEnd();
         }
     }
 }
