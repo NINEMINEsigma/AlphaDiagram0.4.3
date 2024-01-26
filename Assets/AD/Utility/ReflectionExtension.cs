@@ -997,21 +997,37 @@ namespace AD.Utility
         public class ADReflectedMethod
         {
             private MethodInfo method;
+            public int ArgsTotal { get; private set; }
 
             public ADReflectedMethod(Type type, string methodName, Type[] genericParameters, Type[] parameterTypes)
             {
                 MethodInfo nonGenericMethod = type.GetMethod(methodName, parameterTypes);
                 this.method = nonGenericMethod.MakeGenericMethod(genericParameters);
+                ArgsTotal = parameterTypes == null ? 0 : parameterTypes.Length;
             }
 
             public ADReflectedMethod(Type type, string methodName, Type[] genericParameters, Type[] parameterTypes, BindingFlags bindingAttr)
             {
                 MethodInfo nonGenericMethod = type.GetMethod(methodName, bindingAttr, null, parameterTypes, null);
                 this.method = nonGenericMethod.MakeGenericMethod(genericParameters);
+                ArgsTotal = parameterTypes == null ? 0 : parameterTypes.Length;
+            }
+
+            public ADReflectedMethod(Type type, string methodName, Type[] parameterTypes)
+            {
+                MethodInfo nonGenericMethod = type.GetMethod(methodName, parameterTypes);
+                ArgsTotal = parameterTypes == null ? 0 : parameterTypes.Length;
+            }
+
+            public ADReflectedMethod(Type type, string methodName, Type[] parameterTypes, BindingFlags bindingAttr)
+            {
+                MethodInfo nonGenericMethod = type.GetMethod(methodName, bindingAttr, null, parameterTypes, null);
+                ArgsTotal = parameterTypes == null ? 0 : parameterTypes.Length;
             }
 
             public object Invoke(object obj, object[] parameters = null)
             {
+                if (parameters.Length != ArgsTotal) throw new ADException("The number of parameters is incorrect");
                 return method.Invoke(obj, parameters);
             }
         }
