@@ -12,61 +12,45 @@ using UnityEngine.Networking;
 namespace AD.BASE
 {
     public static class FileC
-    { 
+    {
         //获取成这个文件的文件路径（不包括本身）
         public static DirectoryInfo GetDirectroryOfFile(string filePath)
         {
-            Debug.Log($"CreateDirectrory {filePath}[folder_path],");
-            if (!string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath)) throw new ADException("FileC.TryCreateDirectroryOfFile arg : filePath is null or empty");
+            var dir_name = Path.GetDirectoryName(filePath);
+            if (Directory.Exists(dir_name))
             {
-                var dir_name = Path.GetDirectoryName(filePath);
-                if (Directory.Exists(dir_name))
-                {
-                    Debug.Log($"Exists {dir_name}[dir_name],");
-                    return Directory.GetParent(dir_name);
-                }
+                return Directory.GetParent(dir_name);
             }
             return null;
         }
 
         //生成这个文件的文件路径（不包括本身）
-        public static void TryCreateDirectroryOfFile(string filePath)
+        public static bool TryCreateDirectroryOfFile(string filePath)
         {
-            Debug.Log($"CreateDirectrory {filePath}[folder_path],");
-            if (!string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath)) throw new ADException("FileC.TryCreateDirectroryOfFile arg : filePath is null or empty");
+            var dir_name = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir_name))
             {
-                var dir_name = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(dir_name))
-                {
-                    Debug.Log($"No Exists {dir_name}[dir_name],");
-                    Directory.CreateDirectory(dir_name);
-                }
-                else
-                {
-                    Debug.Log($"Exists {dir_name}[dir_name],");
-                }
+                Directory.CreateDirectory(dir_name);
+                return false;
             }
+            else return true;
         }
 
         //生成这个文件的文件路径（不包含本身）
         public static DirectoryInfo CreateDirectroryOfFile(string filePath)
         {
-            Debug.Log($"CreateDirectrory {filePath}[folder_path],");
-            if (!string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath)) throw new ADException("FileC.TryCreateDirectroryOfFile arg : filePath is null or empty");
+            var dir_name = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir_name))
             {
-                var dir_name = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(dir_name))
-                {
-                    Debug.Log($"No Exists {dir_name}[dir_name],");
-                    return Directory.CreateDirectory(dir_name);
-                }
-                else
-                {
-                    Debug.Log($"Exists {dir_name}[dir_name],");
-                    return Directory.GetParent(dir_name);
-                }
+                return Directory.CreateDirectory(dir_name);
             }
-            return null;
+            else
+            {
+                return Directory.GetParent(dir_name);
+            }
         }
 
         //移动整个路径
@@ -238,18 +222,53 @@ namespace AD.BASE
             }
         }
 
-        public static List<FileInfo> FindAll(string dictionary,string extension)
-        {
-            return FindAll(dictionary, T => Path.GetExtension(T) == extension);
-        }
-
-        public static List<FileInfo> FindAll(string dictionary, Predicate<string> _Right)
+        /// <summary>
+        /// 获取该文件夹下顶部文件夹子项中使用该扩展名的文件
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="extension"></param>
+        /// <param name="searchOption"></param>
+        /// <returns></returns>
+        public static List<FileInfo> FindAll(string dictionary, string extension, SearchOption searchOption = SearchOption.TopDirectoryOnly)
         {
             DirectoryInfo direction = new(dictionary);
-            FileInfo[] files = direction.GetFiles("*");
+            if (extension[0] == '.') extension = "*" + extension[1..];
+            else if (extension[0] != '*') extension = "*" + extension;
+            FileInfo[] files = direction.GetFiles(extension, searchOption);
+            List<FileInfo> result = new();
+            foreach (var it in files) result.Add(it);
+            return result.Count != 0 ? result : null;
+        }
+
+        /// <summary>
+        /// 获取该文件夹下顶部文件夹子项中匹配的部分（默认）
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="_Right"></param>
+        /// <param name="searchOption"></param>
+        /// <returns></returns>
+        public static List<FileInfo> FindAll(string dictionary, Predicate<string> _Right, SearchOption searchOption = SearchOption.TopDirectoryOnly)
+        {
+            DirectoryInfo direction = new(dictionary);
+            FileInfo[] files = direction.GetFiles("*", searchOption);
             List<FileInfo> result = new();
             foreach (var it in files)
                 if (_Right(it.Name)) result.Add(it);
+            return result.Count != 0 ? result : null;
+        }
+
+        /// <summary>
+        /// 获取该文件夹下全部子项（默认）
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="searchOption"></param>
+        /// <returns></returns>
+        public static List<FileInfo> FindAll(string dictionary, SearchOption searchOption = SearchOption.AllDirectories)
+        {
+            DirectoryInfo direction = new(dictionary);
+            FileInfo[] files = direction.GetFiles("*", searchOption);
+            List<FileInfo> result = new();
+            foreach (var it in files) result.Add(it);
             return result.Count != 0 ? result : null;
         }
 
@@ -281,7 +300,7 @@ namespace AD.BASE
         }
 
         public static AssetBundle LoadAssetBundle(string path)
-        { 
+        {
             return AssetBundle.LoadFromFile(path); ;
         }
 
@@ -427,7 +446,7 @@ namespace AD.BASE
 
         public static OpenFileName SelectFileOnSystem(UnityAction<string> action, string labelName, string subLabelName, params string[] fileArgs)
         {
-            OpenFileName targetFile = SelectFileOnSystem(labelName,subLabelName,fileArgs);
+            OpenFileName targetFile = SelectFileOnSystem(labelName, subLabelName, fileArgs);
             if (LocalDialog.GetOpenFileName(targetFile) && targetFile.file != "")
             {
                 action(targetFile.file);

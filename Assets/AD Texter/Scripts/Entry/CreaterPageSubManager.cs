@@ -9,7 +9,7 @@ namespace AD.Simple.Texter
     {
         public Animator animator;
         public GameObject Prefab;
-        public Canvas Canvas;
+        public Transform parent;
 
         public void Setup()
         {
@@ -24,7 +24,7 @@ namespace AD.Simple.Texter
             DataAssets assets = new(CreaterName.text, Description.text, DateTimeStr, AssetsName.text);
             ADGlobalSystem.instance.StringValues[LoadingManager.CurrentCreateNameKey] = CreaterName.text;
             ADGlobalSystem.instance.SaveNumericManager();
-            assets.Save().CreateInstance(Prefab, Canvas);
+            assets.Save().CreateInstance(Prefab, parent);
             this.gameObject.SetActive(false);
         }
 

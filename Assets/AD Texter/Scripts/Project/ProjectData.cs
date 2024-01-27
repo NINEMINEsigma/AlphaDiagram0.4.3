@@ -32,7 +32,7 @@ namespace AD.Simple.Texter
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
             FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
             var fileList = FileC.FindAll(fileListPath, ProjectItemDataPointExtension);
-            if (fileListPath != null)
+            if (fileList != null)
             {
                 foreach (var file in fileList)
                 {

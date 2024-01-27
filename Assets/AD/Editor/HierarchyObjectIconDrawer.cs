@@ -85,7 +85,7 @@ public class CustomHierarchy
     }
 }
 
-public class ToolsWindow : EditorWindow
+public class InstanceIDToolsWindow : EditorWindow
 {
     string m_ids = "";// ‰»ÎµƒInstanceID
 
@@ -144,15 +144,5 @@ public class ToolsWindow : EditorWindow
             }
         }
         GUILayout.EndVertical();
-    }
-}
-
-public class EditorMenu
-{
-    [MenuItem("Tools/ToolsWindow")]
-    static void ShowToolsWindow()
-    {
-        var window = (ToolsWindow)EditorWindow.GetWindow(typeof(ToolsWindow), false, "Tools Window");
-        window.Show();
     }
 }

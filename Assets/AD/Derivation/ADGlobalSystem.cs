@@ -570,7 +570,6 @@ namespace AD
                     File.WriteAllBytes(filePath, bytes);
                 }
             }
-            AddMessage("Output " + filePath);
         }
 
         public static bool Input(string filePath, out string str)
@@ -840,6 +839,11 @@ namespace AD
 
         public static void AddMessage(string message, string state = "")
         {
+            if (!Application.isPlaying)
+            {
+                Debug.Log(message);
+                return;
+            }
             if (instance.record.Count > 0 && instance.record[^1].message == message && instance.record[^1].state == state)
             {
                 instance.record[^1].times++;
@@ -851,6 +855,11 @@ namespace AD
 
         public static void AddWarning(string message, string state = "Warning")
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning(message);
+                return;
+            }
             if (instance.record.Count > 0 && instance.record[^1].message == message && instance.record[^1].state == state)
             {
                 instance.record[^1].times++;
@@ -862,6 +871,11 @@ namespace AD
 
         public static void AddError(string message, string state = "Error")
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogError(message);
+                return;
+            }
             if (instance.record.Count > 0 && instance.record[^1].message == message && instance.record[^1].state == state)
             {
                 instance.record[^1].times++;
@@ -873,6 +887,12 @@ namespace AD
 
         public static void AddError(string message,Exception exception, string state = "Error")
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogError(message);
+                Debug.LogException(exception);
+                return;
+            }
             if (instance.record.Count > 0 && instance.record[^1].message == message && instance.record[^1].state == state)
             {
                 instance.record[^1].times++;
@@ -884,6 +904,11 @@ namespace AD
 
         public static void ThrowLogicError(string message, string state = "LogicError")
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogError("[ LogicError ]"+ message);
+                return;
+            }
             if (instance.record.Count > 0 && instance.record[^1].message == message && instance.record[^1].state == state)
             {
                 instance.record[^1].times++;
@@ -919,27 +944,27 @@ namespace AD
 
         public static T Error<T>(string message, Exception ex, T result) where T : class, new()
         {
-            if (IsKeepException) throw new ADException(message, ex);
             AddError(message + "\nError: " + ex.Message + "\nStackTrace: " + ex.StackTrace,ex);
+            if (IsKeepException) throw new ADException(message, ex);
             return result;
         }
         public static T Error<T>(string message, Exception ex = null) where T : class, new()
         {
-            if (IsKeepException) throw new ADException(message, ex);
             AddError(message + "\nError: " + ex.Message + "\nStackTrace: " + ex.StackTrace,ex);
+            if (IsKeepException) throw new ADException(message, ex);
             return default(T);
         }
         public static T Error<T>(string message) where T : class, new()
         {
-            if (IsKeepException) throw new ADException(message);
             AddError(message);
+            if (IsKeepException) throw new ADException(message);
             return default(T);
         }
 
         public static bool Error(string message, bool result = false, Exception ex = null)
         {
-            if (IsKeepException) throw new ADException(message, ex);
             AddError(message);
+            if (IsKeepException) throw new ADException(message, ex);
             return result;
         }
 
@@ -953,6 +978,12 @@ namespace AD
         {
             if (result == null) AddError(message);
             return result;
+        }
+
+        public static T FinalCheckCanntNull<T>(T result, string message = "you obtain a null object") where T : new()
+        {
+            if (result == null) AddError(message);
+            return new();
         }
 
         public static T FinalCheckWithThrow<T>(T result, string message = "you obtain a null object")

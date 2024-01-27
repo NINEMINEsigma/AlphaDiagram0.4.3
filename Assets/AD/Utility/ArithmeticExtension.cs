@@ -50,23 +50,38 @@ namespace AD.Utility
             /// 闭包传递的源Info实例
             /// </summary>
             private ArithmeticInfo info;
+#if UNITY_EDITOR
+            private string BreakMessage;
+#endif
 
             public ArithmeticInfo BuildAnalyty(bool isUnSafe)
             {
-                //先分离函数与变量块
-                BuildVariablesAndFunctionsPriority();
-                //再执行显式括号化
-                BuildParenthesesPriority();
-                //然后根据四则运算优先级进行隐式括号化
-                BuildOperatorPriority();
-                //最终解析
-                BuildFinalArgList(isUnSafe);
+                try
+                {
+                    //先分离函数与变量块
+                    BuildVariablesAndFunctionsPriority();
+                    //再执行显式括号化
+                    BuildParenthesesPriority();
+                    //然后根据四则运算优先级进行隐式括号化
+                    BuildOperatorPriority();
+                    //最终解析
+                    BuildFinalArgList(isUnSafe);
+                }
+                catch (ArithmeticStringErrorException ex)
+                {
+                    if (ex.baseAriInfo == null) throw new ArithmeticStringErrorException(source + " { " + ex.expression + " }", info, this);
+                    else throw new ArithmeticStringErrorException(source + " { " + ex.expression + " }", ex.baseAriInfo, ex.baseAriReader);
+                }
+                catch { throw; }
                 return info;
             }
 
             private void BuildFinalArgList(bool isUnSafe)
             {
-                AD.Utility.ArithmeticInfo.ArithmeticData.Symbol currentSymbol = ArithmeticInfo.ArithmeticData.Symbol.Addition;
+#if UNITY_EDITOR
+                BreakMessage = "Start BuildFinalArgList";
+#endif
+            AD.Utility.ArithmeticInfo.ArithmeticData.Symbol currentSymbol = ArithmeticInfo.ArithmeticData.Symbol.Addition;
                 List<ArithmeticInfo.ArithmeticData> arithmeticDatas = new();
                 foreach (var subStr in subStrs)
                 {
@@ -99,6 +114,9 @@ namespace AD.Utility
                     }
                 }
                 info.ArithmeticDatas = arithmeticDatas;
+#if UNITY_EDITOR
+                BreakMessage = "End BuildFinalArgList";
+#endif
             }
 
             #region BuildVariablesAndFunctionsPriority
@@ -108,6 +126,9 @@ namespace AD.Utility
 
             private void BuildVariablesAndFunctionsPriority()
             {
+#if UNITY_EDITOR
+                BreakMessage = "Start BuildVariablesAndFunctionsPriority";
+#endif
                 int start = 0, level = 0;
                 for (int i = 0, e = source.Length; i < e; i++)
                 {
@@ -124,6 +145,9 @@ namespace AD.Utility
                     }
                 }
                 if (level != 0) throw new ArithmeticStringErrorException(source);
+#if UNITY_EDITOR
+                BreakMessage = "End BuildVariablesAndFunctionsPriority";
+#endif
             }
 
             #endregion
@@ -135,6 +159,9 @@ namespace AD.Utility
 
             private void BuildParenthesesPriority()
             {
+#if UNITY_EDITOR
+                BreakMessage = "Start BuildParenthesesPriority";
+#endif
                 int start = 0, level = 0;
                 for (int i = 0, e = source.Length; i < e; i++)
                 {
@@ -144,7 +171,7 @@ namespace AD.Utility
                     {
                         i = newIndex + 1;
                         //结尾引索不可能超过源字符串末端，但是+1后可能，所以进行一次判断
-                        if (i == e) break;
+                        if (i >= e) break;
                         current = source[i];
                     }
                     if (current == '(')
@@ -154,7 +181,8 @@ namespace AD.Utility
                             //首段初始化初层
                             //if (start == 0 && i != 0)
                             //{
-                            //    BuildSubParenthesesPriorityBlock(start, i);
+                            //    //前一位必是符号层
+                            //    BuildSubParenthesesPriorityBlock(start, i - 1);
                             //}
                             start = i;
                         }
@@ -170,14 +198,23 @@ namespace AD.Utility
                 }
                 if (level != 0) throw new ArithmeticStringErrorException(source);
                 //末段初始化初层
-                //if (start + 1 != source.Length)
+                //if (start + 2 <= source.Length)
                 //{
-                //    BuildSubParenthesesPriorityBlock(start, source.Length);
+                //    BuildSubParenthesesPriorityBlock(start + 2, source.Length);
                 //}
+#if UNITY_EDITOR
+                BreakMessage = "End BuildParenthesesPriority";
+#endif
             }
 
             private void BuildSubParenthesesPriorityBlock(int start, int end)
             {
+#if UNITY_EDITOR
+                if (start == end)
+                {
+                    ADGlobalSystem.ThrowLogicError("Start == End");
+                }
+#endif
                 ParenthesesBlock[start] = end;
             }
 
@@ -187,28 +224,28 @@ namespace AD.Utility
 
             private void BuildOperatorPriority()
             {
+#if UNITY_EDITOR
+                BreakMessage = "Start BuildOperatorPriority";
+#endif
                 int start = 0;
                 bool IsJustMD = true;
                 for (int i = 0, e = source.Length; i < e; i++)
                 {
                     char current = source[i];
                     //跳过括号化的源字符串
-                    if (ParenthesesBlock.Count > 1)
+                    if (ParenthesesBlock.TryGetValue(i, out int newIndex1))
                     {
-                        if (ParenthesesBlock.TryGetValue(i, out int newIndex1))
-                        {
-                            i = newIndex1 + 1;
-                            //结尾引索不可能超过源字符串末端，但是+1后可能，所以进行一次判断
-                            if (i == e) break;
-                            current = source[i];
-                        }
+                        i = newIndex1 + 1;
+                        //结尾引索不可能超过源字符串末端，但是+1后可能，所以进行一次判断
+                        if (i >= e) break;
+                        current = source[i];
                     }
                     //跳过变量与函数的源字符串
                     if (VariablesAndFunctionsLevelBlock.TryGetValue(i, out int newIndex0))
                     {
                         i = newIndex0 + 1;
                         //结尾引索不可能超过源字符串末端，但是+1后可能，所以进行一次判断
-                        if (i == e) break;
+                        if (i >= e) break;
                         current = source[i];
                     }
                     //处理符号位，并根据优先级合并同级
@@ -223,6 +260,10 @@ namespace AD.Utility
                     }
                 }
                 BuildSubStringExpression(start, source.Length);
+
+#if UNITY_EDITOR
+                BreakMessage = "Mid BuildOperatorPriority";
+#endif
 
                 if (!IsJustMD)
                 {
@@ -243,6 +284,10 @@ namespace AD.Utility
                     newSubStrs.Add(subStrs[^1]);
                     subStrs = newSubStrs;
                 }
+
+#if UNITY_EDITOR
+                BreakMessage = "End BuildOperatorPriority";
+#endif
 
                 void BuildOperator(ref int start, ref int i, int e)
                 {
@@ -282,7 +327,17 @@ namespace AD.Utility
     [System.Serializable]
     public class ArithmeticStringErrorException : ADException
     {
-        public ArithmeticStringErrorException(string expression) : base("Exception is about expression : " + expression) { }
+        public ArithmeticStringErrorException(string expression) : base("Exception is about expression : " + expression) { this.expression = expression; }
+        internal ArithmeticStringErrorException(string expression, ArithmeticInfo baseAriInfo, ArithmeticReader baseAriReader) : base("Exception is about expression : " + expression)
+        {
+            this.expression = expression;
+            this.baseAriInfo = baseAriInfo;
+            this.baseAriReader = baseAriReader;
+        }
+
+        public string expression;
+        public ArithmeticInfo baseAriInfo;
+        internal ArithmeticReader baseAriReader;
     }
 
     [System.Serializable]
@@ -372,7 +427,7 @@ namespace AD.Utility
             }
         }
 
-        //大写的I和小写的l根本无法区分，于是写作Unlegitimate
+        //大写的I和小写的l无法区分，于是写作Unlegitimate
         public static ArithmeticInfo GetUnlegitimateOne() => new(false);
 
         protected ArithmeticInfo(bool isLegitimate = true) { this.m_isLegitimate = isLegitimate; }
@@ -387,12 +442,10 @@ namespace AD.Utility
                 //这种情况下应当是有开头结尾是显式的括号包裹着，此时才更新处理源字符串，否则可能是(x)+(y)类似的情况，不能去掉括号
                 if (!temp.Contains('(')) expression = temp;
             }
-#if UNITY_EDITOR
-            Debug.Log("ArithmeticInfo.Parse arg : expression is { " + expression + " }");
-#endif
             //首先尝试简单解析
+            if (ArithmeticBoolen.TryParse(expression, out ArithmeticBoolen boolen)) return result = boolen;
             if (ArithmeticFunction.TryParse(expression, out ArithmeticFunction function)) return result = function;
-            if (ArithmeticVariable.TryParse(expression, out ArithmeticVariable variable)) return result = variable;
+            if (ArithmeticVariable.TryParse(expression, out ArithmeticInfo variable)) return result = variable;
             if (ArithmeticConstant.TryParse(expression, out ArithmeticConstant constant)) return result = constant;
             //非简单语句时进行以下解析
             result = new(true);
@@ -437,7 +490,6 @@ namespace AD.Utility
 
         public static implicit operator bool(ArithmeticInfo arithmeticInfo) => arithmeticInfo.isLegitimate && arithmeticInfo.m_isLegitimate;
 
-
         /// <summary>
         /// 是否是一个合法的算术表达式
         /// </summary>
@@ -456,7 +508,7 @@ namespace AD.Utility
         private ArithmeticConstant m_ArithmeticConstantValue;
         //[SerializeField] 
         private ArithmeticVariable m_ArithmeticVariableValue;
-        //[SerializeField] 
+       // [SerializeField] 
         private ArithmeticFunction m_ArithmeticFunctionValue;
         public ArithmeticConstant ArithmeticConstantValue { get => m_ArithmeticConstantValue; protected set => m_ArithmeticConstantValue = value; }
         public ArithmeticVariable ArithmeticVariableValue { get => m_ArithmeticVariableValue; protected set => m_ArithmeticVariableValue = value; }
@@ -465,6 +517,17 @@ namespace AD.Utility
         public override string ToString()
         {
             return this.ReadValue().ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ArithmeticInfo other) return other.ReadValue().Equals(this.ReadValue());
+            else return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 
@@ -504,7 +567,7 @@ namespace AD.Utility
         }
     }
 
-    [SerializeField]
+    [Serializable]
     public class ArithmeticVariable : ArithmeticInfo
     {
         [Serializable]
@@ -515,7 +578,6 @@ namespace AD.Utility
         }
 
         internal static Dictionary<string, VariableEntry> VariableConstantPairs = new();
-        [SerializeField] private ArithmeticConstant m_valueConstant;
 
         public static implicit operator float(ArithmeticVariable arithmeticVariable) => arithmeticVariable.ReadValue();
 
@@ -530,7 +592,7 @@ namespace AD.Utility
         {
             m_key = key;
             this.isLegitimate = !string.IsNullOrEmpty(key);
-            m_valueConstant = new ArithmeticConstant(value);
+            m_value = value;
             InitValue();
         }
 
@@ -548,13 +610,13 @@ namespace AD.Utility
         {
             UpdateValue();
             if (!this) throw new ArithmeticNotLegitimateException();
-            return m_valueConstant.ReadValue();
+            return m_value;
         }
 
         public void UpdateValue()
         {
             this.isLegitimate = VariableConstantPairs.TryGetValue(this.m_key, out var variableEntry);
-            if (this.isLegitimate) this.m_valueConstant = variableEntry.Value;
+            if (this.isLegitimate) this.m_value = variableEntry.Value.ReadValue();
         }
 
         private void RefValue()
@@ -562,7 +624,7 @@ namespace AD.Utility
             this.isLegitimate = VariableConstantPairs.TryGetValue(this.m_key, out var variableEntry);
             if (this.isLegitimate)
             {
-                this.m_valueConstant = variableEntry.Value;
+                this.m_value = variableEntry.Value.ReadValue();
                 variableEntry.RefIndex++;
             }
         }
@@ -570,10 +632,10 @@ namespace AD.Utility
         private void InitValue()
         {
             this.isLegitimate = !VariableConstantPairs.ContainsKey(this.m_key);
-            if (this.isLegitimate) VariableConstantPairs.Add(m_key, new VariableEntry() { RefIndex = 1, Value = this.m_valueConstant });
+            if (this.isLegitimate) VariableConstantPairs.Add(m_key, new VariableEntry() { RefIndex = 1, Value = new ArithmeticConstant(m_value) });
         }
 
-        public static bool TryParse(string expression, out ArithmeticVariable variable)
+        public static bool TryParse(string expression, out ArithmeticInfo variable)
         {
             expression = expression.Trim();
             if (expression[0] == '{' && expression[^1] == '}')
@@ -585,32 +647,69 @@ namespace AD.Utility
                     variable = null;
                     return false;
                 }
-                string[] strs = expression.Split('=');
-                if (strs.Length == 2)
-                {
-                    string name = strs[0].Trim();
-                    bool IsCanParseArgs = ArithmeticInfo.Parse(strs[1], out ArithmeticInfo temp);
-                    if (VariableConstantPairs.TryGetValue(strs[0], out var variableEntry))
-                    {
-                        if (IsCanParseArgs) variableEntry.Value.SetValue(temp.ReadValue());
-                        else throw new ArithmeticStringErrorException(expression);
-                        variable = new ArithmeticVariable(name);
-                    }
-                    else
-                    {
-                        if (!IsCanParseArgs) throw new ArithmeticStringErrorException(expression);
-                        variable = new ArithmeticVariable(name, temp.ReadValue());
-                    }
-                }
-                else variable = new ArithmeticVariable(expression);
+                variable = MakeEquals(expression) ?? IfEquals(expression) ?? new ArithmeticVariable(expression);
                 return variable;
             }
             variable = null;
             return false;
         }
+
+        private static ArithmeticInfo MakeEquals(string expression)
+        {
+            ArithmeticVariable variable = null;
+            if (!expression.Contains('=')) return null;
+            string[] strs = expression.Split('=');
+            if (strs.Length == 2)
+            {
+                string name = strs[0].Trim();
+                bool IsCanParseArgs = ArithmeticInfo.Parse(strs[1], out ArithmeticInfo temp);
+                if (!IsCanParseArgs)
+                {
+                    IsCanParseArgs = ArithmeticBoolen.TryParse(strs[1], out ArithmeticBoolen tempb);
+                    temp = tempb;
+                }
+                if (VariableConstantPairs.TryGetValue(name, out var variableEntry))
+                {
+                    if (IsCanParseArgs) variableEntry.Value.SetValue(temp.ReadValue());
+                    else throw new ArithmeticStringErrorException(expression);
+                    variable = new ArithmeticVariable(name);
+                }
+                else
+                {
+                    if (!IsCanParseArgs) throw new ArithmeticStringErrorException(expression);
+                    variable = new ArithmeticVariable(name, temp.ReadValue());
+                }
+            }
+            return variable;
+        }
+
+        private static ArithmeticInfo IfEquals(string expression)
+        {
+            ArithmeticVariable variable = null;
+            if (!expression.Contains(':')) return null;
+            string[] strs = expression.Split(':');
+            if (strs.Length == 2)
+            {
+                bool IsCanParseArgs = ArithmeticInfo.Parse(strs[1], out ArithmeticInfo temp);
+                if (VariableConstantPairs.TryGetValue(strs[0].Trim(), out var variableEntry))
+                {
+                    if (IsCanParseArgs)
+                    {
+                        if (variableEntry.Value.ReadValue() == temp.ReadValue()) return new ArithmeticBoolen(true);
+                        else return new ArithmeticBoolen(false);
+                    }
+                    else throw new ArithmeticStringErrorException(expression);
+                }
+                else
+                {
+                    throw new ArithmeticStringErrorException(expression);
+                }
+            }
+            return variable;
+        }
     }
 
-    [SerializeField]
+    [Serializable]
     public class ArithmeticFunction : ArithmeticInfo
     {
         [Serializable]
@@ -727,4 +826,42 @@ namespace AD.Utility
             return result;
         }
     }
+
+    [Serializable]
+    public class ArithmeticBoolen: ArithmeticConstant
+    {
+        public ArithmeticBoolen(bool boolen) : base(boolen ? 1 : 0) { }
+
+        public override float ReadValue()
+        {
+            return base.ReadValue() == 0 ? 0 : 1;
+        }
+
+        public virtual bool ReadBoolen()
+        {
+            return base.ReadValue() != 0;
+        }
+
+        public override string ToString()
+        {
+            return ReadBoolen() ? "true" : "false";
+        }
+
+        public static bool TryParse(string expression,out ArithmeticBoolen boolen)
+        {
+            expression = expression.Trim();
+            if(expression.Equals( "true")||expression.Equals("True")||expression.Equals("TRUE"))
+            {
+                return boolen = new ArithmeticBoolen(true);
+            }
+            else if (expression.Equals("false") || expression.Equals("False") || expression.Equals("False"))
+            {
+                return boolen = new ArithmeticBoolen(false);
+            }
+            boolen = null;
+            return false;
+        }
+    }
+
+
 }

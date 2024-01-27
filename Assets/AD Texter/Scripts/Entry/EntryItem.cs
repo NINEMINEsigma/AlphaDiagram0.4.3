@@ -29,7 +29,7 @@ namespace AD.Simple.Texter
             //coneAllegationItem.OnEnCone.AddListener(FaceAt);
             //coneAllegationItem.OnQuCone.AddListener(SetupPosition);
             //coneAllegationItem.Allegation.Items.Add(coneAllegationItem);
-            SetupPosition();
+            //SetupPosition();
             ClickButton.AddListener(OnClick);
             ClickButton.SetTitle(MyData.Name);
         }
@@ -46,14 +46,14 @@ namespace AD.Simple.Texter
 
         public static bool IsCanUpdateMove = true;
 
-        private void Update()
-        {
-            if(IsCanUpdateMove)
-            {
-                transform.position = Vector3.Lerp(transform.position, GetPos(), 0.5f);
-                FaceAt();
-            }
-        }
+        //private void Update()
+        //{
+        //    if(IsCanUpdateMove)
+        //    {
+        //        transform.position = Vector3.Lerp(transform.position, GetPos(), 0.5f);
+        //        FaceAt();
+        //    }
+        //}
 
         private Vector3 GetPos()
         {

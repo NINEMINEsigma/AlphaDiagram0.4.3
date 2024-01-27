@@ -49,7 +49,7 @@ namespace AD.Simple.Texter
         #endregion
 
         public GameObject Prefab;
-        public Canvas ParentCanvas;
+        public Transform ParentTransform;
 
         private void Start()
         {
@@ -63,7 +63,7 @@ namespace AD.Simple.Texter
             if (af == null) return;
             foreach (var single in GetDatas(af))
             {
-                single.CreateInstance(Prefab, ParentCanvas);
+                single.CreateInstance(Prefab, ParentTransform);
             }
         }
 

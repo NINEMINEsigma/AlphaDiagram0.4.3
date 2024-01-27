@@ -36,9 +36,9 @@ namespace AD.Simple.Texter
             IsAble = true;
         }
 
-        public void CreateInstance(GameObject prefab, Canvas canvas)
+        public void CreateInstance(GameObject prefab, Transform parent)
         {
-            EntryItem entryItem = GameObject.Instantiate(prefab, canvas.transform).GetComponent<EntryItem>();
+            EntryItem entryItem = GameObject.Instantiate(prefab, parent).GetComponent<EntryItem>();
             entryItem.MyData = this;
             entryItem.MyIndex = EntryItem.MaxIndex++;
         }
