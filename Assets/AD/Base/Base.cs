@@ -1,12 +1,13 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.EventSystems;
 
 namespace AD.BASE
 {
@@ -173,7 +174,7 @@ namespace AD.BASE
         public ADException() { AD__GeneratedTime = DateTime.Now; }
         public ADException(string message) : base(message) { AD__GeneratedTime = DateTime.Now; }
         public ADException(string message, Exception inner) : base(message, inner) { AD__GeneratedTime = DateTime.Now; }
-        public ADException(Exception inner) : base("Unknow error", inner) { AD__GeneratedTime = DateTime.Now; }
+        public ADException(Exception inner) : base("inner error", inner) { AD__GeneratedTime = DateTime.Now; }
         protected ADException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { AD__GeneratedTime = DateTime.Now; }
@@ -702,6 +703,8 @@ namespace AD.BASE
 
     public abstract class ADArchitecture<T> : IADArchitecture where T : ADArchitecture<T>, new()
     {
+        public static Dictionary<Type, IADArchitecture> AllArchitecture = new();
+
         #region attribute
 
         private Dictionary<Type, object> AD__Objects = new();
@@ -713,6 +716,7 @@ namespace AD.BASE
                 if (__ADinstance == null)
                 {
                     __ADinstance = new T();
+                    AllArchitecture.Add(typeof(T), __ADinstance);
                     __ADinstance.Init();
                 }
                 return __ADinstance as T;
@@ -726,6 +730,13 @@ namespace AD.BASE
                 AD__Objects.TryAdd(typeof(ADMessageRecord), new ADMessageRecord());
                 return AD__Objects[typeof(ADMessageRecord)] as ADMessageRecord;
             }
+        }
+
+        //构造函数不能public
+        protected ADArchitecture() { }
+        ~ADArchitecture()
+        {
+            AllArchitecture.Remove(typeof(T));
         }
 
         #endregion
@@ -2362,6 +2373,46 @@ namespace AD.BASE
         public static T PrefabInstantiate<T>(this T self) where T : Component
         {
             return GameObject.Instantiate(self.gameObject).GetComponent<T>();
+        }
+    }
+
+    #endregion
+
+    #region Event System Handler
+
+    public interface IADEventSystemHandler: IEventSystemHandler
+    {
+        
+    }
+
+    public static class ADEventSystemExtension
+    {
+        public static void Execute<_IADArchitecture, _IADEventSystemHandler>
+            (this _IADArchitecture architecture, GameObject target, BaseEventData data, ExecuteEvents.EventFunction<_IADEventSystemHandler> functor)
+            where _IADArchitecture : IADArchitecture
+            where _IADEventSystemHandler : IADEventSystemHandler
+        {
+            try
+            {
+                ExecuteEvents.Execute<_IADEventSystemHandler>(target, data, functor);
+            }
+            catch (ADException ex)
+            {
+                architecture.AddMessage(" [ AD Error Message ] " + ex.SerializeMessage());
+                architecture.AddMessage(" [ AD Error Stack ] " + ex.SerializeStackTrace());
+            }
+            catch (Exception ex)
+            {
+                architecture.AddMessage(" [ Unknow Error Message ] " + ex.Message);
+                architecture.AddMessage(" [ Unknow Error Stack ] " + ex.StackTrace);
+            }
+        }
+
+        public static void Execute<_IADEventSystemHandler>
+            (GameObject target, BaseEventData data, ExecuteEvents.EventFunction<_IADEventSystemHandler> functor)
+            where _IADEventSystemHandler : IADEventSystemHandler
+        {
+            ExecuteEvents.Execute<_IADEventSystemHandler>(target, data, functor);
         }
     }
 

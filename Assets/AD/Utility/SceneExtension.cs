@@ -16,6 +16,11 @@ namespace AD.Utility
     {
         #region SceneConversion
 
+        public static AsyncOperation LoadSceneAsync(this string targetname,LoadSceneMode mode = LoadSceneMode.Single)
+        {
+            return SceneManager.LoadSceneAsync(targetname, mode);
+        }
+
         public static void SceneConversion(this string targetname, LoadSceneMode mode = LoadSceneMode.Single)
         {
             SceneManager.LoadScene(targetname, mode);

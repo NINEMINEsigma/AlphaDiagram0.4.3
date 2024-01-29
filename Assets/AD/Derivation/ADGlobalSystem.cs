@@ -1155,6 +1155,32 @@ namespace AD
         }
 
         #endregion
+
+        #region Coroutine
+
+        public static CoroutineInfo OpenCoroutine(IEnumerator coroutiner)
+        {
+            return new CoroutineInfo(instance.StartCoroutine(coroutiner));
+        }
+
+        public class CoroutineInfo
+        {
+            internal CoroutineInfo(Coroutine coroutiner) { this.coroutiner = coroutiner; }
+
+            private Coroutine coroutiner;
+
+            public static CoroutineInfo Start(IEnumerator enumerator)
+            {
+                return ADGlobalSystem.OpenCoroutine(enumerator);
+            }
+
+            public void Stop()
+            {
+                ADGlobalSystem.instance.StopCoroutine(coroutiner);
+            }
+        }
+
+        #endregion
     }
 
     public static class MethodBaseExtension

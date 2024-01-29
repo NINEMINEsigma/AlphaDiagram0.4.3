@@ -10,7 +10,7 @@ namespace AD.BASE
         public string FilePath { get; private set; } = "";
         public DateTime Timestamp { get; private set; } = DateTime.UtcNow;
         public bool IsError { get; private set; } = false;
-        public bool IsEmpty { get; private set; } = true;
+        public bool IsEmpty { get; private set; } = false;
         public Exception ErrorException { get; private set; } = null;
         public bool IsSync = false;
         public bool IsKeepFileControl { get; private set; } = false;
@@ -70,51 +70,16 @@ namespace AD.BASE
 
         private void InitFileStream(bool isRefresh, bool isKeepFileControl)
         {
-            if ((IsKeepFileControl = isKeepFileControl))
+            if (this.IsKeepFileControl = isKeepFileControl)
             {
                 FileStream = new FileStream(FilePath, FileMode.Open, FileAccess.ReadWrite);
-                FileData = new byte[FileStream.Length];
-                byte[] buffer = new byte[256];
-                int len, i = 0;
-                if (isRefresh)
-                    while ((len = FileStream.Read(buffer, 0, buffer.Length)) != 0)
-                    {
-                        for (int j = 0; j < len; j++)
-                        {
-                            FileData[i++] = buffer[j];
-                        }
-                    }
             }
-            else
-            {
-                using var nFileStream = new FileStream(FilePath, FileMode.Open, FileAccess.ReadWrite);
-                FileData = new byte[nFileStream.Length];
-                byte[] buffer = new byte[256];
-                int len, i = 0;
-                if (isRefresh)
-                    while ((len = nFileStream.Read(buffer, 0, buffer.Length)) != 0)
-                    {
-                        for (int j = 0; j < len; j++)
-                        {
-                            FileData[i++] = buffer[j];
-                        }
-                    }
-            }
+            if (isRefresh) UpdateFileData();
         }
 
-        private void InitFileStream(bool isRefresh,Stream stream)
+        private void InitFileStream(bool isRefresh, Stream stream)
         {
-            FileData = new byte[stream.Length];
-            byte[] buffer = new byte[256];
-            int len, i = 0;
-            if (isRefresh)
-                while ((len = stream.Read(buffer, 0, buffer.Length)) != 0)
-                {
-                    for (int j = 0; j < len; j++)
-                    {
-                        FileData[i++] = buffer[j];
-                    }
-                }
+            if (isRefresh) UpdateFileData(stream);
         }
 
         private void SetErrorStatus(Exception ex)
@@ -126,100 +91,74 @@ namespace AD.BASE
             IsSync = false;
         }
 
-        public static string GetExtension(string path)
+        public void UpdateFileData()
         {
-            return Path.GetExtension(path);
-        }
-
-        public static void DeleteFile(string filePath)
-        {
-            if (FileExists(filePath))
-                File.Delete(filePath);
-        }
-
-        public static bool FileExists(string filePath) { return File.Exists(filePath); }
-        public static void MoveFile(string sourcePath, string destPath) { File.Move(sourcePath, destPath); }
-        public static void CopyFile(string sourcePath, string destPath) { File.Copy(sourcePath, destPath); }
-
-        public static void MoveDirectory(string sourcePath, string destPath) { Directory.Move(sourcePath, destPath); }
-        public static void CreateDirectory(string directoryPath) { Directory.CreateDirectory(directoryPath); }
-        public static bool DirectoryExists(string directoryPath) { return Directory.Exists(directoryPath); }
-
-        /*
-		 * 	Given a path, it returns the directory that path points to.
-		 * 	eg. "C:/myFolder/thisFolder/myFile.txt" will return "C:/myFolder/thisFolder".
-		 */
-        public static string GetDirectoryPath(string path, char seperator = '/')
-        {
-            //return Path.GetDirectoryName(path);
-            // Path.GetDirectoryName turns forward slashes to backslashes in some cases on Windows, which is why
-            // Substring is used instead.
-            char slashChar = UsesForwardSlash(path) ? '/' : '\\';
-
-            int slash = path.LastIndexOf(slashChar);
-            // Ignore trailing slash if necessary.
-            if (slash == (path.Length - 1))
-                slash = path.Substring(0, slash).LastIndexOf(slashChar);
-            if (slash == -1)
-                Debug.LogError("Path provided is not a directory path as it contains no slashes.");
-            return path.Substring(0, slash);
-        }
-
-        public static bool UsesForwardSlash(string path)
-        {
-            if (path.Contains("/"))
-                return true;
-            return false;
-        }
-
-        // Takes a directory path and a file or directory name and combines them into a single path.
-        public static string CombinePathAndFilename(string directoryPath, string fileOrDirectoryName)
-        {
-            if (directoryPath[directoryPath.Length - 1] != '/' && directoryPath[directoryPath.Length - 1] != '\\')
-                directoryPath += '/';
-            return directoryPath + fileOrDirectoryName;
-        }
-
-        public static string[] GetDirectories(string path, bool getFullPaths = true)
-        {
-            var paths = Directory.GetDirectories(path);
-            for (int i = 0; i < paths.Length; i++)
+            if (this.IsKeepFileControl)
             {
-                if (!getFullPaths)
-                    paths[i] = Path.GetFileName(paths[i]);
-                // GetDirectories sometimes returns backslashes, so we need to convert them to
-                // forward slashes.
-                paths[i].Replace("\\", "/");
+                UpdateFileData(FileStream);
             }
-            return paths;
-        }
-
-        public static void DeleteDirectory(string directoryPath)
-        {
-            if (DirectoryExists(directoryPath))
-                Directory.Delete(directoryPath, true);
-        }
-
-        public static string[] GetFiles(string path, bool getFullPaths = true)
-        {
-            var paths = Directory.GetFiles(path);
-            if (!getFullPaths)
+            else
             {
-                for (int i = 0; i < paths.Length; i++)
-                    paths[i] = Path.GetFileName(paths[i]);
+                using var nFileStream = new FileStream(FilePath, FileMode.Open, FileAccess.ReadWrite);
+                {
+                    UpdateFileData(nFileStream);
+                }
             }
-            return paths;
         }
 
-        public static byte[] ReadAllBytes(string path)
+        public void UpdateFileData(Stream stream)
         {
-            return File.ReadAllBytes(path);
+            FileData = new byte[stream.Length];
+            byte[] buffer = new byte[256];
+            int len, i = 0;
+            while ((len = stream.Read(buffer, 0, buffer.Length)) != 0)
+            {
+                for (int j = 0; j < len; j++)
+                {
+                    FileData[i++] = buffer[j];
+                }
+            }
         }
 
-        public static void WriteAllBytes(string path, byte[] bytes)
+        public AssetBundle LoadAssetBundle()
         {
-            File.WriteAllBytes(path, bytes);
+            return AssetBundle.LoadFromMemory(FileData);
         }
+
+        public T LoadObject<T>(bool isRefresh, Func<string, T> loader, System.Text.Encoding encoding)
+        {
+            if (isRefresh) UpdateFileData();
+            string str = encoding.GetString(FileData);
+            return loader(str);
+        }
+
+        public object LoadObject<T>(bool isRefresh, Func<string, object> loader, System.Text.Encoding encoding)
+        {
+            if (isRefresh) UpdateFileData();
+            string str = encoding.GetString(FileData);
+            return loader(str);
+        }
+
+        public T LoadObject<T>(bool isRefresh, Func<string, T> loader)
+        {
+            if (isRefresh) UpdateFileData();
+            string str = System.Text.Encoding.Default.GetString(FileData);
+            return loader(str);
+        }
+
+        public object LoadObject<T>(bool isRefresh, Func<string, object> loader)
+        {
+            if (isRefresh) UpdateFileData();
+            string str = System.Text.Encoding.Default.GetString(FileData);
+            return loader(str);
+        }
+
+        public string GetString(bool isRefresh, System.Text.Encoding encoding)
+        {
+            if (isRefresh) UpdateFileData();
+            return encoding.GetString(FileData);
+        }
+
     }
 }
 

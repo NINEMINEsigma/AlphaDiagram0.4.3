@@ -240,3 +240,16 @@ public abstract class ADUIEditor : IADUIEditor
         else HelpBox("ADUI Element Detail Will SerializeField When Playing Mode", MessageType.Info);
     }
 }
+
+public abstract class ADEditorWindow : EditorWindow
+{
+    /*
+     [MenuItem("MyWindow/Window")]
+    static void window()
+    {
+        Mybianyi mybianyi = GetWindow<Mybianyi>();
+        mybianyi.Show();
+    }
+    private void OnGUI()
+     */
+}

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace AD.Utility
 {
@@ -114,6 +116,36 @@ namespace AD.Utility
                 result += self[first++] + " ";
             }
             return result;
+        }
+
+        public static byte[] ToByteArray(this string self)
+        {
+            return self.ToByteArray(System.Text.Encoding.Default);
+        }
+
+        public static byte[] ToByteArrayUTF8(this string self)
+        {
+            return self.ToByteArray(System.Text.Encoding.UTF8);
+        }
+
+        public static byte[] ToByteArray(this string self, Encoding encoding)
+        {
+            return encoding.GetBytes(self);
+        }
+
+        public static string LoadFromMemory(byte[] bytes)
+        {
+            return LoadFromMemory(bytes, System.Text.Encoding.Default);
+        }
+
+        public static string LoadFromMemoryUTF8(byte[] bytes)
+        {
+            return LoadFromMemory(bytes, System.Text.Encoding.UTF8);
+        }
+
+        public static string LoadFromMemory(byte[] bytes, Encoding encoding)
+        {
+            return encoding.GetString(bytes);
         }
     }
 }
