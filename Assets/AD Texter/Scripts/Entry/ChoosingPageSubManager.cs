@@ -5,7 +5,7 @@ using AD.UI;
 using AD.Utility.Object;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     public class ChoosingPageSubManager : SubSceneLoader
     {

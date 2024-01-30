@@ -91,6 +91,11 @@ namespace AD.Utility
             return allGameObject.ToArray();
         }
 
+        public static AsyncOperation UnloadSceneAsync(this string self)
+        {
+            return SceneManager.UnloadSceneAsync(self);
+        }
+
         /*
         Scene scene = SceneManager.GetActiveScene();
         Debug.Log(scene.name);
@@ -115,19 +120,5 @@ namespace AD.Utility
         Debug.Log(SceneManager.sceneCount); 
         */
 
-    }
-
-    static public class AsyncOperationExtension
-    {
-        public static bool IsDone(this AsyncOperation operation, float targetProgress = 0.9f)
-        {
-            Debug.Log("now progress : " + operation.progress);
-            if (operation.progress >= targetProgress)
-            {
-                Debug.Log("The operation is complete");
-                return true;
-            }
-            else return false;
-        }
     }
 }

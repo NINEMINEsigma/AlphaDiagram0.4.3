@@ -4,7 +4,7 @@ using AD.BASE;
 using AD.Utility;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     public class LoadingManager : ADController
     {
@@ -33,8 +33,18 @@ namespace AD.Simple.Texter
         }
         public static Data.DataFile LoadDataAssets(string path)
         {
-            ADGlobalSystem.Input<Data.DataFile>(path, out object result);
-            return ADGlobalSystem.FinalCheck(result as Data.DataFile, path + " is load failed");
+            var file = new ADFile(path, false, true, false, true);
+            try
+            {
+                if (file.Deserialize<Data.DataFile>(false, System.Text.Encoding.UTF8, out object result))
+                    return ADGlobalSystem.FinalCheck(result as Data.DataFile, path + " is load failed");
+                else throw new ADException(path + " is load failed");
+            }
+            catch
+            {
+                file.Delete();
+                throw;
+            }
         }
 
         #endregion
@@ -43,7 +53,8 @@ namespace AD.Simple.Texter
 
         public static void SaveDataAssets(string fileName, DataAssets data)
         {
-            ADGlobalSystem.Output<Data.DataFile>(Path.Combine(FilePath, fileName), new(data));
+            new ADFile(Path.Combine(FilePath, fileName), true, false, false, false).Serialize<Data.DataFile>(new(data), System.Text.Encoding.UTF8, false);
+            //ADGlobalSystem.Output<Data.DataFile>(Path.Combine(FilePath, fileName), new(data));
         }
 
         #endregion

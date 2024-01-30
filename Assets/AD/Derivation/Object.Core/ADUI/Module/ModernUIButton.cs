@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using AD.BASE;
 using TMPro;
@@ -359,9 +360,17 @@ namespace AD.UI
             return this;
         }
 
+        [Obsolete]
         public void SetADGlobalSystemTargetScene()
         {
+            Debug.LogWarning("Obsolete ; please use SetupADGlobalSystemTargetSceneAndLoadScene");
             ADGlobalSystem.instance.TargetSceneName = SceneText;
+        }
+
+        public void SetupADGlobalSystemTargetSceneAndLoadScene()
+        {
+            ADGlobalSystem.instance.TargetSceneName = SceneText;
+            ADGlobalSystem.instance.OnEnd();
         }
     }
 }

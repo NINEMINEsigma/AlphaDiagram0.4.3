@@ -344,7 +344,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
       propertyPath: TargetSceneName
-      value: SettingScene
+      value: _BACK_
       objectReference: {fileID: 0}
     - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
       propertyPath: isAsyncToLoadNextScene
@@ -357,6 +357,110 @@ PrefabInstance:
     - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
       propertyPath: IntValues.Data.Array.size
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: StringValues.Data.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[0].Key
+      value: MainVolume_Percent
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[1].Key
+      value: MainVolume
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[2].Key
+      value: BackgroundVolume_Percent
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[3].Key
+      value: BackgroundVolume
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[4].Key
+      value: EffectVolume_Percent
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[5].Key
+      value: EffectVolume
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[6].Key
+      value: SongVolume_Percent
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[7].Key
+      value: SongVolume
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[8].Key
+      value: ScreenBrightness_Percent
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[9].Key
+      value: ScreenBrightness
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: StringValues.Data.Array.data[0].Key
+      value: PlayerName
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: StringValues.Data.Array.data[1].Key
+      value: CurrentCreaterName
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[0].Value
+      value: 0.49955976
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[1].Value
+      value: 9.991196
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[2].Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[3].Value
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[4].Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[5].Value
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[6].Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[7].Value
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[8].Value
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: FloatValues.Data.Array.data[9].Value
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: StringValues.Data.Array.data[0].Value
+      value: "\u7559\u767D"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
+      propertyPath: StringValues.Data.Array.data[1].Value
+      value: "\u7559\u767D"
       objectReference: {fileID: 0}
     - target: {fileID: 2167730616229911384, guid: 5ff5e20bb829e624a803702e94d45f49, type: 3}
       propertyPath: OnSceneEnd.m_PersistentCalls.m_Calls.Array.size
@@ -603,7 +707,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: buttonText
-      value: '[Back|InterfaceScene]'
+      value: Back
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
@@ -611,7 +715,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode

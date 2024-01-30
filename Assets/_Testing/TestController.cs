@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AD.UI;
 using AD.Utility;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,8 +11,8 @@ namespace TTT
     {
         public string path;
         public string objName;
-        public Texture texture;
         public AssetBundleInfo info;
+        public RawImage RawImage;
 
         public void TetsRun()
         {
@@ -24,7 +25,7 @@ namespace TTT
             info.Load(objName, T =>
             {
                 Debug.Log(T.GetType().Name);
-                texture = T as Texture;
+                RawImage.source.texture = T as Texture;
             });
         }
 

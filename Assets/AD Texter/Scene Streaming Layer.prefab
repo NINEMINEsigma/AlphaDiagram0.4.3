@@ -551,6 +551,8 @@ MonoBehaviour:
       Value: StartGame
     - Key: ProjectScene
       Value: ZoomIn
+    - Key: SettingScene
+      Value: ZoomIn
     OnAdd:
       m_PersistentCalls:
         m_Calls: []
@@ -568,6 +570,8 @@ MonoBehaviour:
     - Key: EntryScene
       Value: ZoomOut
     - Key: ProjectScene
+      Value: ZoomOut
+    - Key: SettingScene
       Value: ZoomOut
     OnAdd:
       m_PersistentCalls:

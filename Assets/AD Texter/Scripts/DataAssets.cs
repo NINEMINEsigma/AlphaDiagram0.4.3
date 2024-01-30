@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using AD.BASE;
-using AD.Simple.Texter.Data;
+using AD.Sample.Texter.Data;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     [Serializable]
     public class DataAssets : ADModel

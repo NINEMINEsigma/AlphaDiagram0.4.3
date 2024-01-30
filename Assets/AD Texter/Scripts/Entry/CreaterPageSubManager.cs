@@ -3,7 +3,7 @@ using AD.Experimental.Performance;
 using AD.UI;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     public class CreaterPageSubManager : SubSceneLoader
     {

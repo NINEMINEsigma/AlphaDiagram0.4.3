@@ -7,8 +7,14 @@ using UnityEngine.SceneManagement;
 
 namespace AD.Experimental.Performance
 {
+    public interface ISceneLoadAssets
+    {
+        void Load(string sceneName);
+        AsyncOperation Unload(string sceneName);
+    }
+
     [Serializable]
-    public class MainSceneLoadAssets
+    public class MainSceneLoadAssets: ISceneLoadAssets
     {
         public ADSerializableDictionary<string, SubSceneLoader> SubBlocks = new();
         public Scene? MainCurrent;
@@ -42,11 +48,11 @@ namespace AD.Experimental.Performance
             SceneManager.SetActiveScene(MainCurrent.GetValueOrDefault());
         }
 
-        public virtual void Unload(string sceneName)
+        public virtual AsyncOperation Unload(string sceneName)
         {
             SubBlocks[sceneName].Unload();
             SubBlocks.Remove(sceneName);
-            SceneManager.UnloadSceneAsync(sceneName);
+            return sceneName.UnloadSceneAsync();
         }
 
         public virtual void UnloadAll()

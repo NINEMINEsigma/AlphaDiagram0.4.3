@@ -4,7 +4,7 @@ using AD.BASE;
 using AD.Experimental.GameEditor;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     public class ProjectManager : ADController
     {

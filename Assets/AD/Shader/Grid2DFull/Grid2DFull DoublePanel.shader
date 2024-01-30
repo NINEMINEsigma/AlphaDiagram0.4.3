@@ -1,4 +1,4 @@
-Shader "AD/infTutorial"
+Shader "AD/infTutorialDouble"
 {
     Properties
     {
@@ -85,7 +85,7 @@ Shader "AD/infTutorial"
                 //float3 positionWS = input.nearPoint + t * (input.farPoint - input.nearPoint);
                 //half ground = step(_PlaneLevel, t);
                 float3 positionWS = input.nearPoint + t * (input.farPoint - input.nearPoint);
-                half ground = step(0, t);
+                half ground = step(-0.05, t);
 
                 float3 cameraPos = _WorldSpaceCameraPos;
                 float fromOrigin = abs(cameraPos.y);

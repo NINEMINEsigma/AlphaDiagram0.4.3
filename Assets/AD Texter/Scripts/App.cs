@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using AD.BASE;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     public class App : ADArchitecture<App>
     {

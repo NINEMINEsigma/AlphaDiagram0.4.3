@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AD Texter/Scenes/ProjectScene.unity
     guid: 57fde834e23dcbd43a9289f18383d9a3
+  - enabled: 1
+    path: Assets/AD Texter/Scenes/SettingScene.unity
+    guid: c5d8bfc41fea5ce429023d135fc56ff4
   m_configObjects: {}

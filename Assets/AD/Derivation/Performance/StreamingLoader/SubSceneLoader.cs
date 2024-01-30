@@ -11,11 +11,11 @@ namespace AD.Experimental.Performance
         public Scene Scene;
         public string SceneName;
 
-        public MainSceneLoadAssets MainLoadAssets;
+        public ISceneLoadAssets MainLoadAssets;
 
         public List<GameObject> Childs = new();
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             foreach (var child in Childs)
             {

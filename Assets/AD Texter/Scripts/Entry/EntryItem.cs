@@ -6,7 +6,7 @@ using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
 
-namespace AD.Simple.Texter
+namespace AD.Sample.Texter
 {
     public class EntryItem : MonoBehaviour
     {

@@ -1,6 +1,11 @@
 using System;
 using System.IO;
+using Newtonsoft.Json;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using System.Reflection;
+using Unity.VisualScripting;
+using static Unity.VisualScripting.Member;
 
 namespace AD.BASE
 {
@@ -18,6 +23,45 @@ namespace AD.BASE
         public Stream FileStream { get; private set; } = null;
         public byte[] FileData { get; private set; } = null;
 
+        private bool isDelete = false;
+
+        public void Delete()
+        {
+            FileC.DeleteFile(FilePath);
+            IsError = false;
+            IsEmpty = true;
+            isDelete = true;
+        }
+
+        /// <summary>
+        /// Just Use This ADFile Delete , You Can Use This Function To Create
+        /// </summary>
+        /// <param name="isRefresh"></param>
+        /// <param name="isKeepFileControl"></param>
+        /// <returns></returns>
+        public bool Create(bool isRefresh = true, bool isKeepFileControl = true)
+        {
+            if (isDelete)
+            {
+                try
+                {
+                    if (File.Exists(FilePath))
+                    {
+                        Timestamp = File.GetLastWriteTime(FilePath).ToUniversalTime();
+                    }
+                    else File.Create(FilePath);
+                    InitFileStream(isRefresh, isKeepFileControl);
+                }
+                catch (Exception ex)
+                {
+                    SetErrorStatus(ex);
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
         ~ADFile()
         {
             FileStream?.Close();
@@ -25,7 +69,7 @@ namespace AD.BASE
 
         public ADFile()
         {
-
+            SetErrorStatus(new ADException("Empty"));
         }
 
         public ADFile(string filePath, bool isTryCreate, bool isRefresh, bool isSync, bool isKeepFileControl)
@@ -157,6 +201,130 @@ namespace AD.BASE
         {
             if (isRefresh) UpdateFileData();
             return encoding.GetString(FileData);
+        }
+
+        /// <summary>
+        /// Text Mode
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="isRefresh"></param>
+        /// <param name="encoding"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public bool Deserialize<T>(bool isRefresh, System.Text.Encoding encoding, out object obj)
+        {
+            try
+            {
+                string source = GetString(isRefresh, encoding);
+                if (typeof(T).IsPrimitive)
+                {
+                    obj = typeof(T).GetMethod("Parse").Invoke(source, null);
+                    return true;
+                }
+                else if (typeof(T).GetAttribute<SerializableAttribute>() != null)
+                {
+                    obj = JsonConvert.DeserializeObject<T>(source);
+                    if (obj != null) return true;
+                    else return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                SetErrorStatus(ex);
+#if UNITY_EDITOR
+                Debug.LogError("ADFile.Deserialize<T>(bool,Encoding) : T is " + typeof(T).FullName + " , is failed on " + FilePath);
+                Debug.LogException(ex);
+#endif
+            }
+            obj = default(T);
+            return false;
+        }
+
+        /// <summary>
+        /// Binary Stream Mode(Load From Immediate Current File)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="isText"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public bool Deserialize<T>(out object obj)
+        {
+            try
+            {
+                if (FileStream != null)
+                {
+                    obj = new BinaryFormatter().Deserialize(FileStream);
+                }
+                else
+                {
+                    using FileStream fs = new(FilePath, FileMode.Open);
+                    obj = new BinaryFormatter().Deserialize(fs);
+                }
+                return obj != null;
+            }
+            catch (Exception ex)
+            {
+                SetErrorStatus(ex);
+#if UNITY_EDITOR
+                Debug.LogError("ADFile.Deserialize<T>() : T is " + typeof(T).FullName + " , is failed on " + FilePath);
+                Debug.LogException(ex);
+#endif
+                obj = default(T);
+                return false;
+            }
+        }
+
+        public bool Serialize<T>(T obj, System.Text.Encoding encoding, bool isAllowSerializeAsBinary = true)
+        {
+            try
+            {
+                if (typeof(T).GetAttribute<SerializableAttribute>() == null)
+                {
+                    Debug.LogWarning("this type is not use SerializableAttribute but you now is try to serialize it");
+                    if (!isAllowSerializeAsBinary) throw new ADException("Not Support");
+                    using MemoryStream ms = new();
+                    new BinaryFormatter().Serialize(ms, obj);
+                    byte[] bytes = ms.GetBuffer();
+                    File.WriteAllBytes(FilePath, bytes);
+                    return true;
+                }
+                else
+                {
+                    File.WriteAllText(FilePath, JsonConvert.SerializeObject(obj, Formatting.Indented), encoding);
+                    UpdateFileData();
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                SetErrorStatus(ex);
+#if UNITY_EDITOR
+                Debug.LogError("ADFile.Deserialize<T>(bool,Encoding) : T is " + typeof(T).FullName + " , is failed on " + FilePath);
+                Debug.LogException(ex);
+#endif
+                return false;
+            }
+        }
+
+        public bool Serialize<T>(T obj)
+        {
+            try
+            {
+                using MemoryStream ms = new();
+                new BinaryFormatter().Serialize(ms, obj);
+                byte[] bytes = ms.GetBuffer();
+                File.WriteAllBytes(FilePath, bytes);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                SetErrorStatus(ex);
+#if UNITY_EDITOR
+                Debug.LogError("ADFile.Deserialize<T>(bool,Encoding) : T is " + typeof(T).FullName + " , is failed on " + FilePath);
+                Debug.LogException(ex);
+#endif
+                return false;
+            }
         }
 
     }

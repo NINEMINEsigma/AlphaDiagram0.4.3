@@ -167,6 +167,8 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
+        public const string _BackSceneTargetSceneName = "_BACK_";
+
         #region Attribute
 
         private static bool AppQuitting = true;
@@ -648,10 +650,9 @@ namespace AD
             {
                 try
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    using (FileStream ms = new(filePath,FileMode.Open))
                     {
-                        BinaryFormatter formatter = new BinaryFormatter();
-                        obj = formatter.Deserialize(ms);
+                        obj = new BinaryFormatter().Deserialize(ms);
                     }
                     if (obj != null) return true;
                     else return false;
@@ -695,21 +696,8 @@ namespace AD
             }
             else
             {
-                try
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        BinaryFormatter formatter = new BinaryFormatter();
-                        obj = formatter.Deserialize(ms);
-                    }
-                    if (obj != null) return true;
-                    else return false;
-                }
-                catch
-                {
-                    obj = default(T);
-                    return false;
-                }
+                obj = default(T);
+                return false;
             }
         }
 
@@ -1003,13 +991,19 @@ namespace AD
         #region Scene
 
         public bool IsEnableSceneController = false;
+        public static string PreviousSceneName { get; private set; }
 
         [SerializeField, Tooltip("Is AsyncLoad Next Scene")] private bool isAsyncToLoadNextScene = false;
         public float WaitTime = 1.5f;
 
         public override void OnEnd()
         {
-            if (IsEnableSceneController) base.OnEnd();
+            if (IsEnableSceneController)
+            {
+                if (this.TargetSceneName == _BackSceneTargetSceneName) this.TargetSceneName = PreviousSceneName;
+                PreviousSceneName = SceneExtension.GetCurrent().name;
+                base.OnEnd();
+            }
         }
 
         public static AsyncOperation CurrentAsyncOperation;
