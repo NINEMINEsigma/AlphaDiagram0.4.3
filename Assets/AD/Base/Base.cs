@@ -2374,6 +2374,11 @@ namespace AD.BASE
         {
             return GameObject.Instantiate(self.gameObject).GetComponent<T>();
         }
+
+        public static T PrefabInstantiate<T,_PrefabType>(this _PrefabType self) where T : Component where _PrefabType : Component
+        {
+            return GameObject.Instantiate(self.gameObject).GetComponent<T>();
+        }
     }
 
     #endregion

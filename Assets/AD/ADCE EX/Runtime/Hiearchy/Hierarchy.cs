@@ -21,6 +21,14 @@ namespace AD.Experimental.GameEditor
 
         public List<ISerializeHierarchyEditor> TargetTopObjectEditors { get; private set; } = new();
 
+        public void ReplaceTop(List<ISerializeHierarchyEditor> newList)
+        {
+            TargetTopObjectEditors = newList;
+            //RefreshPanel();
+            ClearAndRefresh();
+            Architecture.GetController<Properties>().ClearAndRefresh();
+        }
+
         public void AddOnTop(ISerializeHierarchyEditor editor)
         {
             TargetTopObjectEditors.Add(editor);

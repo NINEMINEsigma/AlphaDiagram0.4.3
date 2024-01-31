@@ -51,7 +51,7 @@ namespace AD.Utility
             /// </summary>
             private ArithmeticInfo info;
 #if UNITY_EDITOR
-            private string BreakMessage;
+            public string BreakMessage;
 #endif
 
             public ArithmeticInfo BuildAnalyty(bool isUnSafe)

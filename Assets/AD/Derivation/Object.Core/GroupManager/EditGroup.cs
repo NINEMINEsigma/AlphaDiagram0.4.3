@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AD.BASE;
 using AD.UI;
 using TMPro;
 using UnityEngine;
@@ -52,8 +53,18 @@ namespace AD.Utility.Object
             if (IsHaveTitleTip)
             {
                 _Title.gameObject.SetActive(isActive);
-                if (isActive) _Title.gameObject.transform.FaceAt(core.Core.transform);
+                if (isActive && !core.Is2D) _Title.gameObject.transform.FaceAt(core.Core.transform);
+            }
+            if(isActive)
+            {
+                OnEnter?.Invoke();
+            }
+            else
+            {
+                OnExit?.Invoke();
             }
         }
+
+        public ADEvent OnEnter = new(), OnExit = new();
     }
 }

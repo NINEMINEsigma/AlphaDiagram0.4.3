@@ -1,15 +1,15 @@
-using System.Collections.Generic;
 using AD.BASE;
 using UnityEngine;
 using UnityEngine.Events;
 using Unity.VisualScripting;
+using AD.Utility;
 
 namespace AD.UI
 {
     [RequireComponent(typeof(ViewController))]
     public class CustomWindowElement : MonoBehaviour
     {
-        public Dictionary<string, RectTransform> Childs = new();
+        public ADSerializableDictionary<string, RectTransform> Childs = new();
 
         public RectTransform this[int index]
         {

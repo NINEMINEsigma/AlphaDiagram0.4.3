@@ -7,6 +7,9 @@ namespace AD.UI
 {
     public interface IBehaviourOperator { }
 
+    /// <summary>
+    /// 禁止在Awake时刻使用BehaviourContext
+    /// </summary>
     public class BehaviourContext : MonoBehaviour,
         ICanvasRaycastFilter
     {
@@ -255,6 +258,13 @@ namespace AD.UI
             return locationValid?.Invoke(sp, eventCamera) ?? true;
         }
 
+        private void Awake()
+        {
+            foreach (var item in GetComponents<IBehaviourOperator>())
+            {
+                Destroy(item.As<MonoBehaviour>());
+            }
+        }
         private void OnDestroy()
         {
             foreach (var item in GetComponents<IBehaviourOperator>())

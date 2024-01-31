@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
@@ -36,8 +37,8 @@ namespace AD.Utility
         {
             if (self.Length == 0) throw new ADException("this array is no value");
             float max = self[0];
-            foreach (var value in self) 
-                if(value > max) max = value;
+            foreach (var value in self)
+                if (value > max) max = value;
             return max;
         }
 
@@ -72,8 +73,51 @@ namespace AD.Utility
             foreach (var value in values)
             {
                 result = result || value;
+                if (result) return true;
+            }
+            return false;
+        }
+
+        public static bool ExecuteAll(params Func<bool>[] values)
+        {
+            bool result = true;
+            foreach (var value in values)
+            {
+                result = result && value();
             }
             return result;
+        }
+
+        public static bool ExecuteAny(params Func<bool>[] values)
+        {
+            bool result = false;
+            foreach (var value in values)
+            {
+                result = result || value();
+                if (result) return true;
+            }
+            return false;
+        }
+
+        public static bool ExecuteAll<T>(T input, params Func<T, bool>[] values)
+        {
+            bool result = true;
+            foreach (var value in values)
+            {
+                result = result && value(input);
+            }
+            return result;
+        }
+
+        public static bool ExecuteAny<T>(T input, params Func<T, bool>[] values)
+        {
+            bool result = false;
+            foreach (var value in values)
+            {
+                result = result || value(input);
+                if (result) return true;
+            }
+            return false;
         }
 
         public static int ExecuteCount(params bool[] values)

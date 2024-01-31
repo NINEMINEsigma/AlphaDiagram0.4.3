@@ -11,29 +11,29 @@ using System.Linq;
 namespace AD.Experimental.HosterSystem
 {
     public static class HosterExtension
-	{
-		internal static Dictionary<Type, IHosterTag> StaticTags = new();
+    {
+        internal static Dictionary<Type, IHosterTag> StaticTags = new();
 
-		public static T AddOrGetHosterComponent<T>(this IMainHoster self) where T : IHosterComponent, new()
-		{
-			return self.GetHosterComponent<T>() ?? self.AddHosterComponent<T>();
-		}
-		public static List<IHosterComponent> GetHosterComponents<Key>(this IMainHoster self) where Key : IHosterTag, new()
-		{
-			List<IHosterComponent> result = new();
-			if (StaticTags.ContainsKey(typeof(Key)))
-			{
-				IHosterTag tag = StaticTags[typeof(Key)];
-				foreach (var item in self.HosterComponents)
-				{
-					if (item.Key == tag) result.Add(item.Value);
-				}
-			}
-			return result;
-		}
-	}
+        public static T AddOrGetHosterComponent<T>(this IMainHoster self) where T : IHosterComponent, new()
+        {
+            return self.GetHosterComponent<T>() ?? self.AddHosterComponent<T>();
+        }
+        public static List<IHosterComponent> GetHosterComponents<Key>(this IMainHoster self) where Key : IHosterTag, new()
+        {
+            List<IHosterComponent> result = new();
+            if (StaticTags.ContainsKey(typeof(Key)))
+            {
+                IHosterTag tag = StaticTags[typeof(Key)];
+                foreach (var item in self.HosterComponents)
+                {
+                    if (item.Key == tag) result.Add(item.Value);
+                }
+            }
+            return result;
+        }
+    }
 
-	public class HosterSystem : MonoSystem, IMainHoster
+    public class HosterSystem : MonoSystem, IMainHoster
     {
         #region HosterSystem
 
@@ -45,10 +45,10 @@ namespace AD.Experimental.HosterSystem
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
 		public static IHosterTag ObtainKey<T>() where T : IHosterComponent, new()
-		{
-			if (StaticTags.TryGetValue(typeof(T), out Type type)) return HosterExtension.StaticTags[type];
-			else return null;
-		}
+        {
+            if (StaticTags.TryGetValue(typeof(T), out Type type)) return HosterExtension.StaticTags[type];
+            else return null;
+        }
 
         /// <summary>
         /// 从这里获取Key单例
@@ -56,10 +56,10 @@ namespace AD.Experimental.HosterSystem
         /// <param name="T"></param>
         /// <returns></returns>
 		public static IHosterTag ObtainKey(Type T)
-		{
-			if (StaticTags.TryGetValue(T, out Type type)) return HosterExtension.StaticTags[type];
-			else return null;
-		}
+        {
+            if (StaticTags.TryGetValue(T, out Type type)) return HosterExtension.StaticTags[type];
+            else return null;
+        }
 
         /// <summary>
         /// 不能撤销的调用，需要取消请自行操作StaticTags
@@ -68,22 +68,22 @@ namespace AD.Experimental.HosterSystem
         /// <typeparam name="T">HosterComponent类型</typeparam>
         /// <typeparam name="Key">Tag类型</typeparam>
         public static void RegisterKey<T, Key>() where T : IHosterComponent, new() where Key : IHosterTag, new()
-		{
-			if(StaticTags.TryAdd(typeof(T), typeof(Key)))
+        {
+            if (StaticTags.TryAdd(typeof(T), typeof(Key)))
             {
                 HosterExtension.StaticTags.Add(typeof(Key), new Key());
             }
-		}
+        }
 
-		/// <summary>
-		/// 继承并在初始化函数中注册Key
-		/// </summary>
+        /// <summary>
+        /// 继承并在初始化函数中注册Key
+        /// </summary>
         public override void Init()
-		{
+        {
             this.StartCoroutine(MakeInit());
             RegisterKey<TransformDiagram, TransformDiagramKey>();
             RegisterKey<AddDiagram, AddDiagramKey>();
-		}
+        }
 
         #endregion
 
@@ -101,7 +101,7 @@ namespace AD.Experimental.HosterSystem
 
         #region 注意，这些序号需要使用接口来获取确定的属性
 
-        public int SerializeIndex { get=>-100000; set { } }
+        public int SerializeIndex { get => -100000; set { } }
         int ICanSerializeOnCustomEditor.SerializeIndex => -100000;
         int ICanSerialize.SerializeIndex { get => -100000; set { } }
 
@@ -208,7 +208,7 @@ namespace AD.Experimental.HosterSystem
 
         protected virtual void Start()
         {
-			GameEditorApp.instance.RegisterSystem<HosterSystem>(this);
+            GameEditorApp.instance.RegisterSystem<HosterSystem>(this);
             AddHosterComponent<TransformDiagram>();
             AddHosterComponent<AddDiagram>();
         }
@@ -237,50 +237,50 @@ namespace AD.Experimental.HosterSystem
     /// 主核接口
     /// </summary>
     public interface IBaseHoster
-	{
-		void DoUpdate();
-	}
-	/// <summary>
-	/// 仅作为托管槽标识符
-	/// </summary>
-	public interface IHosterTag { }
-	/// <summary>
-	/// 将自身作为左侧面板展示器，同时作为托管对象（主类型）
-	/// </summary>
-	public interface IMainHoster : ISerializeHierarchyEditor, ICanSerializeOnCustomEditor, IBaseHoster
-	{
-		/// <summary>
-		/// 需要使用HosterSystem.ObtainKey来获取注册用的TagKey
-		/// </summary>
-		Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; }
+    {
+        void DoUpdate();
+    }
+    /// <summary>
+    /// 仅作为托管槽标识符
+    /// </summary>
+    public interface IHosterTag { }
+    /// <summary>
+    /// 将自身作为左侧面板展示器，同时作为托管对象（主类型）
+    /// </summary>
+    public interface IMainHoster : ISerializeHierarchyEditor, ICanSerializeOnCustomEditor, IBaseHoster
+    {
+        /// <summary>
+        /// 需要使用HosterSystem.ObtainKey来获取注册用的TagKey
+        /// </summary>
+        Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; }
 
-		/// <summary>
-		/// 添加类型
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		T AddHosterComponent<T>() where T : IHosterComponent, new();
+        /// <summary>
+        /// 添加类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        T AddHosterComponent<T>() where T : IHosterComponent, new();
 
-		/// <summary>
-		/// 获取类型
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		T GetHosterComponent<T>() where T : IHosterComponent, new();
+        /// <summary>
+        /// 获取类型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        T GetHosterComponent<T>() where T : IHosterComponent, new();
 
-		/// <summary>
-		/// 通过类型数组添加类型
-		/// </summary>
-		/// <param name="components"></param>
-		/// <returns>成功的数量</returns>
-		int AddHosterComponents(params Type[] components);
+        /// <summary>
+        /// 通过类型数组添加类型
+        /// </summary>
+        /// <param name="components"></param>
+        /// <returns>成功的数量</returns>
+        int AddHosterComponents(params Type[] components);
 
-		/// <summary>
-		/// 通过类型清除托管组件
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <returns></returns>
-		bool RemoveHosterComponent<T>() where T : IHosterComponent, new();
+        /// <summary>
+        /// 通过类型清除托管组件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        bool RemoveHosterComponent<T>() where T : IHosterComponent, new();
 
         /// <summary>
         /// 通过Key清除托管组件
@@ -290,54 +290,54 @@ namespace AD.Experimental.HosterSystem
         bool RemoveHosterComponentByKey<Key>() where Key : IHosterTag, new();
 
     }
-	/// <summary>
-	/// 将自身作为右侧面板展示器，同时作为托管对象的托管组件（托管对象（附））
-	/// </summary>
-	public interface IHosterComponent : ISerializePropertiesEditor, IBaseHoster
-	{
-		IMainHoster Parent { get; }
-		bool Enable { get; set; }
-		void DoSetup();
-		void DoCleanup();
-		void SetParent(IMainHoster Parent);
-	}
+    /// <summary>
+    /// 将自身作为右侧面板展示器，同时作为托管对象的托管组件（托管对象（附））
+    /// </summary>
+    public interface IHosterComponent : ISerializePropertiesEditor, IBaseHoster
+    {
+        IMainHoster Parent { get; }
+        bool Enable { get; set; }
+        void DoSetup();
+        void DoCleanup();
+        void SetParent(IMainHoster Parent);
+    }
 
     /// <summary>
     /// 继承 IMainHoster ( ISerializeHierarchyEditor, ICanSerializeOnCustomEditor, IBaseHoster )
     /// </summary>
-    public abstract class HosterBase: IMainHoster
+    public abstract class HosterBase : IMainHoster
     {
         #region EditGroup
 
         public virtual EditGroup EditGroup { get; protected set; }
 
-		public ColliderLayer SubColliderLayer => EditGroup.ColliderLayer;
-		public ViewLayer ViewLayer => EditGroup.ViewLayer;
+        public ColliderLayer SubColliderLayer => EditGroup.ColliderLayer;
+        public ViewLayer ViewLayer => EditGroup.ViewLayer;
 
-		#endregion
+        #endregion
 
-		#region IMainHoster Assets
+        #region IMainHoster Assets
 
-		public Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; set; } = new();
+        public Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; set; } = new();
         public List<IHosterComponent> NoMatchHosterComponents = new();
 
-		public List<ISerializePropertiesEditor> MatchPropertiesEditors { get; set; } = new();
-		public bool IsOpenListView { get; set; } = false;
-		public ISerializeHierarchyEditor MatchHierarchyEditor { get => this; set { throw new ADException("Not Support"); } }
+        public List<ISerializePropertiesEditor> MatchPropertiesEditors { get; set; } = new();
+        public bool IsOpenListView { get; set; } = false;
+        public ISerializeHierarchyEditor MatchHierarchyEditor { get => this; set { throw new ADException("Not Support"); } }
 
         public HierarchyItem MatchItem { get; set; }
-		public ICanSerializeOnCustomEditor MatchTarget => this;
+        public ICanSerializeOnCustomEditor MatchTarget => this;
         public ICanSerializeOnCustomEditor ParentTarget { get; set; }
 
         #region 注意，这些序号需要使用接口来获取确定的属性
 
         public virtual int SerializeIndex { get; set; }
-		int ICanSerializeOnCustomEditor.SerializeIndex => this.SerializeIndex;
+        int ICanSerializeOnCustomEditor.SerializeIndex => this.SerializeIndex;
         int ICanSerialize.SerializeIndex { get; set; }
 
-		#endregion
+        #endregion
 
-		private List<HosterBase> childs = new();
+        private List<HosterBase> childs = new();
 
         #endregion
 
@@ -409,27 +409,27 @@ namespace AD.Experimental.HosterSystem
             }
         }
 
-		public virtual void ClickOnLeft() { }
+        public virtual void ClickOnLeft() { }
 
-		public virtual void ClickOnRight() { }
+        public virtual void ClickOnRight() { }
 
-		public virtual void DoUpdate() { }
+        public virtual void DoUpdate() { }
 
         public List<ICanSerializeOnCustomEditor> GetChilds()
         {
-			return childs.GetSubList<HosterBase,ICanSerializeOnCustomEditor>();
+            return childs.GetSubList<HosterBase, ICanSerializeOnCustomEditor>();
         }
 
         public T GetHosterComponent<T>() where T : IHosterComponent, new()
         {
-			if (HosterComponents.TryGetValue(HosterSystem.ObtainKey<T>(), out var component)) return (T)component;
-			else return default;
+            if (HosterComponents.TryGetValue(HosterSystem.ObtainKey<T>(), out var component)) return (T)component;
+            else return default;
         }
 
         public abstract void OnSerialize();
 
         public bool RemoveHosterComponent<T>() where T : IHosterComponent, new()
-		{
+        {
             try
             {
                 IHosterTag key = HosterSystem.ObtainKey<T>();
@@ -457,8 +457,8 @@ namespace AD.Experimental.HosterSystem
                 }
                 ADGlobalSystem.ThrowLogicError("RemoveHosterComponent");
             }
-			return false;
-		}
+            return false;
+        }
 
         /// <summary>
         /// 补充函数
@@ -580,9 +580,9 @@ namespace AD.Experimental.HosterSystem
     /// <summary>
     /// Diagram组件的扩展实现，是PropertiesBlock（Properties面板控件）与IHosterComponent的实现
     /// </summary>
-    public abstract class BaseDiagram<T> :PropertiesBlock<T>, IHosterComponent where T:class,ICanSerializeOnCustomEditor
+    public abstract class BaseDiagram<T> : PropertiesBlock<T>, IHosterComponent where T : class, ICanSerializeOnCustomEditor
     {
-        protected BaseDiagram(string layer, int index = 0) : base( layer, index)
+        protected BaseDiagram(string layer, int index = 0) : base(layer, index)
         {
         }
 

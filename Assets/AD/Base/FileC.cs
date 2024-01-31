@@ -587,6 +587,16 @@ namespace AD.BASE
                 File.Delete(filePath);
         }
 
+        public static void CreateFile(string filePath)
+        {
+            File.Create(filePath).Close();
+        }
+
+        public static void CreateFile(string filePath, out FileStream fileStream)
+        {
+            fileStream = File.Create(filePath);
+        }
+
         public static bool FileExists(string filePath) { return File.Exists(filePath); }
         public static void MoveFile(string sourcePath, string destPath) { File.Move(sourcePath, destPath); }
         public static void CopyFile(string sourcePath, string destPath) { File.Copy(sourcePath, destPath); }

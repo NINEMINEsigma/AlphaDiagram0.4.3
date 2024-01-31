@@ -167,6 +167,8 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
+        public static string Version => "AD/0.4.3/20240201/0203";
+
         public const string _BackSceneTargetSceneName = "_BACK_";
 
         #region Attribute
@@ -460,6 +462,7 @@ namespace AD
 
         protected override void Awake()
         {
+            Debug.Log("Version : " + Version);
             if (_m_instance != null && _m_instance != this) DestroyImmediate(_m_instance.gameObject);
             _m_instance = this;
             if (IsEnableSceneController) base.Awake();

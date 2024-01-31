@@ -23,6 +23,9 @@ namespace AD.UI
         BehaviourContext Context { get; }
     }
 
+    /// <summary>
+    /// 所有ADUI组件禁止在Awake使用ADUI业务逻辑
+    /// </summary>
     [Serializable]
     public abstract class ADUI : MonoBehaviour, IADUI
     {

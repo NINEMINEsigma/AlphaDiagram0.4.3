@@ -229,6 +229,7 @@ namespace AD.Experimental.GameEditor
                 MessageInputField.gameObject.SetActive(false);
                 ExitMessagePanelTigger.gameObject.SetActive(false);
             });
+            this.SetRight(ADGlobalSystem.Version);
         }
 
         public override void Init()

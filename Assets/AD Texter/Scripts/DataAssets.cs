@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using AD.BASE;
+using AD.Experimental.GameEditor;
 using AD.Sample.Texter.Data;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace AD.Sample.Texter
@@ -97,10 +99,16 @@ namespace AD.Sample.Texter
             public string DateTime;
             public string AssetsName;
 
+            public DataFile() : this("None", "None", System.DateTime.Now.ToLongTimeString(), "None")
+            {
+
+            }
+
             public DataFile(DataAssets data) : this(data.CreaterName, data.Description, data.DateTime, data.AssetsName)
             {
             }
 
+            [JsonConstructor]
             public DataFile(string createrName, string description, string dateTime, string assetsName)
             {
                 CreaterName = createrName;

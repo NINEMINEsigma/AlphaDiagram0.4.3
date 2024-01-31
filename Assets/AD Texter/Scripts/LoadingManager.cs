@@ -33,10 +33,10 @@ namespace AD.Sample.Texter
         }
         public static Data.DataFile LoadDataAssets(string path)
         {
-            var file = new ADFile(path, false, true, false, true);
+            var file = new ADFile(false, path, false, false, true);
             try
             {
-                if (file.Deserialize<Data.DataFile>(false, System.Text.Encoding.UTF8, out object result))
+                if (file.Deserialize<Data.DataFile>(true, System.Text.Encoding.UTF8, out object result))
                     return ADGlobalSystem.FinalCheck(result as Data.DataFile, path + " is load failed");
                 else throw new ADException(path + " is load failed");
             }
@@ -53,7 +53,7 @@ namespace AD.Sample.Texter
 
         public static void SaveDataAssets(string fileName, DataAssets data)
         {
-            new ADFile(Path.Combine(FilePath, fileName), true, false, false, false).Serialize<Data.DataFile>(new(data), System.Text.Encoding.UTF8, false);
+            new ADFile(Path.Combine(FilePath, fileName), true, false, false, true).Serialize<Data.DataFile>(new(data), System.Text.Encoding.UTF8, false);
             //ADGlobalSystem.Output<Data.DataFile>(Path.Combine(FilePath, fileName), new(data));
         }
 

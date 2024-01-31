@@ -3,9 +3,8 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
-using System.Reflection;
 using Unity.VisualScripting;
-using static Unity.VisualScripting.Member;
+using AD.Utility;
 
 namespace AD.BASE
 {
@@ -27,7 +26,9 @@ namespace AD.BASE
 
         public void Delete()
         {
+            FileStream?.Close();
             FileC.DeleteFile(FilePath);
+            FileStream = null;
             IsError = false;
             IsEmpty = true;
             isDelete = true;
@@ -81,8 +82,12 @@ namespace AD.BASE
                 {
                     Timestamp = File.GetLastWriteTime(filePath).ToUniversalTime();
                 }
-                else if (!isTryCreate) SetErrorStatus(new ADException("File Cannt Found"));
-                else File.Create(filePath);
+                else if (!isTryCreate)
+                {
+                    SetErrorStatus(new ADException("File Cannt Found"));
+                    return;
+                }
+                else FileC.CreateFile(filePath);
                 IsSync = isSync;
                 InitFileStream(isRefresh, isKeepFileControl);
             }
@@ -101,8 +106,60 @@ namespace AD.BASE
                 {
                     Timestamp = File.GetLastWriteTime(filePath).ToUniversalTime();
                 }
-                else if (!isTryCreate) SetErrorStatus(new ADException("File Cannt Found"));
-                else File.Create(filePath);
+                else if (!isTryCreate)
+                {
+                    SetErrorStatus(new ADException("File Cannt Found"));
+                    return;
+                }
+                else FileC.CreateFile(filePath);
+                IsSync = isSync;
+                InitFileStream(isRefresh, stream);
+            }
+            catch (Exception ex)
+            {
+                SetErrorStatus(ex);
+            }
+        }
+
+        public ADFile(bool isCanOverwrite, string filePath, bool isRefresh, bool isSync, bool isKeepFileControl)
+        {
+            try
+            {
+                FilePath = filePath;
+                if (File.Exists(filePath))
+                {
+                    if (isCanOverwrite)
+                    {
+                        SetErrorStatus(new ADException("File Is Exists"));
+                        return;
+                    }
+                }
+                else FileC.CreateFile(filePath);
+                Timestamp = File.GetLastWriteTime(filePath).ToUniversalTime();
+                IsSync = isSync;
+                InitFileStream(isRefresh, isKeepFileControl);
+            }
+            catch (Exception ex)
+            {
+                SetErrorStatus(ex);
+            }
+        }
+
+        public ADFile(bool isCanOverwrite, string filePath, bool isRefresh, bool isSync, Stream stream)
+        {
+            try
+            {
+                FilePath = filePath;
+                if (File.Exists(filePath))
+                {
+                    if (isCanOverwrite)
+                    {
+                        SetErrorStatus(new ADException("File Is Exists"));
+                        return;
+                    }
+                }
+                else FileC.CreateFile(filePath);
+                Timestamp = File.GetLastWriteTime(filePath).ToUniversalTime();
                 IsSync = isSync;
                 InitFileStream(isRefresh, stream);
             }
@@ -290,8 +347,16 @@ namespace AD.BASE
                 }
                 else
                 {
-                    File.WriteAllText(FilePath, JsonConvert.SerializeObject(obj, Formatting.Indented), encoding);
-                    UpdateFileData();
+                    if (FileStream == null)
+                    {
+                        File.WriteAllText(FilePath, JsonConvert.SerializeObject(obj, Formatting.Indented), encoding);
+                        UpdateFileData();
+                    }
+                    else
+                    {
+                        this.FileData = encoding.GetBytes(JsonConvert.SerializeObject(obj, Formatting.Indented));
+                        FileStream.Write(this.FileData, 0, this.FileData.Length);
+                    }
                     return true;
                 }
             }
@@ -312,8 +377,9 @@ namespace AD.BASE
             {
                 using MemoryStream ms = new();
                 new BinaryFormatter().Serialize(ms, obj);
-                byte[] bytes = ms.GetBuffer();
-                File.WriteAllBytes(FilePath, bytes);
+                this.FileData = ms.GetBuffer();
+                if (FileStream == null) File.WriteAllBytes(FilePath, FileData);
+                else FileStream.Write(FileData, 0, FileData.Length);
                 return true;
             }
             catch (Exception ex)

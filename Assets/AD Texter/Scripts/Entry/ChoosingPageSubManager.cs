@@ -37,7 +37,7 @@ namespace AD.Sample.Texter
         private IEnumerator RealUnload()
         {
             CameraCore.IsLockKeyBoardDetectForMove = false;
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.75f);
             MainLoadAssets.Unload(this.SceneName);
         }
 

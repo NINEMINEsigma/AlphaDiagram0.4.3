@@ -29,6 +29,7 @@ namespace AD.Utility.Object
 
     public class CameraCore : ADController, ICanInitialize
     {
+        public bool Is2D = false;
         public Camera Core;
         [SerializeField] private TouchPanel touchPanel;
         public TouchPanel TouchPanel
@@ -102,10 +103,20 @@ namespace AD.Utility.Object
             get => Infomation.moveSpeed;
             set => Infomation.moveSpeed = value;
         }
+        public Vector3 moveSpeedVec = Vector3.one;
         public float rotionSpeed
         {
             get => Infomation.rotionSpeed;
             set => Infomation.rotionSpeed = value;
+        }
+        public Vector2 rotionSpeedVec = Vector2.one;
+
+        public float near2DPanelZ = 10, far2DPanelZ = 50;
+        public XYZA xyza = XYZA.Z;
+
+        public enum XYZA
+        {
+            X,Y,Z
         }
 
         private bool CanIDragRotating = true;
@@ -131,7 +142,7 @@ namespace AD.Utility.Object
             RayForm = Core.GetRay();
             RayForm.mask = LayerMask.GetMask("Default");
             UpdateDirty();
-            TouchPanel.OnEvent.AddListener(Rotating);
+            if (TouchPanel != null && !Is2D) TouchPanel.OnEvent.AddListener(Rotating);
         }
 
         public static bool IsLockKeyBoardDetectForMove = false;
@@ -149,15 +160,11 @@ namespace AD.Utility.Object
             {
                 //Detect Clear
                 if (IsLockKeyBoardDetectForMove == false &&
-                    PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove())) 
+                    PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove()))
                     ClearDirty();
             }
             if (
-#if UNITY_EDITOR
-                Keyboard.current.zKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame
-#else
-                Keyboard.current.leftCtrlKey.isPressed && Keyboard.current.zKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame
-#endif
+                Keyboard.current.zKey.isPressed && Keyboard.current.xKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame
                 ) UndoPast();
         }
 
@@ -178,14 +185,17 @@ namespace AD.Utility.Object
             }
         }
 
+        private Coroutine coroutiner;
+
         private void FollowMode()
         {
             if (RayBehavourForm == RayBehavour.Follow && Mouse.current.leftButton.wasPressedThisFrame && Keyboard.current.cKey.isPressed)
             {
                 if (Target != null)
                 {
-                    StopCoroutine(nameof(Move));
-                    StartCoroutine(Move());
+                    PastOneTarget = Target;
+                    if (coroutiner != null) StopCoroutine(coroutiner);
+                    coroutiner = StartCoroutine(Move());
                 }
             }
         }
@@ -235,28 +245,49 @@ namespace AD.Utility.Object
         private void Rotating(Vector2 dragVec)
         {
             if (CanIDragRotating)
-                Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(dragVec.y * Time.deltaTime * rotionSpeed).AddY(-dragVec.x * Time.deltaTime * rotionSpeed);
+                Core.transform.localEulerAngles =
+                    Core.transform.localEulerAngles
+                    .AddX(rotionSpeedVec.y * dragVec.y * Time.deltaTime * rotionSpeed)
+                    .AddY(-rotionSpeedVec.x * dragVec.x * Time.deltaTime * rotionSpeed);
         }
 
         private bool DownMove()
         {
-            if (!Keyboard.current.leftShiftKey.isPressed && !Keyboard.current.qKey.isPressed) return false;
-            Core.transform.position -= moveSpeed * Time.deltaTime * Core.transform.up;
-            return true;
+            if (Is2D)
+            {
+                if (!Keyboard.current.sKey.isPressed) return false;
+                Core.transform.position -= moveSpeedVec.y * moveSpeed * Time.deltaTime * Core.transform.up;
+                return true;
+            }
+            else
+            {
+                if (!Keyboard.current.leftShiftKey.isPressed && !Keyboard.current.qKey.isPressed) return false;
+                Core.transform.position -= moveSpeedVec.y * moveSpeed * Time.deltaTime * Core.transform.up;
+                return true;
+            }
         }
 
         private bool UpMove()
         {
-            if (!Keyboard.current.spaceKey.isPressed && !Keyboard.current.eKey.isPressed) return false;
-            Core.transform.position += moveSpeed * Time.deltaTime * Core.transform.up;
-            return true;
+            if (Is2D)
+            {
+                if (!Keyboard.current.wKey.isPressed) return false;
+                Core.transform.position += moveSpeedVec.y * moveSpeed * Time.deltaTime * Core.transform.up;
+                return true;
+            }
+            else
+            {
+                if (!Keyboard.current.spaceKey.isPressed && !Keyboard.current.eKey.isPressed) return false;
+                Core.transform.position += moveSpeedVec.y * moveSpeed * Time.deltaTime * Core.transform.up;
+                return true;
+            }
         }
 
         private bool RightMove()
         {
             if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
             {
-                Core.transform.position += moveSpeed * Time.deltaTime * Core.transform.right;
+                Core.transform.position += moveSpeedVec.x * moveSpeed * Time.deltaTime * Core.transform.right;
                 return true;
             }
             return false;
@@ -266,30 +297,131 @@ namespace AD.Utility.Object
         {
             if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
             {
-                Core.transform.position -= moveSpeed * Time.deltaTime * Core.transform.right;
+                Core.transform.position -= moveSpeedVec.x * moveSpeed * Time.deltaTime * Core.transform.right;
                 return true;
             }
             return false;
+        }
+
+        private bool When2DContronZ(Vector3 dvalue)
+        {
+            float near = near2DPanelZ, far = far2DPanelZ;
+            if (near2DPanelZ > far2DPanelZ)
+            {
+                near = far2DPanelZ;
+                far = near2DPanelZ;
+            }
+            switch (xyza)
+            {
+                case XYZA.X:
+                    {
+                        if (Core.transform.position.x + dvalue.x < near)
+                        {
+                            Core.transform.position = Core.transform.position.SetX(near);
+                            return false;
+                        }
+                    }
+                    break;
+                case XYZA.Y:
+                    {
+                        if (Core.transform.position.y + dvalue.y < near)
+                        {
+                            Core.transform.position = Core.transform.position.SetY(near);
+                            return false;
+                        }
+                    }
+                    break;
+                case XYZA.Z:
+                    {
+                        if (Core.transform.position.z + dvalue.z < near)
+                        {
+                            Core.transform.position = Core.transform.position.SetZ(near);
+                            return false;
+                        };
+                    }
+                    break;
+            }
+            switch (xyza)
+            {
+                case XYZA.X:
+                    {
+                        if (Core.transform.position.x + dvalue.x > far)
+                        {
+                            Core.transform.position = Core.transform.position.SetX(far);
+                            return false;
+                        }
+                    }
+                    break;
+                case XYZA.Y:
+                    {
+                        if (Core.transform.position.y + dvalue.y > far)
+                        {
+                            Core.transform.position = Core.transform.position.SetY(far);
+                            return false;
+                        }
+                    }
+                    break;
+                case XYZA.Z:
+                    {
+                        if (Core.transform.position.z + dvalue.z > far)
+                        {
+                            Core.transform.position = Core.transform.position.SetZ(far);
+                            return false;
+                        }
+                    }
+                    break;
+            }
+            return true;
         }
 
         private bool BackMove()
         {
-            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
+            if (Is2D)
             {
-                Core.transform.position -= moveSpeed * Time.deltaTime * Core.transform.forward;
-                return true;
+                float value = Mouse.current.scroll.ReadValue().y;
+                if (value < 0)
+                {
+                    var dvalue = 0.12f * moveSpeed * moveSpeedVec.z * Time.deltaTime * value* Core.transform.forward;
+                    if (!When2DContronZ(dvalue)) return false;
+                    Core.transform.position += dvalue ;
+                    return true;
+                }
+                return false;
             }
-            return false;
+            else
+            {
+                if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
+                {
+                    Core.transform.position -= moveSpeedVec.z * moveSpeed * Time.deltaTime * Core.transform.forward;
+                    return true;
+                }
+                return false;
+            }
         }
 
         private bool ForwardMove()
         {
-            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
+            if (Is2D)
             {
-                Core.transform.position += moveSpeed * Time.deltaTime * Core.transform.forward;
-                return true;
+                float value = Mouse.current.scroll.ReadValue().y;
+                if (value > 0)
+                {
+                    var dvalue = 0.12f * moveSpeed * moveSpeedVec.z * Time.deltaTime * value* Core.transform.forward;
+                    if (!When2DContronZ(dvalue)) return false;
+                    Core.transform.position += dvalue ;
+                    return true;
+                }
+                return false;
             }
-            return false;
+            else
+            {
+                if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
+                {
+                    Core.transform.position += moveSpeedVec.z * moveSpeed * Time.deltaTime * Core.transform.forward;
+                    return true;
+                }
+                return false;
+            }
         }
 
         #endregion
@@ -306,16 +438,42 @@ namespace AD.Utility.Object
         {
             dalte = 1;
             UpdateDirty();
-            Core.transform.LookAt(Target.transform);
-            if (Core.transform.localEulerAngles.x > 190) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(-10);
-            if (Core.transform.localEulerAngles.x < 170) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(10);
-            while (dalte > 0)
+            if (Is2D)
             {
-                dalte = Mathf.Max(0, dalte - Time.deltaTime);
-                Core.transform.position = Vector3.Lerp(Core.transform.position, PastOneTarget.transform.position - Core.transform.forward * 10, FollowCurve.Evaluate(1 - dalte));
-                yield return null;
+                Vector3 oPanelVec = Vector3.zero;
+                switch (xyza)
+                {
+                    case XYZA.X:
+                        oPanelVec = PastOneTarget.transform.position.SetX(Core.transform.position.x);
+                        break;
+                    case XYZA.Y:
+                        oPanelVec = PastOneTarget.transform.position.SetY(Core.transform.position.y);
+                        break;
+                    case XYZA.Z:
+                        oPanelVec = PastOneTarget.transform.position.SetZ(Core.transform.position.z);
+                        break;
+                }
+                while (dalte > 0)
+                {
+                    dalte = Mathf.Max(0, dalte - Time.deltaTime);
+                    Core.transform.position = Vector3.Lerp(Core.transform.position, oPanelVec, FollowCurve.Evaluate(1 - dalte));
+                    yield return null;
+                }
+                Core.transform.position = Vector3.Lerp(Core.transform.position, oPanelVec, 1);
             }
-            Core.transform.position = Vector3.Lerp(Core.transform.position, PastOneTarget.transform.position - Core.transform.forward * 10, 1);
+            else
+            {
+                Core.transform.LookAt(Target.transform);
+                if (Core.transform.localEulerAngles.x > 190) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(-10);
+                if (Core.transform.localEulerAngles.x < 170) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(10);
+                while (dalte > 0)
+                {
+                    dalte = Mathf.Max(0, dalte - Time.deltaTime);
+                    Core.transform.position = Vector3.Lerp(Core.transform.position, PastOneTarget.transform.position - Core.transform.forward * 10, FollowCurve.Evaluate(1 - dalte));
+                    yield return null;
+                }
+                Core.transform.position = Vector3.Lerp(Core.transform.position, PastOneTarget.transform.position - Core.transform.forward * 10, 1);
+            }
         }
     }
 }

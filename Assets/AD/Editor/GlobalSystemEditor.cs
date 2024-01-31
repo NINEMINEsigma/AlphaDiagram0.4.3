@@ -261,6 +261,9 @@ namespace AD
 
         public override void OnSettingsGUI()
         {
+            GUILayout.BeginHorizontal(EditorStyles.helpBox);
+            this.HelpBox(ADGlobalSystem.Version, MessageType.Info);
+            GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal(EditorStyles.helpBox);
 
