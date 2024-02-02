@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using AD.BASE;
+using AD.Experimental.SceneTrans;
 using AD.Utility;
 using UnityEngine;
 
@@ -33,7 +34,7 @@ namespace AD.Sample.Texter
         }
         public static Data.DataFile LoadDataAssets(string path)
         {
-            var file = new ADFile(false, path, false, false, true);
+            /*var file = new ADFile(false, path, false, false, false);
             try
             {
                 if (file.Deserialize<Data.DataFile>(true, System.Text.Encoding.UTF8, out object result))
@@ -42,9 +43,10 @@ namespace AD.Sample.Texter
             }
             catch
             {
-                file.Delete();
+                //file.Delete();
                 throw;
-            }
+            }*/
+            return ADGlobalSystem.Input<Data.DataFile>(path, out object result) ? result as Data.DataFile : null;
         }
 
         #endregion
@@ -53,8 +55,9 @@ namespace AD.Sample.Texter
 
         public static void SaveDataAssets(string fileName, DataAssets data)
         {
-            new ADFile(Path.Combine(FilePath, fileName), true, false, false, true).Serialize<Data.DataFile>(new(data), System.Text.Encoding.UTF8, false);
-            //ADGlobalSystem.Output<Data.DataFile>(Path.Combine(FilePath, fileName), new(data));
+            /*var file = new ADFile(Path.Combine(FilePath, fileName), true, false, false, false);
+            file.Serialize<Data.DataFile>(new(data), System.Text.Encoding.UTF8, false);*/
+            ADGlobalSystem.Output<Data.DataFile>(Path.Combine(FilePath, fileName), new(data));
         }
 
         #endregion
@@ -76,6 +79,7 @@ namespace AD.Sample.Texter
             {
                 single.CreateInstance(Prefab, ParentTransform);
             }
+            SceneTrans.instance.SceneOpenAnimation["EntryScene"] = "ZoomIn";
         }
 
         private void OnDestroy()

@@ -58,7 +58,7 @@ namespace AD.Utility
     [Serializable]
     public class TimeClocker : ICanInitialize
     {
-        [SerializeField] long clockS, clockE, clockU;
+        public long clockS, clockE, clockU;
 
         internal TimeClocker()
         {
@@ -77,21 +77,62 @@ namespace AD.Utility
             clockE = System.DateTime.Now.Ticks;
         }
 
+        /// <summary>
+        /// ms
+        /// </summary>
         public float StartTime
         {
             get => clockS / 10000.0f;
         }
+        /// <summary>
+        /// ms
+        /// </summary>
         public float LastUpdateTime
         {
             get => clockE / 10000.0f;
         }
+        /// <summary>
+        /// ms
+        /// </summary>
         public float LastDalteTime
         {
             get => clockU / 10000.0f;
         }
+        /// <summary>
+        /// ms
+        /// </summary>
         public float KeepingTime
         {
             get => (clockE - clockS) / 10000.0f;
+        }
+
+        /// <summary>
+        /// s
+        /// </summary>
+        public float StartSceond
+        {
+            get => clockS / 10.0f;
+        }
+        /// <summary>
+        /// s
+        /// </summary>
+        public float LastUpdateSceond
+        {
+            get => clockE / 10.0f;
+        }
+        /// <summary>
+        /// s
+        /// </summary>
+        public float LastDalteSceond
+        {
+            get => clockU / 10.0f;
+        }
+        /// <summary>
+        /// s
+        /// </summary>
+        public float KeepingSceond
+        {
+            get => (clockE - clockS) / 10.0f;
         }
     }
 }

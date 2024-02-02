@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using AD.BASE;
+using AD.Experimental.GameEditor;
 using AD.Sample.Texter.Data;
-using TMPro;
+using AD.Utility;
 using UnityEngine;
 
 namespace AD.Sample.Texter
@@ -22,38 +23,74 @@ namespace AD.Sample.Texter
             return ES3.Load<ProjectData_BaseMap>(ProjectItemDataExtension, file.FullName);
         }
 
-        private static void Save(AD.Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> cacheDataForm)
+        private static void Save(AD.Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> cacheDataForm, string path)
         {
-            ES3.Save<ProjectData_BaseMap>(ProjectItemDataPointExtension, cacheDataForm.MatchElementBM.Get());
+            ES3.Save<ProjectData_BaseMap>(ProjectItemDataExtension, cacheDataForm.MatchElementBM.Get(), path);
         }
 
-        public void Load()
+        public IEnumerator Load(TaskInfo loadingTask)
         {
+            TimeClocker timer = TimeExtension.GetTimer();
+
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
             FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
-            var fileList = FileC.FindAll(fileListPath, ProjectItemDataPointExtension);
+            var fileList = FileC.FindAll(fileListPath, ProjectItemDataExtension);
+            yield return new WaitForEndOfFrame();
             if (fileList != null)
             {
-                foreach (var file in fileList)
+                List<ProjectItemData> projectItemDatas = new();
+                for (int i = 0, e = fileList.Count; i < e; i++)
                 {
+                    FileInfo file = fileList[i];
+                    if (timer.LastDalteSceond > 0.1f)
+                    {
+                        loadingTask.TaskValue = (float)i / (float)e + 0.3f;
+                        yield return new WaitForEndOfFrame();
+                        timer.Update();
+                    }
                     ProjectData_BaseMap bmap = Load(file);
-                    string key = Path.GetFileNameWithoutExtension(file.Name);
+                    string key = bmap.ProjectItemID;
                     bmap.ToObject(out ProjectItemData projcetdata);
                     this.Add(
                         new AD.Experimental.Localization.Cache.CacheAssetsKey(key)
                         , new ProjectItemDataCache(key, projcetdata, bmap));
+                    projectItemDatas.Add(projcetdata);
+                }
+                for (int i = 0, e = projectItemDatas.Count; i < e; i++)
+                {
+                    ProjectItemData projcetdata = projectItemDatas[i];
+                    if (timer.LastDalteSceond > 0.1f)
+                    {
+                        loadingTask.TaskValue = (float)i / (float)e + 1.3f;
+                        yield return new WaitForEndOfFrame();
+                        timer.Update();
+                    }
+                    App.instance.OnGenerate.Invoke(projcetdata);
                 }
             }
+
+            loadingTask.TaskPercent = 1.00f;
         }
 
-        public void Save()
+        public IEnumerator Save(TaskInfo savingTask)
         {
+            TimeClocker timer = TimeExtension.GetTimer();
+
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
             FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
-            foreach (AD.Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> item in this)
+            int i = 0, e = this.Count;
+            foreach (var item in this)
             {
-                Save(item);
+                if (timer.LastDalteSceond > 0.1f)
+                {
+                    savingTask.TaskValue = (float)i / (float)e + 0.3f;
+                    yield return new WaitForEndOfFrame();
+                    timer.Update();
+                }
+                Save(item, Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName, item.MatchElementBM.Get().ProjectItemID + ProjectItemDataPointExtension));
             }
+
+            savingTask.TaskPercent = 1.00f;
         }
     }
 
@@ -119,13 +156,65 @@ namespace AD.Sample.Texter
     [Serializable]
     public class ProjectItemData : IBase<ProjectData_BaseMap>
     {
-        public long ProjectItemID;
+        public const string ProjectRootID = "ProjectRoot";
+
+        public static Dictionary<string, IProjectItemWhereNeedInitData> IDSet = new();
+
+        public static IProjectItem GetParent(string key)
+        {
+            if (key == null)
+            {
+                App.instance.AddMessage("null key when GetParent");
+                return App.instance.GetController<ProjectManager>().ProjectRootMono;
+            }
+            if (key.Equals(ProjectRootID)) return App.instance.GetController<ProjectManager>().ProjectRootMono;
+            return IDSet.TryGetValue(key, out var parent) ? parent : null;
+        }
+
+        public ProjectItemData() : this(null) { }
+        public ProjectItemData(IProjectItemWhereNeedInitData matchProjectItem) : this(matchProjectItem, "New Object", ProjectRootID, Vector2.zero) { }
+        protected ProjectItemData(IProjectItemWhereNeedInitData matchProjectItem, string projectItemID, string parentItemID, Vector2 projectItemPosition)
+        {
+            MatchProjectItem = matchProjectItem;
+            ProjectItemID = projectItemID;
+            ParentItemID = parentItemID == null ? ProjectItemData.ProjectRootID : projectItemID;
+            ProjectItemPosition = projectItemPosition;
+        }
+        ~ProjectItemData()
+        {
+            IDSet.Remove(ProjectItemID);
+        }
+
+        public IProjectItemWhereNeedInitData MatchProjectItem;
+        private string projectItemID;
+        public string ProjectItemID
+        {
+            get => projectItemID;
+            set
+            {
+                if (projectItemID == value) return;
+                else
+                {
+                    int counter = 1;
+                    string newID = value;
+                    while (IDSet.ContainsKey(newID))
+                    {
+                        newID = value + $"({counter})";
+                    }
+                    if (projectItemID != null) IDSet.Remove(projectItemID);
+                    IDSet.Add(newID, this.MatchProjectItem);
+                    projectItemID = newID;
+                }
+            }
+        }
+        public string ParentItemID;
+        public Vector2 ProjectItemPosition;
 
         #region IBase
 
         public bool FromMap(IBaseMap from)
         {
-            if(from is ProjectData_BaseMap projectData_BaseMap)
+            if (from is ProjectData_BaseMap projectData_BaseMap)
             {
                 return FromMap(projectData_BaseMap);
             }
@@ -140,12 +229,24 @@ namespace AD.Sample.Texter
 
         #endregion
 
+        /// <summary>
+        /// Base is useful
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
         public virtual bool FromMap(ProjectData_BaseMap from)
         {
             this.ProjectItemID = from.ProjectItemID;
+            this.ParentItemID = from.ParentItemID == null ? ProjectItemData.ProjectRootID : from.ProjectItemID;
+            this.ProjectItemPosition = from.ProjectItemPosition;
             return true;
         }
 
+        /// <summary>
+        /// Base is NotImplementedException
+        /// </summary>
+        /// <param name="BM"></param>
+        /// <exception cref="NotImplementedException"></exception>
         public virtual void ToMap(out ProjectData_BaseMap BM)
         {
             throw new NotImplementedException();
@@ -158,7 +259,9 @@ namespace AD.Sample.Texter
         [Serializable]
         public class ProjectData_BaseMap : IBaseMap<ProjectItemData>
         {
-            public long ProjectItemID;
+            public string ProjectItemID;
+            public string ParentItemID;
+            public Vector2 ProjectItemPosition;
 
             #region NotSupport
 
@@ -178,7 +281,7 @@ namespace AD.Sample.Texter
 
             public bool FromObject(IBase from)
             {
-                if(from is ProjectItemData projectItemData)
+                if (from is ProjectItemData projectItemData)
                 {
                     return FromObject(projectItemData);
                 }
@@ -195,14 +298,26 @@ namespace AD.Sample.Texter
 
             #region IBaseMap<ProjectItemData>
 
+            /// <summary>
+            /// Base is NotImplementedException
+            /// </summary>
+            /// <param name="obj"></param>
+            /// <exception cref="NotImplementedException"></exception>
             public virtual void ToObject(out ProjectItemData obj)
             {
                 throw new NotImplementedException();
             }
 
+            /// <summary>
+            /// Base is useful
+            /// </summary>
+            /// <param name="from"></param>
+            /// <returns></returns>
             public virtual bool FromObject(ProjectItemData from)
             {
                 this.ProjectItemID = from.ProjectItemID;
+                this.ParentItemID = from.ParentItemID == null ? ProjectItemData.ProjectRootID : from.ProjectItemID;
+                this.ProjectItemPosition = from.ProjectItemPosition;
                 return true;
             }
 

@@ -146,6 +146,7 @@ namespace AD.Utility.Object
         }
 
         public static bool IsLockKeyBoardDetectForMove = false;
+        public bool IsLockKeyBoardDetectForMoveMyselfClone;
 
         public void SetCameraCoreLockKeyBoardDetect(bool boolen)
         {
@@ -154,6 +155,7 @@ namespace AD.Utility.Object
 
         void Update()
         {
+            IsLockKeyBoardDetectForMoveMyselfClone = IsLockKeyBoardDetectForMove;
             NotNoneMode(); FollowMode(); ClearCatch();
             CheakCanIRotating();
             if (Mouse.current.leftButton.isPressed == false)

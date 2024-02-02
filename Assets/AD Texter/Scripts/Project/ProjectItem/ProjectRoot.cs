@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
@@ -8,15 +7,14 @@ using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-namespace AD.Sample.Texter
+namespace AD.Sample.Texter.Project
 {
-    public class ProjectRoot : MonoBehaviour, IProjectItemRoot, IProjectItem
+    public class ProjectRoot : MonoBehaviour, IProjectItemRoot
     {
         public class ProjectRootBlock : ProjectItemBlock
         {
-            public ProjectRootBlock(ProjectRoot target)
+            public ProjectRootBlock(ProjectRoot target) : base(target)
             {
                 that = target;
             }
@@ -29,8 +27,25 @@ namespace AD.Sample.Texter
                 this.MatchItem.SetTitle("Project Assets");
                 PropertiesLayout.Label(data.CreaterName, "Project Creater");
                 PropertiesLayout.Label(data.DateTime, "Project Created Time");
-                PropertiesLayout.InputField(data.Description, "Project Description");
+                var inputD = PropertiesLayout.InputField(data.Description, "Project Description");
                 PropertiesLayout.Label(data.AssetsName, "Project Assets Time");
+                PropertiesLayout.Button("Description", "Enter Description On A Bigger Field", () =>
+                {
+                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>()
+                    .ObtainElement(new Vector2(800, 600));
+                    var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
+                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(800, 600);
+                    temp
+                    .SetADUIOnWindow<ModernUIInputField>("Field", mif)
+                    .SetText(data.Description)
+                    .AddListener(T =>
+                    {
+                        data.Description = T;
+                        inputD.text = T;
+                        temp.BackPool();
+                    });
+                });
+                PropertiesLayout.Button("Save", "Save Project Assets", () => data.Save());
             }
         }
 
@@ -40,14 +55,22 @@ namespace AD.Sample.Texter
 
         public int SerializeIndex => 0;
 
+        public List<GameObject> SubProjectItemPrefab = new();
+
         private void Start()
         {
-            MatchHierarchyEditor = new HierarchyBlock<ProjectRoot>(this, nameof(ProjectRoot));
+            MatchHierarchyEditor = new HierarchyBlock<ProjectRoot>(this, nameof(ProjectRoot).Translate());
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
             {
-                new ProjectRootBlock(this)
+                new ProjectRootBlock(this),
+                new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
             };
             GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
+        }
+
+        public void SetupChild(IProjectItem child)
+        {
+            child.As<MonoBehaviour>().transform.position = this.transform.position + new Vector3(5, 0, 0);
         }
 
         public void ClickOnLeft()
@@ -60,12 +83,12 @@ namespace AD.Sample.Texter
 
         }
 
-        public List<IProjectItem> Childs = new();
-        public List<ICanSerializeOnCustomEditor> GetChilds() => Childs.GetSubList<IProjectItem, ICanSerializeOnCustomEditor>();
+        public List<ICanSerializeOnCustomEditor> Childs = new();
+        public List<ICanSerializeOnCustomEditor> GetChilds() => Childs;
 
         public bool IsAbleDisplayedOnHierarchyAtTheSameTime(Type type)
         {
-            return false;
+            return true;
         }
 
         public void SaveProjectSourceData_ReturnVoid()
@@ -78,13 +101,13 @@ namespace AD.Sample.Texter
             try
             {
                 CurrentDataAssets.Save();
-                ADGlobalSystem.AddMessage(nameof(SaveProjectSourceData), "Save");
+                ADGlobalSystem.AddMessage(nameof(ProjectRoot), "Save");
                 App.instance.AddMessage("Save Project Source Data Successful");
                 return true;
             }
             catch(Exception ex)
             {
-                ADGlobalSystem.AddError(nameof(SaveProjectSourceData), ex);
+                ADGlobalSystem.AddError(nameof(ProjectRoot), ex);
                 App.instance.AddMessage("Save Project Source Data Failed");
                 return false;
             }
@@ -96,8 +119,10 @@ namespace AD.Sample.Texter
 
         public void SaveDataForStaticEditorBar()
         {
-            if (!SaveData(out var badSaveItems)) 
+            if (!SaveData(out var badSaveItems))
                 badSaveItemsObjects = badSaveItems.GetSubList<GameObject, IProjectItem>(T => T is MonoBehaviour, T => T.As<MonoBehaviour>().gameObject);
+            else
+                App.instance.GetController<ProjectManager>().SaveProjectData();
         }
 
         public bool SaveData(out List<IProjectItem> badSaveItems)
@@ -108,7 +133,7 @@ namespace AD.Sample.Texter
                 bool result = true;
                 foreach (var child in Childs)
                 {
-                    result = child.SaveData(out List<IProjectItem> temp) && result;
+                    result = child.As<IProjectItem>().SaveData(out List<IProjectItem> temp) && result;
                     if (temp != null)
                     {
                         if (badSaveItems == null) badSaveItems = temp;

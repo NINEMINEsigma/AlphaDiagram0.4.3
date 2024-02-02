@@ -1,6 +1,5 @@
 using System.Collections;
 using AD.Experimental.Performance;
-using AD.Experimental.SceneTrans;
 using AD.UI;
 using AD.Utility.Object;
 using UnityEngine;
@@ -23,7 +22,6 @@ namespace AD.Sample.Texter
                 assets.Description = Description.text;
                 assets.Save();
                 ADGlobalSystem.instance.OnEnd();
-                SceneTrans.instance.SceneOpenAnimation["EntryScene"] = "ZoomIn";
             });
             CameraCore.IsLockKeyBoardDetectForMove = true;
         }

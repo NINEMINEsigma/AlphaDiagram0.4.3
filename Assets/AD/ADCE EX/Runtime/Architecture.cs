@@ -109,6 +109,14 @@ namespace AD.Experimental.GameEditor
         }
     }
 
+    public class RefreshPropertiesPanel : ADCommand
+    {
+        public override void OnExecute()
+        {
+            Architecture.GetController<Hierarchy>().RefreshPanel();
+        }
+    }
+
     public interface ICanSerialize
     {
         void OnSerialize();

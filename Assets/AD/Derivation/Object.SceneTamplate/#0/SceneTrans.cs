@@ -76,14 +76,12 @@ namespace AD.Experimental.SceneTrans
         {
             if (SceneOpenAnimation.TryGetValue(SceneExtension.GetCurrent().name, out var openAnimtion))
             {
-                Animator.Play("Idle");
                 Animator.Play(openAnimtion);
             }
             sceneBase.OnSceneEnd.AddListener(() =>
             {
                 if (SceneCloseAnimation.TryGetValue(SceneExtension.GetCurrent().name, out var targetAnimation))
                 {
-                    Animator.Play("Idle");
                     Animator.Play(targetAnimation);
                 }
             });
@@ -95,12 +93,10 @@ namespace AD.Experimental.SceneTrans
         {
             if (SceneOpenAnimation.TryGetValue(key, out var openAnimtion))
             {
-                Animator.Play("Idle");
                 Animator.Play(openAnimtion);
             }
             else if (SceneCloseAnimation.TryGetValue(key, out var closeAnimtion))
             {
-                Animator.Play("Idle");
                 Animator.Play(closeAnimtion);
             }
         }
@@ -114,6 +110,18 @@ namespace AD.Experimental.SceneTrans
             {
                 closeAction.Invoke();
             }
+        }
+
+        public void Replace(string key,string value)
+        {
+            if (SceneOpenAnimation.ContainsKey(key)) SceneOpenAnimation[key] = value;
+            if (SceneCloseAnimation.ContainsKey(key)) SceneCloseAnimation[key] = value;
+        }
+
+        public void Replace(string key, ADEvent value)
+        {
+            if (SceneOpenEvent.ContainsKey(key)) SceneOpenEvent[key] = value;
+            if (SceneCloseEvent.ContainsKey(key)) SceneCloseEvent[key] = value;
         }
     }
 }

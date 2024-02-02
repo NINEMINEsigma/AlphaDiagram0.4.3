@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
+using AD.Experimental.SceneTrans;
+using AD.Sample.Texter.Project;
 using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
@@ -88,12 +90,14 @@ namespace AD.Sample.Texter
 
         [Header("Assets")]
         public Transform ProjectTransformRoot;
+        public ProjectRoot ProjectRootMono;
         [Header("Prefab")]
         public PrefabModel ProjectPrefabModel;
 
         private void Start()
         {
             App.instance.RegisterController(this);
+            App.instance.OnGenerate.AddListener(T => this.OnGenerate.Invoke(T));
         }
 
         private void OnDestroy()
@@ -101,13 +105,26 @@ namespace AD.Sample.Texter
             Architecture.UnRegister<ProjectManager>();
         }
 
+        private void OnApplicationQuit()
+        {
+            App.instance.SaveRecord();
+        }
+
+        private TaskInfo loadingTask, savingTask;
+
         public override void Init()
+        {
+            loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
+            loadingTask.Register();
+            StartCoroutine(LoadEveryOne(loadingTask));
+        }
+
+        private IEnumerator LoadEveryOne(TaskInfo loadingTask)
         {
             CurrentProjectData = new()
             {
                 DataAssetsForm = Architecture.GetModel<DataAssets>()
             };
-            CurrentProjectData.Load();
             if(Architecture.Contains<ProjectLoadEntry>())
             {
                 //更新
@@ -119,11 +136,30 @@ namespace AD.Sample.Texter
             }
             ProjectPrefabModel.Root = ProjectTransformRoot;
             Architecture.RegisterModel(ProjectPrefabModel);
+
+            loadingTask.TaskValue = 0.1f;
+            yield return new WaitForSeconds(1f);
+            loadingTask.TaskValue = 0.3f;
+
+            yield return CurrentProjectData.Load(loadingTask);
+
         }
 
         public void SaveProjectData()
         {
-            CurrentProjectData.Save();
+            if(loadingTask!=null)
+            {
+                loadingTask.UnRegister();
+                loadingTask = null;
+            }
+            if (savingTask != null)
+            {
+                savingTask.UnRegister();
+                savingTask = null;
+            }
+            savingTask = new TaskInfo("Project Saving", 0, 0, new Vector2(0, 1f), false);
+            savingTask.Register();
+            StartCoroutine(CurrentProjectData.Save(savingTask));
         }
 
         public void BackToEntry()
@@ -145,5 +181,7 @@ namespace AD.Sample.Texter
             Architecture.RegisterModel(Architecture.GetModel<ProjectLoadEntry>());
             ADGlobalSystem.instance.OnEnd();
         }
+
+        public ADEvent<ProjectItemData> OnGenerate = new();
     }
 }

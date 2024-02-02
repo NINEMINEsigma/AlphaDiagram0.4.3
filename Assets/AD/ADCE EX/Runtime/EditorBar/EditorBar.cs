@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.UI;
-using Ichni;
 using UnityEngine;
 
 namespace AD.Experimental.GameEditor

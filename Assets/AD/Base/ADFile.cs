@@ -4,13 +4,14 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Unity.VisualScripting;
-using AD.Utility;
 
 namespace AD.BASE
 {
     [Serializable]
-    public sealed class ADFile
+    public sealed class ADFile : IDisposable
     {
+        public static implicit operator bool(ADFile file) => file.ErrorException != null && !file.IsEmpty;
+
         public string FilePath { get; private set; } = "";
         public DateTime Timestamp { get; private set; } = DateTime.UtcNow;
         public bool IsError { get; private set; } = false;
@@ -19,16 +20,16 @@ namespace AD.BASE
         public bool IsSync = false;
         public bool IsKeepFileControl { get; private set; } = false;
 
-        public Stream FileStream { get; private set; } = null;
+        private Stream FileStream;
         public byte[] FileData { get; private set; } = null;
 
         private bool isDelete = false;
 
         public void Delete()
         {
-            FileStream?.Close();
+            this.Dispose();
             FileC.DeleteFile(FilePath);
-            FileStream = null;
+            ErrorException = null;
             IsError = false;
             IsEmpty = true;
             isDelete = true;
@@ -65,7 +66,7 @@ namespace AD.BASE
 
         ~ADFile()
         {
-            FileStream?.Close();
+            Dispose();
         }
 
         public ADFile()
@@ -190,17 +191,30 @@ namespace AD.BASE
             this.ErrorException = ex;
             Timestamp = DateTime.UtcNow;
             IsSync = false;
+            Debug.LogException(ex);
+        }
+
+        private bool DebugMyself()
+        {
+            if (this.IsEmpty || this.ErrorException != null)
+            {
+                Debug.LogError("This File Was Drop in Error");
+                Debug.LogException(ErrorException);
+                return true;
+            }
+            return false;
         }
 
         public void UpdateFileData()
         {
+            if (DebugMyself()) return;
             if (this.IsKeepFileControl)
             {
                 UpdateFileData(FileStream);
             }
             else
             {
-                using var nFileStream = new FileStream(FilePath, FileMode.Open, FileAccess.ReadWrite);
+                using (var nFileStream = new FileStream(FilePath, FileMode.Open, FileAccess.ReadWrite))
                 {
                     UpdateFileData(nFileStream);
                 }
@@ -209,6 +223,7 @@ namespace AD.BASE
 
         public void UpdateFileData(Stream stream)
         {
+            if (DebugMyself()) return;
             FileData = new byte[stream.Length];
             byte[] buffer = new byte[256];
             int len, i = 0;
@@ -223,11 +238,13 @@ namespace AD.BASE
 
         public AssetBundle LoadAssetBundle()
         {
+            if (DebugMyself()) return null;
             return AssetBundle.LoadFromMemory(FileData);
         }
 
         public T LoadObject<T>(bool isRefresh, Func<string, T> loader, System.Text.Encoding encoding)
         {
+            if (DebugMyself()) return default;
             if (isRefresh) UpdateFileData();
             string str = encoding.GetString(FileData);
             return loader(str);
@@ -235,6 +252,7 @@ namespace AD.BASE
 
         public object LoadObject<T>(bool isRefresh, Func<string, object> loader, System.Text.Encoding encoding)
         {
+            if (DebugMyself()) return null;
             if (isRefresh) UpdateFileData();
             string str = encoding.GetString(FileData);
             return loader(str);
@@ -242,6 +260,7 @@ namespace AD.BASE
 
         public T LoadObject<T>(bool isRefresh, Func<string, T> loader)
         {
+            if (DebugMyself()) return default;
             if (isRefresh) UpdateFileData();
             string str = System.Text.Encoding.Default.GetString(FileData);
             return loader(str);
@@ -249,6 +268,7 @@ namespace AD.BASE
 
         public object LoadObject<T>(bool isRefresh, Func<string, object> loader)
         {
+            if (DebugMyself()) return null;
             if (isRefresh) UpdateFileData();
             string str = System.Text.Encoding.Default.GetString(FileData);
             return loader(str);
@@ -256,6 +276,7 @@ namespace AD.BASE
 
         public string GetString(bool isRefresh, System.Text.Encoding encoding)
         {
+            if (DebugMyself()) return null;
             if (isRefresh) UpdateFileData();
             return encoding.GetString(FileData);
         }
@@ -270,9 +291,15 @@ namespace AD.BASE
         /// <returns></returns>
         public bool Deserialize<T>(bool isRefresh, System.Text.Encoding encoding, out object obj)
         {
+            if (DebugMyself())
+            {
+                obj = ErrorException;
+                return false;
+            }
+            string source = "";
             try
             {
-                string source = GetString(isRefresh, encoding);
+                source = GetString(isRefresh, encoding);
                 if (typeof(T).IsPrimitive)
                 {
                     obj = typeof(T).GetMethod("Parse").Invoke(source, null);
@@ -289,7 +316,7 @@ namespace AD.BASE
             {
                 SetErrorStatus(ex);
 #if UNITY_EDITOR
-                Debug.LogError("ADFile.Deserialize<T>(bool,Encoding) : T is " + typeof(T).FullName + " , is failed on " + FilePath);
+                Debug.LogError("ADFile.Deserialize<T>(bool,Encoding) : T is " + typeof(T).FullName + " , is failed on " + FilePath + "\nsource : " + source);
                 Debug.LogException(ex);
 #endif
             }
@@ -306,9 +333,14 @@ namespace AD.BASE
         /// <returns></returns>
         public bool Deserialize<T>(out object obj)
         {
+            if (DebugMyself())
+            {
+                obj = ErrorException;
+                return false;
+            }
             try
             {
-                if (FileStream != null)
+                if (IsKeepFileControl)
                 {
                     obj = new BinaryFormatter().Deserialize(FileStream);
                 }
@@ -333,6 +365,10 @@ namespace AD.BASE
 
         public bool Serialize<T>(T obj, System.Text.Encoding encoding, bool isAllowSerializeAsBinary = true)
         {
+            if (DebugMyself())
+            {
+                return false;
+            }
             try
             {
                 if (typeof(T).GetAttribute<SerializableAttribute>() == null)
@@ -341,21 +377,28 @@ namespace AD.BASE
                     if (!isAllowSerializeAsBinary) throw new ADException("Not Support");
                     using MemoryStream ms = new();
                     new BinaryFormatter().Serialize(ms, obj);
-                    byte[] bytes = ms.GetBuffer();
-                    File.WriteAllBytes(FilePath, bytes);
+                    FileData = ms.GetBuffer();
+                    if (IsKeepFileControl)
+                    {
+                        FileStream.Write(FileData, 0, FileData.Length);
+                    }
+                    else
+                    {
+                        File.WriteAllBytes(FilePath, FileData);
+                    }
                     return true;
                 }
                 else
                 {
-                    if (FileStream == null)
-                    {
-                        File.WriteAllText(FilePath, JsonConvert.SerializeObject(obj, Formatting.Indented), encoding);
-                        UpdateFileData();
-                    }
-                    else
+                    if (IsKeepFileControl)
                     {
                         this.FileData = encoding.GetBytes(JsonConvert.SerializeObject(obj, Formatting.Indented));
                         FileStream.Write(this.FileData, 0, this.FileData.Length);
+                    }
+                    else
+                    {
+                        File.WriteAllText(FilePath, JsonConvert.SerializeObject(obj, Formatting.Indented), encoding);
+                        UpdateFileData();
                     }
                     return true;
                 }
@@ -373,13 +416,24 @@ namespace AD.BASE
 
         public bool Serialize<T>(T obj)
         {
+            if (DebugMyself())
+            {
+                return false;
+            }
             try
             {
                 using MemoryStream ms = new();
                 new BinaryFormatter().Serialize(ms, obj);
                 this.FileData = ms.GetBuffer();
-                if (FileStream == null) File.WriteAllBytes(FilePath, FileData);
-                else FileStream.Write(FileData, 0, FileData.Length);
+                FileData = ms.GetBuffer();
+                if (IsKeepFileControl)
+                {
+                    FileStream.Write(FileData, 0, FileData.Length);
+                }
+                else
+                {
+                    File.WriteAllBytes(FilePath, FileData);
+                }
                 return true;
             }
             catch (Exception ex)
@@ -393,6 +447,33 @@ namespace AD.BASE
             }
         }
 
+        public void Close()
+        {
+            if (IsKeepFileControl)
+            {
+                FileStream?.Close();
+                FileStream?.Dispose();
+                FileStream = null;
+                IsKeepFileControl = false;
+                IsError = false;
+                IsEmpty = true;
+            }
+        }
+
+        public void Keep()
+        {
+            if (!IsKeepFileControl)
+            {
+                Close();
+                InitFileStream(false, true);
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Close();
+            this.FileData = null;
+        }
     }
 }
 

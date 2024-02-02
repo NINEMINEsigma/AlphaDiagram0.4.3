@@ -421,7 +421,7 @@ namespace AD.Experimental.Localization.Cache
             datas.Remove(key);
         }
 
-
+        public int Count => datas.Count;
 
     }
 
