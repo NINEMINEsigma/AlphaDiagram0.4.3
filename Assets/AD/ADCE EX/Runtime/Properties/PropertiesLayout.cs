@@ -236,12 +236,12 @@ namespace AD.Experimental.GameEditor
         {
             var cat = GUIField("InputField(UI)", message).As<InputField>().SetText(text);
             cat.SetPlaceholderText(placeholderText);
-            return cat;
+            return cat as InputField;
         }
         public static InputField InputField(string text, string message)
         {
             var cat = GUIField("InputField(UI)", message).As<InputField>().SetText(text);
-            return cat;
+            return cat as InputField;
         }
 
         public static IBoolButton BoolButton(string label, bool isModernUI, bool initBool, string message, UnityAction<bool> action)
@@ -490,7 +490,7 @@ namespace AD.Experimental.GameEditor
         public static ModernUIInputField ModernUIInputField(string text, string message)
         {
             var cat = GUIField("InputField(ModernUI)", message).As<ModernUIInputField>().SetText(text);
-            return cat;
+            return cat as ModernUIInputField;
         }
 
         //ListView

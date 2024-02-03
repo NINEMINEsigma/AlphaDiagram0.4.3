@@ -1,9 +1,11 @@
 using AD.BASE;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace AD.UI
 {
-    public class ModernUIInputField : PropertyModule,INumericManager<string>
+    public class ModernUIInputField : PropertyModule,INumericManager<string>, IInputField
     {
         public ModernUIInputField()
         {
@@ -21,6 +23,7 @@ namespace AD.UI
                 return _Source;
             }
         }
+        public TMP_InputField source => Source.source;
         public AD.UI.ViewController Icon;
         [SerializeField]private Animator _inputFieldAnimator;
         public Animator inputFieldAnimator
@@ -117,26 +120,20 @@ namespace AD.UI
             set { Source.text = value; }
         }
 
-        public ModernUIInputField SetText(string text)
+        public IInputField SetText(string text)
         {
             this.text = text;
             return this;
         }
 
-        public enum PressType
-        {
-            OnSelect,
-            OnEnd
-        }
-
-        public void AddListener(UnityEngine.Events.UnityAction<string> action, PressType type = PressType.OnEnd)
+        public void AddListener(UnityAction<string> action, PressType type = PressType.OnEnd)
         {
             if (type == PressType.OnSelect) Source.source.onSelect.AddListener(action);
             else if (type == PressType.OnEnd) Source.source.onEndEdit.AddListener(action);
             else AD.ADGlobalSystem.AddMessage("You try to add worry listener");
         }
 
-        public void RemoveListener(UnityEngine.Events.UnityAction<string> action, PressType type = PressType.OnEnd)
+        public void RemoveListener(UnityAction<string> action, PressType type = PressType.OnEnd)
         {
             if (type == PressType.OnSelect) Source.source.onSelect.RemoveListener(action);
             else if (type == PressType.OnEnd) Source.source.onEndEdit.RemoveListener(action);
@@ -166,6 +163,17 @@ namespace AD.UI
         public void NumericManager(string value)
         {
             SetValue_NumericManagerName(this.NumericManagerName, this.text);
+        }
+
+        public void SetPlaceholderText(string text)
+        {
+            Source.SetPlaceholderText(text);
+        }
+
+        public IInputField SetTextWithoutNotify(string text)
+        {
+            Source.SetTextWithoutNotify(text);
+            return this;
         }
     } 
 }

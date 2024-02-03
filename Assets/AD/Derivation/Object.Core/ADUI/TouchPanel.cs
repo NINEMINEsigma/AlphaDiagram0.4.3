@@ -26,13 +26,13 @@ namespace AD.UI
                 {
                     if (Selected)
                         OnClickWhenCurrentWasPressLeft.Invoke(TargetCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue().ToVector3().SetZ(Distance)));
-                }, PressType.ThisFramePressed);
+                }, AD.PressType.ThisFramePressed);
             RightRegisterInfo = ADGlobalSystem.AddListener(Mouse.current.rightButton,
                 () =>
                 {
                     if (Selected)
                         OnClickWhenCurrentWasPressRight.Invoke(TargetCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue().ToVector3().SetZ(Distance)));
-                }, PressType.ThisFramePressed);
+                }, AD.PressType.ThisFramePressed);
         }
         protected virtual void OnDestroy()
         {

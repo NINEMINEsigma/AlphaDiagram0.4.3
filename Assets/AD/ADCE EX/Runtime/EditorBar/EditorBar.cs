@@ -96,5 +96,11 @@ namespace AD.Experimental.GameEditor
             Items.Clear();
             Refresh();
         }
+
+        public void OpenScene(string sceneName)
+        {
+            ADGlobalSystem.instance.TargetSceneName = sceneName;
+            ADGlobalSystem.instance.OnEnd();
+        }
     }
 }

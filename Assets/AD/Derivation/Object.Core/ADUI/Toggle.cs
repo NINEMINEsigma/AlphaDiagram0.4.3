@@ -1,7 +1,6 @@
 using System;
 using AD.BASE;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
@@ -85,7 +84,7 @@ namespace AD.UI
             {
                 if (!Selected) return;
                 isOn = !isOn;
-            }, PressType.ThisFramePressed); 
+            }, AD.PressType.ThisFramePressed); 
         }
         protected void OnDestroy()
         {

@@ -116,7 +116,7 @@ namespace AD.Utility.Object
 
         public enum XYZA
         {
-            X,Y,Z
+            X, Y, Z
         }
 
         private bool CanIDragRotating = true;
@@ -165,9 +165,7 @@ namespace AD.Utility.Object
                     PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove()))
                     ClearDirty();
             }
-            if (
-                Keyboard.current.zKey.isPressed && Keyboard.current.xKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame
-                ) UndoPast();
+            if (Keyboard.current.zKey.isPressed && Keyboard.current.xKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame) UndoPast();
         }
 
         private void CheakCanIRotating()
@@ -383,9 +381,9 @@ namespace AD.Utility.Object
                 float value = Mouse.current.scroll.ReadValue().y;
                 if (value < 0)
                 {
-                    var dvalue = 0.12f * moveSpeed * moveSpeedVec.z * Time.deltaTime * value* Core.transform.forward;
+                    var dvalue = 0.12f * moveSpeed * moveSpeedVec.z * Time.deltaTime * value * Core.transform.forward;
                     if (!When2DContronZ(dvalue)) return false;
-                    Core.transform.position += dvalue ;
+                    Core.transform.position += dvalue;
                     return true;
                 }
                 return false;
@@ -408,9 +406,9 @@ namespace AD.Utility.Object
                 float value = Mouse.current.scroll.ReadValue().y;
                 if (value > 0)
                 {
-                    var dvalue = 0.12f * moveSpeed * moveSpeedVec.z * Time.deltaTime * value* Core.transform.forward;
+                    var dvalue = 0.12f * moveSpeed * moveSpeedVec.z * Time.deltaTime * value * Core.transform.forward;
                     if (!When2DContronZ(dvalue)) return false;
-                    Core.transform.position += dvalue ;
+                    Core.transform.position += dvalue;
                     return true;
                 }
                 return false;

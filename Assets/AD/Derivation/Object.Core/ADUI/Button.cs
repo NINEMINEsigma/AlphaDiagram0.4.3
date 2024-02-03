@@ -1,8 +1,6 @@
 using System;
 using AD.BASE;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -98,26 +96,26 @@ namespace AD.UI
             IsClick = !IsClick;
         }
 
-        public Button AddListener(UnityEngine.Events.UnityAction action, PressType type = PressType.ThisFramePressed)
+        public Button AddListener(UnityAction action, AD.PressType type = AD.PressType.ThisFramePressed)
         {
-            if (type == PressType.ThisFramePressed) OnClick.AddListener(action);
-            else if (type == PressType.ThisFrameReleased) OnRelease.AddListener(action);
+            if (type == AD.PressType.ThisFramePressed) OnClick.AddListener(action);
+            else if (type == AD.PressType.ThisFrameReleased) OnRelease.AddListener(action);
             else AD.ADGlobalSystem.AddMessage("You try to add worry listener");
             return this;
         }
 
-        public Button RemoveListener(UnityEngine.Events.UnityAction action, PressType type = PressType.ThisFramePressed)
+        public Button RemoveListener(UnityAction action, AD.PressType type = AD.PressType.ThisFramePressed)
         {
-            if (type == PressType.ThisFramePressed) OnClick.RemoveListener(action);
-            else if (type == PressType.ThisFrameReleased) OnRelease.RemoveListener(action);
+            if (type == AD.PressType.ThisFramePressed) OnClick.RemoveListener(action);
+            else if (type == AD.PressType.ThisFrameReleased) OnRelease.RemoveListener(action);
             else AD.ADGlobalSystem.AddMessage("You try to remove worry listener");
             return this;
         }
 
-        public Button RemoveAllListeners(PressType type = PressType.ThisFramePressed)
+        public Button RemoveAllListeners(AD.PressType type = AD.PressType.ThisFramePressed)
         {
-            if (type == PressType.ThisFramePressed) OnClick.RemoveAllListeners();
-            else if (type == PressType.ThisFrameReleased) OnRelease.RemoveAllListeners();
+            if (type == AD.PressType.ThisFramePressed) OnClick.RemoveAllListeners();
+            else if (type == AD.PressType.ThisFrameReleased) OnRelease.RemoveAllListeners();
             return this;
         }
 

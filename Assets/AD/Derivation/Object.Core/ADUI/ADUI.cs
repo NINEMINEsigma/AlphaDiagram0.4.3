@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AD.BASE;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
@@ -186,6 +187,29 @@ namespace AD.UI
         void Select(string option);
         void AddListener(UnityAction<string> action);
         void RemoveListener(UnityAction<string> action);
+    }
+
+    public enum PressType
+    {
+        OnSelect,
+        OnEnd
+    }
+
+    public interface IInputField : IADUI
+    {
+        TMP_InputField source { get; }
+        string text { get; set; }
+        InputFieldValueProperty ValueProperty { get; }
+        InputFieldProperty TextProperty { get; }
+        BindPropertyJustSet<string, BindInputFieldAsset> Input { get; }
+        BindPropertyJustGet<string, BindInputFieldAsset> Output { get; }
+
+        void AddListener(UnityAction<string> action, PressType type = PressType.OnEnd);
+        void RemoveAllListener(PressType type = PressType.OnEnd);
+        void RemoveListener(UnityAction<string> action, PressType type = PressType.OnEnd);
+        void SetPlaceholderText(string text);
+        IInputField SetText(string text);
+        IInputField SetTextWithoutNotify(string text);
     }
 
     public interface INumericManager<T>

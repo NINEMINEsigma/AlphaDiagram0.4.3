@@ -96,13 +96,13 @@ namespace AD.UI
                 {
                     past = T;
                     curselect = curs;
-                }, InputField.PressType.OnSelect);
+                }, PressType.OnSelect);
                 target.AddListener(T =>
                 {
                     if (float.TryParse(target.text, out float value)) targetCall.Invoke(value);
                     else target.SetText(past);
                     curselect = 0;
-                }, InputField.PressType.OnEnd);
+                }, PressType.OnEnd);
             }
         }
 

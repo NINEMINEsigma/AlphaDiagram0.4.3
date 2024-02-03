@@ -110,29 +110,17 @@ namespace AD.Sample.Texter.Project
                 inputT.AddListener(T => data.text = T);
                 PropertiesLayout.Button("Text", "Enter Text On A Bigger Field", () =>
                 {
-                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>()
-                    .ObtainElement(new Vector2(800, 600));
-                    var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
-                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(800, 600);
-                    temp
-                    .SetADUIOnWindow<ModernUIInputField>("Field", mif)
-                    .SetText(data.description)
-                    .AddListener(T =>
-                    {
-                        data.description = T;
-                        inputT.text = T;
-                        temp.BackPool();
-                    });
+                    //TODO
                 });
 
                 var inputD = PropertiesLayout.InputField(data.description, "Text Description");
                 inputD.AddListener(T => data.description = T);
                 PropertiesLayout.Button("Description", "Enter Description On A Bigger Field", () =>
                 {
-                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>()
-                    .ObtainElement(new Vector2(800, 600));
+                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>().ObtainElement().SetTitle("Text ProjectItem".Translate());
                     var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
-                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(800, 600);
+                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(1600, 800);
+                    mif.SetTitle("Description".Translate());
                     temp
                     .SetADUIOnWindow<ModernUIInputField>("Field", mif)
                     .SetText(data.description)

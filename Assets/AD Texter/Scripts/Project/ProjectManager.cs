@@ -159,12 +159,11 @@ namespace AD.Sample.Texter
             }
             savingTask = new TaskInfo("Project Saving", 0, 0, new Vector2(0, 1f), false);
             savingTask.Register();
-            StartCoroutine(CurrentProjectData.Save(savingTask));
+            SceneTrans.instance.StartCoroutine(CurrentProjectData.Save(savingTask));
         }
 
         public void BackToEntry()
         {
-            SaveProjectData();
             ADGlobalSystem.instance.OnEnd();
         }
 

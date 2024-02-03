@@ -10,7 +10,7 @@ namespace AD.UI
 {
     [Serializable, RequireComponent(typeof(TMP_InputField))]
     [AddComponentMenu("UI/AD/InputField", 100)]
-    public class InputField : AD.UI.ADUI
+    public class InputField : AD.UI.ADUI, IInputField
     {
         public override bool IsNeedContext => false;
 
@@ -107,22 +107,16 @@ namespace AD.UI
             _m_Property.Set(text);
         }
 
-        public InputField SetText(string text)
+        public IInputField SetText(string text)
         {
             this.text = text;
             return this;
         }
 
-        public InputField SetTextWithoutNotify(string text)
+        public IInputField SetTextWithoutNotify(string text)
         {
             this.source.SetTextWithoutNotify(text);
             return this;
-        }
-
-        public enum PressType
-        {
-            OnSelect,
-            OnEnd
         }
 
         public void AddListener(UnityEngine.Events.UnityAction<string> action, PressType type = PressType.OnEnd)
