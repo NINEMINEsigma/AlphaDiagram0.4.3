@@ -248,6 +248,9 @@ namespace AD.Sample.Texter.Project
 
         //EditGroup
 
+        [SerializeField, Header("EditGroup")] private EditGroup m_EditGroup;
+        public EditGroup MyEditGroup => m_EditGroup;
+
         private void EnterMe()
         {
             if (GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.Contains(this.MatchHierarchyEditor)) return;

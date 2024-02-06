@@ -57,8 +57,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1874856569001159041, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
       propertyPath: OnPointerEnterEvent.InvokeArray.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 4012978001877682443, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
+      propertyPath: m_EditGroup
+      value: 
+      objectReference: {fileID: 1319054866634177883}
     - target: {fileID: 4012978001877682443, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
       propertyPath: SubProjectItemPrefab.Array.size
       value: 1
@@ -69,7 +73,18 @@ PrefabInstance:
       objectReference: {fileID: 8662397913388901987, guid: c3710d0b141a73a46943cd35712dd5de, type: 3}
     - target: {fileID: 5761814083186688693, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
       propertyPath: OnPointerExitEvent.InvokeArray.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
+--- !u!114 &1319054866634177883 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1866816689368473702, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
+  m_PrefabInstance: {fileID: 839493116937297213}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a586e3943b264604294a60ffa2b2fdb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -5,6 +5,7 @@ using UnityEngine;
 using AD.UI;
 using System.Linq;
 using UnityEngine.Playables;
+using AD.Utility;
 
 namespace AD
 {
@@ -114,7 +115,14 @@ namespace AD
                 {
                     EditorGUILayout.LabelField(new GUIContent("TargetSceneName"), customSkin.FindStyle("Text"), GUILayout.Width(120));
                     EditorGUILayout.PropertyField(TargetSceneName, new GUIContent(""));
-
+                    if(TargetSceneName.stringValue.Equals(ADGlobalSystem._BackSceneTargetSceneName))
+                    {
+                        this.HelpBox("Now Next Scene Will Be The Scene Which Is Previous Scene", MessageType.Info);
+                    }
+                    else if(TargetSceneName.stringValue.Contains("back",System.StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        this.HelpBox($"Do You Want To Set The Target To Go Back To The Previous Scene , You Can Enter \"{ADGlobalSystem._BackSceneTargetSceneName}\"", MessageType.Warning);
+                    }
                 });
                 GUILayout.BeginHorizontal(EditorStyles.helpBox);
 

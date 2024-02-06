@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using AD.Experimental.GameEditor;
 using System;
+using AD.Utility.Object;
 
 namespace AD.Sample.Texter
 {
@@ -9,6 +10,8 @@ namespace AD.Sample.Texter
         bool IsAbleDisplayedOnHierarchyAtTheSameTime(Type type);
         bool SaveData(out List<IProjectItem> badSaveItems);
         bool SaveProjectSourceData();
+
+        EditGroup MyEditGroup { get; }
     }
 
     public interface IProjectItemWhereNeedInitData: IProjectItem

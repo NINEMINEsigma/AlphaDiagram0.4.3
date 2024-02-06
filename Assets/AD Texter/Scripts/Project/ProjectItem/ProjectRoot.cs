@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Sample.Texter.Internal;
 using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
-using UnityEngine;
 
 namespace AD.Sample.Texter.Project
 {
@@ -55,7 +55,7 @@ namespace AD.Sample.Texter.Project
 
         public int SerializeIndex => 0;
 
-        public List<GameObject> SubProjectItemPrefab = new();
+        [Header("Prefab")] public List<GameObject> SubProjectItemPrefab = new();
 
         private void Start()
         {
@@ -66,6 +66,21 @@ namespace AD.Sample.Texter.Project
                 new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
             };
             GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
+        }
+
+        private void Update()
+        {
+            /*Vector3 mlt = InternalUtility.AnchoringLeftTop(MyEditGroup), mlb = InternalUtility.AnchoringLeftButtom(MyEditGroup);
+            Vector3 mrt = InternalUtility.AnchoringRightTop(MyEditGroup), mrb = InternalUtility.AnchoringRightButtom(MyEditGroup);
+            foreach (var child in Childs)
+            {
+                if (child is MonoBehaviour mono)
+                {
+                    var eg = mono.GetComponent<EditGroup>();
+                    Vector3 lt= InternalUtility.AnchoringLeftTop(eg),lb= InternalUtility.AnchoringLeftButtom(eg);
+                    Vector3 rt = InternalUtility.AnchoringRightTop(eg), rb = InternalUtility.AnchoringRightButtom(eg);
+                }
+            }*/
         }
 
         public void SetupChild(IProjectItem child)
@@ -105,7 +120,7 @@ namespace AD.Sample.Texter.Project
                 App.instance.AddMessage("Save Project Source Data Successful");
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ADGlobalSystem.AddError(nameof(ProjectRoot), ex);
                 App.instance.AddMessage("Save Project Source Data Failed");
@@ -115,7 +130,7 @@ namespace AD.Sample.Texter.Project
 
         public DataAssets CurrentDataAssets => App.instance.GetModel<DataAssets>();
 
-        public List<GameObject> badSaveItemsObjects;
+        [Header("Bad Items")] public List<GameObject> badSaveItemsObjects;
 
         public void SaveDataForStaticEditorBar()
         {
@@ -151,6 +166,9 @@ namespace AD.Sample.Texter.Project
 
         //EditGroup
 
+        [SerializeField, Header("EditGroup")] private EditGroup m_EditGroup;
+        public EditGroup MyEditGroup => m_EditGroup;
+
         private void EnterMe()
         {
             if (GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.Contains(this.MatchHierarchyEditor)) return;
@@ -158,10 +176,11 @@ namespace AD.Sample.Texter.Project
             List<ISerializeHierarchyEditor> newList = new() { this.MatchHierarchyEditor };
             foreach (ISerializeHierarchyEditor sEditor in GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors)
             {
-                if(IsAbleDisplayedOnHierarchyAtTheSameTime(sEditor.MatchTarget.GetType()))
+                if (IsAbleDisplayedOnHierarchyAtTheSameTime(sEditor.MatchTarget.GetType()))
                     newList.Add(sEditor);
             }
             GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
         }
+
     }
 }

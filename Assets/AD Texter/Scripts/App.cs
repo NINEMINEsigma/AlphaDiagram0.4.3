@@ -108,6 +108,28 @@ namespace AD.Sample.Texter
             }
         }
 
+        public static class InternalUtility
+        {
+            public static Vector3 AnchoringRightTop(EditGroup target)
+            {
+                return target.ViewLayer.GameObjects["Anchoring Right Top"].transform.position;
+            }
+
+            public static Vector3 AnchoringRightButtom(EditGroup target)
+            {
+                return target.ViewLayer.GameObjects["Anchoring Right Buttom"].transform.position;
+            }
+
+            public static Vector3 AnchoringLeftTop(EditGroup target)
+            {
+                return target.ViewLayer.GameObjects["Anchoring Left Top"].transform.position;
+            }
+
+            public static Vector3 AnchoringLeftButtom(EditGroup target)
+            {
+                return target.ViewLayer.GameObjects["Anchoring Left Buttom"].transform.position;
+            }
+        }
     }
 
     public class App : ADArchitecture<App>

@@ -9,11 +9,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2068284546322081506, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: OnPointerExitEvent.InvokeArray.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5280121648803319254, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: OnPointerEnterEvent.InvokeArray.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5380206527264585763, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: m_LocalScale.x
@@ -89,6 +89,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+--- !u!114 &8662397913388901984 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5380206528027329585, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+  m_PrefabInstance: {fileID: 3647159599979553361}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8662397913388901987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a586e3943b264604294a60ffa2b2fdb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8662397913388901987 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5380206528027329586, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
@@ -113,3 +124,4 @@ MonoBehaviour:
     text: 
     description: 
   SubProjectItemPrefab: []
+  m_EditGroup: {fileID: 8662397913388901984}
