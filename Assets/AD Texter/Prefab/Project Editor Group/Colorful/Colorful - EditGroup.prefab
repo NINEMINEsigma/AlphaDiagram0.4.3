@@ -9,12 +9,36 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2068284546322081506, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: OnPointerExitEvent.InvokeArray.Array.size
-      value: 5
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2954488599234279883, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2954488599234279883, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2954488599234279883, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5280121648803319254, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: OnPointerEnterEvent.InvokeArray.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
+    - target: {fileID: 5380206527897947560, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+      propertyPath: GameObjects.Data.Array.size
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5380206527897947560, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+      propertyPath: GameObjects.Data.Array.data[5].Key
+      value: In Points
+      objectReference: {fileID: 0}
+    - target: {fileID: 5380206527897947560, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+      propertyPath: GameObjects.Data.Array.data[5].Value
+      value: 
+      objectReference: {fileID: 1293287679240370361}
     - target: {fileID: 5380206528027329584, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -65,7 +89,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5380206528027329586, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: m_Name
-      value: Project Root Variant
+      value: Colorful - EditGroup
       objectReference: {fileID: 0}
     - target: {fileID: 5649223818759343688, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
       propertyPath: SourcePairs.Array.data[0].SpriteSource
@@ -156,3 +180,8 @@ MonoBehaviour:
   SubProjectItemPrefab: []
   badSaveItemsObjects: []
   m_EditGroup: {fileID: 1239805370655458853}
+--- !u!1 &1293287679240370361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5362757413433129645, guid: 41e8b22d8e03f994eabfc481fde6057b, type: 3}
+  m_PrefabInstance: {fileID: 6601988151101932052}
+  m_PrefabAsset: {fileID: 0}

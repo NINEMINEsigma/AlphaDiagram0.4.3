@@ -18,6 +18,8 @@ namespace AD.UI
             STRING
         }
 
+        public const string ButtonAnimatorModeIsBoolString = "ButtonAnimatorModeIsBool";
+
         //[Header("Animator")]
         public Animator animator = null;
         public ButtonAnimatorMode ChooseMode = ButtonAnimatorMode.BOOL;
@@ -37,15 +39,24 @@ namespace AD.UI
             set
             {
                 if (animator != null && IsKeepState)
+                {
+                    animator.speed = AnimationSpeed;
                     switch (ChooseMode)
                     {
                         case ButtonAnimatorMode.BOOL:
-                            animator.SetBool(AnimatorBoolString, value);
+                            {
+                                animator.SetBool(AnimatorBoolString, value);
+                                animator.SetBool(ButtonAnimatorModeIsBoolString, true);
+                            }
                             break;
                         case ButtonAnimatorMode.STRING:
-                            animator.Play(value ? AnimatorONString : AnimatorOFFString);
+                            {
+                                animator.Play(value ? AnimatorONString : AnimatorOFFString);
+                                animator.SetBool(ButtonAnimatorModeIsBoolString, false);
+                            }
                             break;
                     }
+                }
                 _IsClick = value && IsKeepState;
                 if (value) OnClick.Invoke();
                 else OnRelease.Invoke();
@@ -53,7 +64,8 @@ namespace AD.UI
         }
         //[Tooltip("false时不会触发任何动画也不会保持按下的状态")]
         public bool IsKeepState = false;
-        public TMP_Text title;
+        public float AnimationSpeed = 1;
+        public TMP_Text title; 
 
         public Button()
         {

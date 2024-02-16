@@ -13,6 +13,7 @@ public class ButtonEdior : ADUIEditor
     SerializedProperty _IsClick;
     SerializedProperty IsKeepState;
     SerializedProperty title;
+    SerializedProperty AnimationSpeed;
 
     protected override string TopHeader => "Button Top Header";
 
@@ -31,6 +32,7 @@ public class ButtonEdior : ADUIEditor
         _IsClick = serializedObject.FindProperty(nameof(_IsClick));
         IsKeepState = serializedObject.FindProperty(nameof(IsKeepState));
         title = serializedObject.FindProperty(nameof(title));
+        AnimationSpeed = serializedObject.FindProperty(nameof(AnimationSpeed));
     }
 
     public override void OnContentGUI()
@@ -58,6 +60,7 @@ public class ButtonEdior : ADUIEditor
             EditorGUILayout.PropertyField(AnimatorBoolString);
             EditorGUILayout.PropertyField(AnimatorONString);
             EditorGUILayout.PropertyField(AnimatorOFFString);
+            EditorGUILayout.PropertyField(AnimationSpeed);
             EditorGUILayout.Space(20);
         }
         else HorizontalBlockWithBox(() => OnNotChangeGUI(() => EditorGUILayout.TextArea("No Animatior")));

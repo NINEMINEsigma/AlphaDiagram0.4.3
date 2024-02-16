@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using AD.BASE;
 using UnityEngine;
 
 namespace AD.Utility.Object
 {
     [ExecuteAlways]
-    public class MaterialGroup : MonoBehaviour
+    public class MaterialGroup : ADController
     {
         [Serializable]
         public class SourceEntry
@@ -84,6 +83,11 @@ namespace AD.Utility.Object
                 }
                 catch { }
             }
+        }
+
+        public override void Init()
+        {
+            SourcePairs.Clear();
         }
     }
 }

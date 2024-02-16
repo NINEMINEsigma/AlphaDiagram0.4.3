@@ -6,7 +6,6 @@ using AD.Sample.Texter.Internal;
 using AD.Sample.Texter.Project;
 using AD.Utility;
 using AD.Utility.Object;
-using CW.Common;
 using UnityEngine;
 
 namespace AD.Sample.Texter
@@ -110,24 +109,92 @@ namespace AD.Sample.Texter
 
         public static class InternalUtility
         {
+            public static GameObject InternalObtainGameObject(EditGroup target, string Key)
+            {
+                return target.ViewLayer.GameObjects[Key];
+            }
+
             public static Vector3 AnchoringRightTop(EditGroup target)
             {
-                return target.ViewLayer.GameObjects["Anchoring Right Top"].transform.position;
+                return InternalObtainGameObject(target, "Anchoring Right Top").transform.position;
             }
 
             public static Vector3 AnchoringRightButtom(EditGroup target)
             {
-                return target.ViewLayer.GameObjects["Anchoring Right Buttom"].transform.position;
+                return InternalObtainGameObject(target, "Anchoring Right Buttom").transform.position;
             }
 
             public static Vector3 AnchoringLeftTop(EditGroup target)
             {
-                return target.ViewLayer.GameObjects["Anchoring Left Top"].transform.position;
+                return InternalObtainGameObject(target, "Anchoring Left Top").transform.position;
             }
 
             public static Vector3 AnchoringLeftButtom(EditGroup target)
             {
-                return target.ViewLayer.GameObjects["Anchoring Left Buttom"].transform.position;
+                return InternalObtainGameObject(target, "Anchoring Left Buttom").transform.position;
+            }
+
+            public static Vector3 OutPoint(EditGroup target)
+            {
+                return InternalObtainGameObject(target, "Out Point").transform.position;
+            }
+
+            public static GameObject InPoints(EditGroup target)
+            {
+                return InternalObtainGameObject(target, "InPoints");
+            }
+
+            public static void SetInPointCount(EditGroup target, int count)
+            {
+                GameObject inPoint = InternalObtainGameObject(target, "InPoints");
+                int e = inPoint.transform.childCount;
+                for (int i = 0; i < e; i++)
+                {
+                    var cat = inPoint.transform.GetChild(i);
+                    cat.gameObject.SetActive(i < count);
+                    cat.name = i.ToString();
+                }
+                GameObject prefab = inPoint.transform.GetChild(0).gameObject;
+                for (int i = e; i < count; i++)
+                {
+                    var cat = prefab.PrefabInstantiate();
+                    cat.transform.SetParent(inPoint.transform, false);
+                    cat.SetActive(i < count);
+                    cat.name = i.ToString();
+                }
+            }
+
+            public static int GetInPointCount(EditGroup target)
+            {
+                int result = 0;
+                GameObject inPoint = InternalObtainGameObject(target, "InPoints");
+                int e = inPoint.transform.childCount;
+                for (int i = 0; i < e; i++)
+                {
+                    var cat = inPoint.transform.GetChild(i);
+                    if (cat.gameObject.activeSelf) result++;
+                }
+                return result;
+            }
+
+            public static Vector3 InPoint(EditGroup target,int index)
+            {
+                int result = 0;
+                GameObject inPoint = InternalObtainGameObject(target, "InPoints");
+                int e = inPoint.transform.childCount;
+                for (int i = 0; i < e; i++)
+                {
+                    var cat = inPoint.transform.GetChild(i);
+                    if (cat.gameObject.activeSelf)
+                    {
+                        if(result==index)
+                        {
+                            return cat.position;
+                        }
+                        result++;
+                    }
+                }
+                return inPoint.transform.GetChild(0).position;
             }
         }
     }

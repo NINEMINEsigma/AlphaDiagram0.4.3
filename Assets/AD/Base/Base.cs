@@ -774,9 +774,16 @@ namespace AD.BASE
             return instance;
         }
 
+        private object _p_last_object;
+        private Type _p_last_type;
         private object Get<_T>()
         {
-            if (AD__Objects.TryGetValue(typeof(_T), out var result)) return result;
+            if (typeof(_T) == _p_last_type) return _p_last_object;
+            if (AD__Objects.TryGetValue(typeof(_T), out var result))
+            {
+                _p_last_type = typeof(_T);
+                return _p_last_object = result;
+            }
             else return null;
         }
 

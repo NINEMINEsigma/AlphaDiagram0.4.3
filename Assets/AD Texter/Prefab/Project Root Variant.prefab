@@ -55,5 +55,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: Project Root Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 8259191068995107807, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8259191068995107807, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8259191068995107807, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
