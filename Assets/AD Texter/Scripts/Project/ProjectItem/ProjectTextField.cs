@@ -110,14 +110,25 @@ namespace AD.Sample.Texter.Project
                 inputT.AddListener(T => data.text = T);
                 PropertiesLayout.Button("Text", "Enter Text On A Bigger Field", () =>
                 {
-                    //TODO
+                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>().ObtainElement(new Vector2(1600, 800)).SetTitle("Text ProjectItem".Translate());
+                    var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
+                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(1600, 800);
+                    mif.SetTitle("Description".Translate());
+                    temp
+                    .SetADUIOnWindow<ModernUIInputField>("Field", mif)
+                    .SetText(data.text)
+                    .AddListener(T =>
+                    {
+                        data.text = T;
+                        inputT.text = T;
+                    });
                 });
 
                 var inputD = PropertiesLayout.InputField(data.description, "Text Description");
                 inputD.AddListener(T => data.description = T);
                 PropertiesLayout.Button("Description", "Enter Description On A Bigger Field", () =>
                 {
-                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>().ObtainElement().SetTitle("Text ProjectItem".Translate());
+                    var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>().ObtainElement(new Vector2(1600, 800)).SetTitle("Text ProjectItem".Translate());
                     var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
                     mif.transform.As<RectTransform>().sizeDelta = new Vector2(1600, 800);
                     mif.SetTitle("Description".Translate());
@@ -128,7 +139,6 @@ namespace AD.Sample.Texter.Project
                     {
                         data.description = T;
                         inputD.text = T;
-                        temp.BackPool();
                     });
                 });
             }

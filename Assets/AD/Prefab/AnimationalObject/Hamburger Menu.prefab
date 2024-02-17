@@ -96,7 +96,9 @@ MonoBehaviour:
   OnRelease:
     m_PersistentCalls:
       m_Calls: []
+  _IsClick: 0
   IsKeepState: 1
+  AnimationSpeed: 1
   title: {fileID: 0}
 --- !u!114 &6010039714026283512
 MonoBehaviour:

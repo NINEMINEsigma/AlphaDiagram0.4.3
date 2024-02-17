@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using AD.BASE;
 using AD.UI;
 using AD.Utility;
@@ -167,7 +169,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240217/0136";
+        public static string Version => "AD/0.4.3/20240218/0127";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -194,8 +196,8 @@ namespace AD
                     catch
                     {
                         _m_instance = new GameObject().AddComponent<ADGlobalSystem>();
-                        _m_instance.name = "GlobalSystem";
                     }
+                    _m_instance.name = "GlobalSystem";
                 }
                 return _m_instance;
             }
@@ -250,6 +252,7 @@ namespace AD
             {
                 ADGlobalSystem obj = GameObject.Instantiate(Resources.Load<GameObject>("GlobalSystem")).GetComponent<ADGlobalSystem>();
                 Selection.activeObject = obj.gameObject;
+                obj.gameObject.name = "GlobalSystem";
             }
             catch
             {
@@ -460,6 +463,10 @@ namespace AD
 
         #region MonoFunction 
 
+        public bool IsAutoSaveArchitecturesDebugLog = false;
+        public float AutoSaveArchitecturesDebugLogTimeLimit = 60;
+        public TimeClocker AutoSaveArchitecturesDebugLogTimeLimitCounter;
+
         protected override void Awake()
         {
             Debug.Log("Version : " + Version);
@@ -467,23 +474,39 @@ namespace AD
             _m_instance = this;
             if (IsEnableSceneController) base.Awake();
 
-            //if (StringValues == null)
-            {
-                ADGlobalSystem.Deserialize<ADSerializableDictionary<string, string>>(PlayerPrefs.GetString("NumericManager_String"), out object temp0);
-                StringValues = (ADSerializableDictionary<string, string>)temp0 ?? new();
-            }
-            //if (IntValues == null)
-            {
-                ADGlobalSystem.Deserialize<ADSerializableDictionary<string, int>>(PlayerPrefs.GetString("NumericManager_Int"), out object temp1);
-                IntValues = (ADSerializableDictionary<string, int>)temp1 ?? new();
-            }
-            //if (FloatValues == null)
-            {
-                ADGlobalSystem.Deserialize<ADSerializableDictionary<string, float>>(PlayerPrefs.GetString("NumericManager_Float"), out object temp2);
-                FloatValues = (ADSerializableDictionary<string, float>)temp2 ?? new();
-            }
+            LoadNumericManager();
+
+            AutoSaveArchitecturesDebugLogTimeLimitCounter = TimeExtension.GetTimer();
 
             AppQuitting = false;
+        }
+
+        private void AutoSaving()
+        {
+            Debug.Log($"尝试保存Log信息 : {ObjectExtension.AllArchitecture.Count}");
+            foreach (var arc in ObjectExtension.AllArchitecture)
+            {
+                if (!arc.Value.Contains<ADMessageRecord>()) continue;
+                string fileName = "AutoLog";
+                string fullPath = Path.Combine(Application.persistentDataPath, arc.Value.GetType().FullName.Replace('.', '\\'), fileName) + ".AD.log";
+                var dic = FileC.CreateDirectroryOfFile(fullPath);
+                if (dic.GetFiles().Length > 100) dic.Delete();
+                arc.Value.GetModel<ADMessageRecord>().Save(fullPath);
+                Debug.Log(fullPath + " 已保存");
+            }
+            AutoSaveArchitecturesDebugLogTimeLimitCounter.Init();
+        }
+
+        private void Update()
+        {
+            if (IsAutoSaveArchitecturesDebugLog)
+            {
+                AutoSaveArchitecturesDebugLogTimeLimitCounter.Update();
+                if (AutoSaveArchitecturesDebugLogTimeLimitCounter.LastDalteTime > AutoSaveArchitecturesDebugLogTimeLimit)
+                {
+                    AutoSaving();
+                }
+            }
         }
 
         private void LateUpdate()
@@ -1040,14 +1063,21 @@ namespace AD
         public ADSerializableDictionary<string, float> FloatValues;
         public ADSerializableDictionary<string, string> StringValues;
 
+        public void LoadNumericManager()
+        {
+            Input<ADSerializableDictionary<string, string>>(Path.Combine(Application.persistentDataPath, "NumericManager_String.numeric"), out object temp0);
+            Input<ADSerializableDictionary<string, int>>(Path.Combine(Application.persistentDataPath, "NumericManager_Int.numeric"), out object temp1);
+            Input<ADSerializableDictionary<string, float>>(Path.Combine(Application.persistentDataPath, "NumericManager_Float.numeric"), out object temp2);
+            StringValues = (ADSerializableDictionary<string, string>)temp0 ?? new();
+            IntValues = (ADSerializableDictionary<string, int>)temp1 ?? new();
+            FloatValues = (ADSerializableDictionary<string, float>)temp2 ?? new();
+        }
+
         public void SaveNumericManager()
         {
-            ADGlobalSystem.Serialize(StringValues, out var str_str);
-            PlayerPrefs.SetString("NumericManager_String", str_str);
-            ADGlobalSystem.Serialize(IntValues, out var str_int);
-            PlayerPrefs.SetString("NumericManager_Int", str_int);
-            ADGlobalSystem.Serialize(FloatValues, out var str_float);
-            PlayerPrefs.SetString("NumericManager_Float", str_float);
+            Output<ADSerializableDictionary<string, string>>(Path.Combine(Application.persistentDataPath, "NumericManager_String.numeric"), StringValues);
+            Output<ADSerializableDictionary<string, int>>(Path.Combine(Application.persistentDataPath, "NumericManager_Int.numeric"), IntValues);
+            Output<ADSerializableDictionary<string, float>>(Path.Combine(Application.persistentDataPath, "NumericManager_Float.numeric"), FloatValues);
         }
 
         public void SetIntValue(string key,int value)

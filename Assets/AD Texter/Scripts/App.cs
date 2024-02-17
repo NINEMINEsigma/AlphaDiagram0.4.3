@@ -220,6 +220,7 @@ namespace AD.Sample.Texter
                         _Parent =>
                         {
                             var newChild = T.PrefabInstantiate().GetComponent(TargetCT) as IProjectItem;
+                            _Parent.MatchHierarchyEditor.IsOpenListView = false;
                             newChild.SetParent(_Parent);
                             newChild.As<MonoBehaviour>().transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
                             return newChild;

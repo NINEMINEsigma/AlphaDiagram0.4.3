@@ -35,6 +35,7 @@ public class ModernUISwitchEditor : ADUIEditor
 
     public override void OnContentGUI()
     {
+        MakeUpNumericManager(nameof(that.NumericManagerName));
         EditorGUILayout.PropertyField(OnEvents, new GUIContent("On Events"), true);
         EditorGUILayout.PropertyField(OffEvents, new GUIContent("Off Events"), true);
         EditorGUILayout.PropertyField(SwitchEvents, new GUIContent("Switch Events"), true);

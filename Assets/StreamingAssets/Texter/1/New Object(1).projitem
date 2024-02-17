@@ -1,0 +1,16 @@
+{
+	"projitem" : {
+		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
+		"value" : {
+			"__type" : "AD.Sample.Texter.Data.ProjectTextData_BaseMap,Assembly-CSharp",
+			"text" : "",
+			"description" : "",
+			"ProjectItemID" : "New Object(1)",
+			"ParentItemID" : "New Object(1)",
+			"ProjectItemPosition" : {
+				"x" : 3.956479,
+				"y" : -2.67797637
+			}
+		}
+	}
+}

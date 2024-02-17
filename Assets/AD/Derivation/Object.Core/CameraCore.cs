@@ -191,14 +191,21 @@ namespace AD.Utility.Object
         {
             if (RayBehavourForm == RayBehavour.Follow && Mouse.current.leftButton.wasPressedThisFrame && Keyboard.current.cKey.isPressed)
             {
-                if (Target != null)
-                {
-                    PastOneTarget = Target;
-                    if (coroutiner != null) StopCoroutine(coroutiner);
-                    coroutiner = StartCoroutine(Move());
-                }
+                TryStartCoroutineMove();
             }
         }
+
+        public void TryStartCoroutineMove()
+        {
+            if (Target != null)
+            {
+                PastOneTarget = Target;
+                if (coroutiner != null) StopCoroutine(coroutiner);
+                coroutiner = StartCoroutine(Move());
+            }
+        }
+
+        public ADEvent<GameObject, RayInfo> CatchFocusEvent = new();
 
         private void NotNoneMode()
         {
@@ -209,6 +216,7 @@ namespace AD.Utility.Object
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
                     FoucsOneTarget = RayForm.NearestRaycastHitForm.collider.gameObject;
+                    CatchFocusEvent.Invoke(FoucsOneTarget, RayForm);
                 }
                 var cat = RayForm.NearestRaycastHitForm.collider.gameObject;
                 var targetOOO = Target == null ? FoucsOneTarget : Target;

@@ -64,6 +64,13 @@ namespace AD.Experimental.GameEditor
 
         public TouchPanel TouchPanel;
 
+        public enum CoreCameraDragObjectType
+        {
+            None,EditorGroup,Collider
+        }
+
+        public CoreCameraDragObjectType CoreCameraDragObjectEnable = CoreCameraDragObjectType.EditorGroup;
+
         #endregion
 
         #region ValueIndexSystem
@@ -81,7 +88,8 @@ namespace AD.Experimental.GameEditor
 
         public void LateUpdate()
         {
-            CoreCameraDragObject();
+            if (CoreCameraDragObjectEnable == CoreCameraDragObjectType.EditorGroup) CoreCameraDragObject();
+            else if (CoreCameraDragObjectEnable == CoreCameraDragObjectType.Collider) CoreCameraDragCollider();
         }
 
         private void CoreCameraDragObject()
@@ -93,29 +101,45 @@ namespace AD.Experimental.GameEditor
 
                 Transform FoucesOne = colliderLayer.ParentGroup.transform;
                 Transform CoreOne = CoreCamera.Core.transform;
+                DragingFocusObject(FoucesOne, CoreOne);
+            }
+        }
 
-                Vector2 dragVec = TouchPanel.DeltaDragVec;
-                float DragDelta = DragSpeed * Time.deltaTime;
-                if (CoreCamera.Is2D)
+        private void CoreCameraDragCollider()
+        {
+            if (CoreCamera != null && CoreCamera.FoucsOneTarget != null && Mouse.current.leftButton.isPressed)
+            {
+                GameObject FoucesOneObject = CoreCamera.FoucsOneTarget;
+
+                Transform FoucesOne = FoucesOneObject.transform;
+                Transform CoreOne = CoreCamera.Core.transform;
+                DragingFocusObject(FoucesOne, CoreOne);
+            }
+        }
+
+        private void DragingFocusObject(Transform FoucesOne, Transform CoreOne)
+        {
+            Vector2 dragVec = TouchPanel.DeltaDragVec;
+            float DragDelta = DragSpeed * Time.deltaTime;
+            if (CoreCamera.Is2D)
+            {
+                if (!Keyboard.current.wKey.isPressed && !Keyboard.current.sKey.isPressed && !Keyboard.current.upArrowKey.isPressed && !Keyboard.current.downArrowKey.isPressed)
+                    FoucesOne.position += DragDelta * dragVec.x * CoreOne.right;
+                if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed && !Keyboard.current.leftArrowKey.isPressed && !Keyboard.current.rightArrowKey.isPressed)
+                    FoucesOne.position += DragDelta * dragVec.y * CoreOne.up;
+            }
+            else
+            {
+                if (Keyboard.current.spaceKey.isPressed || Keyboard.current.leftShiftKey.isPressed)
+                {
+                    FoucesOne.position += DragSpeed * Time.deltaTime * dragVec.y * CoreOne.forward;
+                }
+                else
                 {
                     if (!Keyboard.current.wKey.isPressed && !Keyboard.current.sKey.isPressed && !Keyboard.current.upArrowKey.isPressed && !Keyboard.current.downArrowKey.isPressed)
                         FoucesOne.position += DragDelta * dragVec.x * CoreOne.right;
                     if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed && !Keyboard.current.leftArrowKey.isPressed && !Keyboard.current.rightArrowKey.isPressed)
                         FoucesOne.position += DragDelta * dragVec.y * CoreOne.up;
-                }
-                else
-                {
-                    if (Keyboard.current.spaceKey.isPressed || Keyboard.current.leftShiftKey.isPressed)
-                    {
-                        FoucesOne.position += DragSpeed * Time.deltaTime * dragVec.y * CoreOne.forward;
-                    }
-                    else
-                    {
-                        if (!Keyboard.current.wKey.isPressed && !Keyboard.current.sKey.isPressed && !Keyboard.current.upArrowKey.isPressed && !Keyboard.current.downArrowKey.isPressed)
-                            FoucesOne.position += DragDelta * dragVec.x * CoreOne.right;
-                        if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed && !Keyboard.current.leftArrowKey.isPressed && !Keyboard.current.rightArrowKey.isPressed)
-                            FoucesOne.position += DragDelta * dragVec.y * CoreOne.up;
-                    }
                 }
             }
         }

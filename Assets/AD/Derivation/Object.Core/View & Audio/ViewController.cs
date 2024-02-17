@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using AD.BASE;
 using AD.Utility;
-using UniRx.Triggers;
 using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -165,7 +163,7 @@ namespace AD.UI
 
         [SerializeField]
         UnityEngine.Gradient _effectGradient = new Gradient() 
-        { colorKeys = new GradientColorKey[] { new GradientColorKey(new Color(0.63f,0.63f,0.63f,1), 0), new GradientColorKey(Color.white, 1) } };
+        { colorKeys = new GradientColorKey[] { new GradientColorKey(Color.white, 1), new GradientColorKey(Color.white, 1) } };
 
         public Blend BlendMode
         {
@@ -254,6 +252,7 @@ namespace AD.UI
         {
             base.Start();
 
+            if (!Application.isPlaying) return;
             if (ViewImage != null)
             {
                 AD.UI.ADUI.Initialize(this);

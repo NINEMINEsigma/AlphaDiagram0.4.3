@@ -13,9 +13,6 @@ GameObject:
   - component: {fileID: 74856100616418838}
   - component: {fileID: 74856100616418839}
   - component: {fileID: 74856100616418832}
-  - component: {fileID: 811636679043057700}
-  - component: {fileID: 443921986152117646}
-  - component: {fileID: 6042678196571578042}
   m_Layer: 5
   m_Name: CostomWindow
   m_TagString: Untagged
@@ -57,6 +54,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c97652864c87a4246a9f0fb221388f0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Childs:
+    Data: []
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
+    OnReplace:
+      m_PersistentCalls:
+        m_Calls: []
   _Padding: {x: 0, y: 0, z: 0, w: 0}
   isCanBackPool: 1
   SubPage: {fileID: 74856100949534831}
@@ -160,46 +171,6 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
---- !u!114 &811636679043057700
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74856100616418837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &443921986152117646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74856100616418837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 213f8197d2e780a4eb37503ae30823ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerEnterEvent:
-    InvokeArray: 00000000
---- !u!114 &6042678196571578042
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 74856100616418837}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5977b725805788d429efc1ae02814fe4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerExitEvent:
-    InvokeArray: 00000000
 --- !u!1 &74856100949534828
 GameObject:
   m_ObjectHideFlags: 0
@@ -530,6 +501,7 @@ MonoBehaviour:
       m_Calls: []
   _IsClick: 0
   IsKeepState: 0
+  AnimationSpeed: 1
   title: {fileID: 0}
 --- !u!95 &74856101198179884
 Animator:

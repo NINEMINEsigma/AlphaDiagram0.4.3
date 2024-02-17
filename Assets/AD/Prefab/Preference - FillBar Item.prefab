@@ -12,9 +12,6 @@ GameObject:
   - component: {fileID: 2160647440853853323}
   - component: {fileID: 2160647440853853320}
   - component: {fileID: 2160647440853853321}
-  - component: {fileID: 2160647440853853326}
-  - component: {fileID: 2160647440853853327}
-  - component: {fileID: 2160647440853853324}
   m_Layer: 0
   m_Name: Preference - FillBar Item
   m_TagString: Untagged
@@ -103,6 +100,7 @@ MonoBehaviour:
     Name: 
     SpriteName: 
   IsKeepCoverParent: 0
+  IsSetUpCoverParentAtStart: 0
   _gradientType: 0
   _blendMode: 2
   _modifyVertices: 1
@@ -137,46 +135,6 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
---- !u!114 &2160647440853853326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2160647440853853298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e9e920162904ba944a1415f2afaa3977, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2160647440853853327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2160647440853853298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 213f8197d2e780a4eb37503ae30823ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerEnterEvent:
-    InvokeArray: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
---- !u!114 &2160647440853853324
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2160647440853853298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5977b725805788d429efc1ae02814fe4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnPointerExitEvent:
-    InvokeArray: 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 --- !u!1001 &2160647440493878874
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -443,7 +401,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4247100306540257603, guid: d7f701b428163a440a69cd4d249ca855, type: 3}
       propertyPath: m_fontSize
-      value: 25.55
+      value: 25.6
       objectReference: {fileID: 0}
     - target: {fileID: 4247100306540257603, guid: d7f701b428163a440a69cd4d249ca855, type: 3}
       propertyPath: m_fontStyle

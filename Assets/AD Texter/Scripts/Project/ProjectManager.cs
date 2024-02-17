@@ -91,6 +91,8 @@ namespace AD.Sample.Texter
         [Header("Assets")]
         public Transform ProjectTransformRoot;
         public ProjectRoot ProjectRootMono;
+        public CameraCore MainCameraCore;
+        public TimeClocker ADGTimeC;
         [Header("Prefab")]
         public PrefabModel ProjectPrefabModel;
 
@@ -98,6 +100,8 @@ namespace AD.Sample.Texter
         {
             App.instance.RegisterController(this);
             App.instance.OnGenerate.AddListener(T => this.OnGenerate.Invoke(T));
+            ADGlobalSystem.instance.IsAutoSaveArchitecturesDebugLog = true;
+            ADGTimeC = ADGlobalSystem.instance.AutoSaveArchitecturesDebugLogTimeLimitCounter;
         }
 
         private void OnDestroy()
@@ -182,5 +186,16 @@ namespace AD.Sample.Texter
         }
 
         public ADEvent<ProjectItemData> OnGenerate = new();
+
+        public void CatchItemByCameraCore(GameObject target, RayExtension.RayInfo info)
+        {
+            MainCameraCore.TryStartCoroutineMove();
+            var cat = target.GetComponents<IProjectItem>();
+            if(cat.Length!=0)
+            {
+                UIApp.GetController<Properties>().MatchTarget = cat[0];
+                UIApp.GetController<Properties>().ClearAndRefresh();
+            }
+        }
     }
-}
+} 

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace AD.Utility
@@ -103,7 +104,7 @@ namespace AD.Utility
             public TVal Value;
         }
 
-        [SerializeField]
+        [SerializeField, JsonIgnore]
         private List<Entry> Data;
 
         public ADEvent<TKey> OnAdd = new(), OnTryAdd = new(), OnRemove = new();

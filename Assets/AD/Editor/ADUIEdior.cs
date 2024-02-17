@@ -166,6 +166,19 @@ public abstract class AbstractCustomADEditor : Editor
     {
         base.OnInspectorGUI();
     }
+
+    public void MakeUpNumericManager(string thatNumericManagerName)
+    {
+        SerializedProperty property = serializedObject.FindProperty(thatNumericManagerName);
+        VerticalBlockWithBox(() =>
+        {
+            if (property.stringValue.StartsWith("Default"))
+                HelpBox("Numeric Manager Is Idle", MessageType.Info);
+            else
+                HelpBox("You Can Name It Start With Default To Make It Idle", MessageType.Info);
+            EditorGUILayout.PropertyField(property);
+        });
+    }
 }
 
 public abstract class IADUIEditor : AbstractCustomADEditor

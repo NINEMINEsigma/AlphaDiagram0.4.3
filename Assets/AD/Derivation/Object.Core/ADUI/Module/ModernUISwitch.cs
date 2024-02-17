@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 
 namespace AD.UI
 {
-    public class ModernUISwitch : ADUI,IBoolButton
+    public class ModernUISwitch : ADUI,IBoolButton,INumericManager<bool>
     {
         // Events
         public ADEvent OnEvents = new();
@@ -43,6 +43,7 @@ namespace AD.UI
         public bool enableSwitchSounds = false;
         public bool useHoverSound = true;
         public bool useClickSound = true;
+        public string NumericManagerName = DefaultNumericManagerName;
 
         // Resources
         private Animator switchAnimator;
@@ -110,7 +111,7 @@ namespace AD.UI
 
         public void Init()
         {
-            _isOn = false;
+            isOn = false;
         }
 
         private void AnimateSwitch(bool boolen)
@@ -160,6 +161,24 @@ namespace AD.UI
         {
             SwitchEvents.RemoveListener(action);
             return this;
+        }
+
+        public void NumericManager(bool value)
+        {
+            if(ADGlobalSystem.instance.IntValues.TryGetValue(this.NumericManagerName,out var intvalue))
+            {
+                if (isOn && intvalue == 0)
+                    SetValue_NumericManagerName(this.NumericManagerName, 1);
+                if (!isOn && intvalue != 0)
+                    SetValue_NumericManagerName(this.NumericManagerName, 0);
+            }
+            else SetValue_NumericManagerName(this.NumericManagerName, this.isOn ? 1 : 0);
+        }
+
+        protected override void HowSetupByNumericManager()
+        {
+            if (GetValue_NumericManagerName(NumericManagerName, out int value))
+                this.isOn = value != 0;
         }
     }
 }

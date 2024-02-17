@@ -703,8 +703,6 @@ namespace AD.BASE
 
     public abstract class ADArchitecture<T> : IADArchitecture where T : ADArchitecture<T>, new()
     {
-        public static Dictionary<Type, IADArchitecture> AllArchitecture = new();
-
         #region attribute
 
         private Dictionary<Type, object> AD__Objects = new();
@@ -716,7 +714,7 @@ namespace AD.BASE
                 if (__ADinstance == null)
                 {
                     __ADinstance = new T();
-                    AllArchitecture.Add(typeof(T), __ADinstance);
+                    ObjectExtension.AllArchitecture.Add(typeof(T), __ADinstance);
                     __ADinstance.Init();
                 }
                 return __ADinstance as T;
@@ -736,7 +734,7 @@ namespace AD.BASE
         protected ADArchitecture() { }
         ~ADArchitecture()
         {
-            AllArchitecture.Remove(typeof(T));
+            ObjectExtension.AllArchitecture.Remove(typeof(T));
         }
 
         #endregion
@@ -750,7 +748,15 @@ namespace AD.BASE
 
         public virtual void SaveRecord()
         {
-            MessageRecord.Save(Path.Combine(Application.persistentDataPath, "AD", this.GetType().Name, DateTime.Now.Ticks.ToString()) + ".AD.log");
+            string fileName = "";
+            fileName += DateTime.Now.DayOfWeek.ToString() + " ";
+            fileName += DateTime.Now.Hour.ToString() + "h";
+            fileName += DateTime.Now.Minute.ToString() + "m";
+            fileName += DateTime.Now.Second.ToString() + "s";
+            string fullPath = Path.Combine(Application.persistentDataPath, this.GetType().FullName.Replace('.', '\\'), fileName) + ".AD.log";
+            var dic = FileC.CreateDirectroryOfFile(fullPath);
+            if (dic.GetFiles().Length > 100) dic.Delete();
+            MessageRecord.Save(fullPath);
         }
 
         public abstract IBaseMap ToMap();
@@ -2310,6 +2316,8 @@ namespace AD.BASE
 
     public static class ObjectExtension
     {
+        public static Dictionary<Type, IADArchitecture> AllArchitecture = new();
+
         public static T As<T>(this object self) where T : class
         {
             if (self == null) throw new ADException("Now As._Left is null");

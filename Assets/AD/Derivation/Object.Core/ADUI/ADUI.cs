@@ -54,6 +54,8 @@ namespace AD.UI
         public int SerialNumber { get; set; } = 0;
         public string ElementArea = "null";
 
+        public const string DefaultNumericManagerName= "Default";
+
         public virtual void TurnsActive(GameObject target) => target.gameObject.SetActive(!target.gameObject.activeSelf);
 
         public virtual void OnPointerEnter(PointerEventData eventData)
@@ -105,6 +107,15 @@ namespace AD.UI
         {
             if (obj.IsNeedContext)
                 obj.InitializeContext();
+            obj.SerialNumber = TotalSerialNumber++;
+            Items.Add(obj);
+        }
+
+        public static void Initialize(IADUI obj, string numericManagerName)
+        {
+            if (obj.IsNeedContext)
+                obj.InitializeContext();
+            obj.As<INumericManager>().SetupByNumericManager(numericManagerName);
             obj.SerialNumber = TotalSerialNumber++;
             Items.Add(obj);
         }
@@ -162,6 +173,29 @@ namespace AD.UI
         {
             ADGlobalSystem.instance.SetStringValue(NumericManagerName, value);
         }
+
+        public static bool GetValue_NumericManagerName(string NumericManagerName, out float value)
+        {
+            return ADGlobalSystem.instance.FloatValues.TryGetValue(NumericManagerName, out value);
+        }
+        public static bool GetValue_NumericManagerName(string NumericManagerName, out int value)
+        {
+            return ADGlobalSystem.instance.IntValues.TryGetValue(NumericManagerName, out value);
+        }
+        public static bool GetValue_NumericManagerName(string NumericManagerName, out string value)
+        {
+            return ADGlobalSystem.instance.StringValues.TryGetValue(NumericManagerName, out value);
+        }
+
+        public void SetupByNumericManager(string numericManagerName)
+        {
+            if (!string.IsNullOrEmpty(numericManagerName) && numericManagerName.StartsWith("Default"))
+                HowSetupByNumericManager();
+        }
+        protected virtual void HowSetupByNumericManager()
+        {
+
+        }
     }
 
     public interface IButton : IADUI
@@ -212,7 +246,12 @@ namespace AD.UI
         IInputField SetTextWithoutNotify(string text);
     }
 
-    public interface INumericManager<T>
+    public interface INumericManager
+    {
+        void SetupByNumericManager(string numericManagerName);
+    }
+
+    public interface INumericManager<T> : INumericManager
     {
         void NumericManager(T value);
     }

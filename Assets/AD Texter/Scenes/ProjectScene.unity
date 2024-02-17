@@ -624,7 +624,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1002687280392057815, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -455.9544
+      value: -455.95428
       objectReference: {fileID: 0}
     - target: {fileID: 1995526601676542757, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_IsActive
@@ -696,7 +696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4538837733359995695, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00007677078
+      value: -0.00012373924
       objectReference: {fileID: 0}
     - target: {fileID: 6317214944257746823, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_text
@@ -813,7 +813,7 @@ PrefabInstance:
     - target: {fileID: 7953931864537186812, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: StaticItem.Array.data[0].Callbacks.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1696605981247371494}
     - target: {fileID: 7953931864537186812, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: StaticItem.Array.data[1].Callbacks.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -1058,6 +1058,21 @@ MonoBehaviour:
   far2DPanelZ: 50
   xyza: 1
   IsLockKeyBoardDetectForMoveMyselfClone: 0
+  CatchFocusEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2057135014}
+        m_TargetAssemblyTypeName: AD.Sample.Texter.ProjectManager, Assembly-CSharp
+        m_MethodName: CatchItemByCameraCore
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1542409747
 GameObject:
   m_ObjectHideFlags: 0
@@ -1516,6 +1531,7 @@ MonoBehaviour:
   CoreCamera: {fileID: 1342043927}
   DragSpeed: 2.6
   TouchPanel: {fileID: 1871995296}
+  CoreCameraDragObjectEnable: 1
   ValueSource:
     Data: []
     OnAdd:
@@ -1742,7 +1758,8 @@ MonoBehaviour:
       DateTime: 
       AssetsName: 
   ProjectTransformRoot: {fileID: 1162533632}
-  ProjectRootMono: {fileID: 0}
+  ProjectRootMono: {fileID: 1696605981247371494}
+  MainCameraCore: {fileID: 1342043927}
   ProjectPrefabModel:
     Root: {fileID: 0}
     Prefabs:
@@ -1821,12 +1838,32 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3803961930877563509, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+      propertyPath: SubProjectItemPrefab.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3803961930877563509, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+      propertyPath: SubProjectItemPrefab.Array.data[0]
+      value: 
+      objectReference: {fileID: 8662397913388901987, guid: c3710d0b141a73a46943cd35712dd5de, type: 3}
     - target: {fileID: 8206719086998618273, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8206719086998618273, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8206719086998618273, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
       propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8206719086998618273, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8206719086998618273, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+      propertyPath: m_AnchoredPosition.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8206719086998618273, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
@@ -1835,6 +1872,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+--- !u!114 &1696605981247371494 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3803961930877563509, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}
+  m_PrefabInstance: {fileID: 1696605981247371493}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696605981247371495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5bb834938fb20a04ea5aea6f97f0ccad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1696605981247371495 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1319054866634177880, guid: 1dec582eee2e3f14fb69e116c263e699, type: 3}

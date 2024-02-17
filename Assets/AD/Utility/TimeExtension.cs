@@ -111,28 +111,28 @@ namespace AD.Utility
         /// </summary>
         public float StartSceond
         {
-            get => clockS / 10.0f;
+            get => clockS / 10000000.0f;
         }
         /// <summary>
         /// s
         /// </summary>
         public float LastUpdateSceond
         {
-            get => clockE / 10.0f;
+            get => clockE / 10000000.0f;
         }
         /// <summary>
         /// s
         /// </summary>
         public float LastDalteSceond
         {
-            get => clockU / 10.0f;
+            get => clockU / 10000000.0f;
         }
         /// <summary>
         /// s
         /// </summary>
         public float KeepingSceond
         {
-            get => (clockE - clockS) / 10.0f;
+            get => (clockE - clockS) / 10000000.0f;
         }
     }
 }

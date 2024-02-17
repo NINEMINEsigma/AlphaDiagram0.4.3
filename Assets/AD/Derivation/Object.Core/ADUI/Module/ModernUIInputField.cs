@@ -37,7 +37,6 @@ namespace AD.UI
 
         [Header("Setting")]
         public string NumericManagerName = DefaultNumericManagerName;
-        public static string DefaultNumericManagerName => "DefaultInput";
 
         // Hidden variables
         private readonly string inAnim = "In";
@@ -174,6 +173,12 @@ namespace AD.UI
         {
             Source.SetTextWithoutNotify(text);
             return this;
+        }
+
+        protected override void HowSetupByNumericManager()
+        {
+            if (GetValue_NumericManagerName(NumericManagerName, out string str))
+                this.text = str;
         }
     } 
 }

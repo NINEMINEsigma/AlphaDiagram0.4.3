@@ -323,31 +323,21 @@ namespace AD.BASE
                 callback(-1, headRequest.error + ":cannt found the file");
                 yield break;
             }
-            ulong totalLength = ulong.Parse(headRequest.GetResponseHeader("Content-Length"));
-            Debug.Log("获取大小" + totalLength);
             headRequest.Dispose();
             using UnityWebRequest Request = UnityWebRequest.Get(loadPath);
             //append设置为true文件写入方式为接续写入，不覆盖原文件。
             Request.downloadHandler = new DownloadHandlerFile(savePath, true);
             FileInfo file = new FileInfo(savePath);
-            ulong fileLength = (ulong)file.Length;
 
             //请求网络数据从第fileLength到最后的字节；
-            Request.SetRequestHeader("Range", "bytes=" + fileLength + "-");
+            Request.SetRequestHeader("Range", "bytes=" + file.Length + "-");
 
-            if (!string.IsNullOrEmpty(headRequest.error))
-            {
-                callback(0, headRequest.error + ":failed");
-                yield break;
-            }
-            if (fileLength < totalLength)
+            if (Request.downloadProgress<1)
             {
                 Request.SendWebRequest();
                 while (!Request.isDone)
                 {
-                    double progress = (Request.downloadedBytes + fileLength) / (double)totalLength;
-                    callback((float)progress, "loading");
-                    Debug.Log("下载量" + Request.downloadedBytes);
+                    callback(Request.downloadProgress * 100, "%");
                     //超过一定的字节关闭现在的协程，开启新的协程，将资源分段下载
                     if (Request.downloadedBytes >= loadedBytes)
                     {
@@ -365,11 +355,7 @@ namespace AD.BASE
                     yield return null;
                 }
             }
-            if (string.IsNullOrEmpty(Request.error))
-            {
-                Debug.Log("下载成功" + savePath);
-                callback(1, "succeed");
-            }
+            if (string.IsNullOrEmpty(Request.error)) callback(1, "succeed");
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
