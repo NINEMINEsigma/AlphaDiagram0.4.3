@@ -129,7 +129,7 @@ namespace AD.Sample.Texter
             {
                 DataAssetsForm = Architecture.GetModel<DataAssets>()
             };
-            if(Architecture.Contains<ProjectLoadEntry>())
+            if (Architecture.Contains<ProjectLoadEntry>())
             {
                 //更新
                 Architecture.RegisterModel<ProjectLoadEntry>(Architecture.GetModel<ProjectLoadEntry>().GetNext(CurrentProjectData.DataAssetsForm));
@@ -151,7 +151,7 @@ namespace AD.Sample.Texter
 
         public void SaveProjectData()
         {
-            if(loadingTask!=null)
+            if (loadingTask != null)
             {
                 loadingTask.UnRegister();
                 loadingTask = null;
@@ -187,15 +187,14 @@ namespace AD.Sample.Texter
 
         public ADEvent<ProjectItemData> OnGenerate = new();
 
+        public GameObject LastFocusTarget;
         public void CatchItemByCameraCore(GameObject target, RayExtension.RayInfo info)
         {
-            MainCameraCore.TryStartCoroutineMove();
-            var cat = target.GetComponents<IProjectItem>();
-            if(cat.Length!=0)
+            if (LastFocusTarget == target)
             {
-                UIApp.GetController<Properties>().MatchTarget = cat[0];
-                UIApp.GetController<Properties>().ClearAndRefresh();
+                MainCameraCore.TryStartCoroutineMove();
             }
+            LastFocusTarget = target;
         }
     }
-} 
+}

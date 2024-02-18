@@ -104,7 +104,10 @@ namespace AD.Sample.Texter.Project
                 var data = that.ProjectTextSourceData;
                 this.MatchItem.SetTitle("Texter");
 
-                DisplayProjectID(data);
+                DisplayProjectID(data).AddListener(T =>
+                {
+                    that.MatchHierarchyEditor.As<HierarchyBlock<ProjectTextField>>().Title = T;
+                });
 
                 var inputT = PropertiesLayout.InputField(data.text, "Text");
                 inputT.AddListener(T => data.text = T);
@@ -112,7 +115,7 @@ namespace AD.Sample.Texter.Project
                 {
                     var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>().ObtainElement(new Vector2(1600, 800)).SetTitle("Text ProjectItem".Translate());
                     var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
-                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(1600, 800);
+                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(1550, 750);
                     mif.SetTitle("Description".Translate());
                     temp
                     .SetADUIOnWindow<ModernUIInputField>("Field", mif)
@@ -130,7 +133,7 @@ namespace AD.Sample.Texter.Project
                 {
                     var temp = GameEditorApp.instance.GetSystem<GameEditorWindowGenerator>().ObtainElement(new Vector2(1600, 800)).SetTitle("Text ProjectItem".Translate());
                     var mif = ADGlobalSystem.GenerateElement<ModernUIInputField>().PrefabInstantiate();
-                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(1600, 800);
+                    mif.transform.As<RectTransform>().sizeDelta = new Vector2(1550, 750);
                     mif.SetTitle("Description".Translate());
                     temp
                     .SetADUIOnWindow<ModernUIInputField>("Field", mif)
@@ -157,12 +160,6 @@ namespace AD.Sample.Texter.Project
 
         private void Start()
         {
-            MatchHierarchyEditor = new HierarchyBlock<ProjectTextField>(this, nameof(ProjectTextField).Translate());
-            MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
-            {
-                new ProjectTextFieldBlock(this),
-                new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
-            };
             GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
             if (IsSetupProjectTextSourceData)
             {
@@ -172,6 +169,45 @@ namespace AD.Sample.Texter.Project
             {
                 ProjectTextSourceData = new(this);
             }
+            MatchHierarchyEditor = new HierarchyBlock<ProjectTextField>(this, ProjectTextSourceData.ParentItemID);
+            MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
+            {
+                new ProjectTextFieldBlock(this),
+                new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
+            };
+            App.instance.AddMessage($"Project Item(Text) {ProjectTextSourceData.ParentItemID} Setup");
+            OnMenu = new()
+            {
+                [0] = new Dictionary<string, ADEvent>()
+                {
+                    {"Delete",new(()=>TryDestory()) }
+                }
+            };
+        }
+
+        private void TryDestory()
+        {
+            GameEditorApp.instance
+                .GetSystem<CustomWindowGenerator>()
+                .ObtainElement(new(200, 60))
+                .SetTitle("Warning : Will Delete Child".Translate())
+                .GenerateButton("Yes".Translate())
+                .AddListener(() =>
+                {
+                    GameObject.Destroy(gameObject);
+                    GameEditorApp.instance.SendCommand<RefreshHierarchyPanel>();
+                    GameEditorApp.instance.SendCommand<RefreshPropertiesPanel>();
+                });
+        }
+
+        private void OnDestroy()
+        {
+            if (ADGlobalSystem.instance == null) return;
+            App.instance.GetController<ProjectManager>().CurrentProjectData.Remove(new(ProjectItemBindKey));
+            this.ProjectTextSourceData = null;
+            this.MatchHierarchyEditor = null;
+            this.MatchPropertiesEditors.Clear();
+            this.SetParent(null);
         }
 
         public void SetupChild(IProjectItem child)
@@ -186,9 +222,11 @@ namespace AD.Sample.Texter.Project
 
         }
 
+        public Dictionary<int, Dictionary<string, ADEvent>> OnMenu;
+
         public void ClickOnRight()
         {
-
+            GameEditorApp.instance.GetSystem<SinglePanelGenerator>().OnMenuInit(OnMenu);
         }
 
         public List<ICanSerializeOnCustomEditor> Childs = new();
@@ -227,7 +265,7 @@ namespace AD.Sample.Texter.Project
             catch (Exception ex)
             {
                 ADGlobalSystem.AddError(nameof(ProjectTextField) + " " + SourceData.ProjectItemID.ToString(), ex);
-                App.instance.AddMessage($"Save Text {SourceData.ProjectItemID} Data Successful");
+                App.instance.AddMessage($"Save Text {SourceData.ProjectItemID} Data Failed");
                 return false;
             }
         }

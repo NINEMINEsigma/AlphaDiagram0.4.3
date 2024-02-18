@@ -6,8 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using AD.BASE;
 using AD.UI;
 using AD.Utility;
@@ -169,7 +167,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240218/0127";
+        public static string Version => "AD/0.4.3/20240218/1615";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -483,18 +481,24 @@ namespace AD
 
         private void AutoSaving()
         {
-            Debug.Log($"尝试保存Log信息 : {ObjectExtension.AllArchitecture.Count}");
+            AddMessage($"尝试保存Log信息 : {ObjectExtension.AllArchitecture.Count}","AutoSave");
+
+            int counter = 0;
             foreach (var arc in ObjectExtension.AllArchitecture)
             {
+                AddMessage("进行至" + arc.Value.GetType().FullName,"AutoSave");
                 if (!arc.Value.Contains<ADMessageRecord>()) continue;
+                counter++;
                 string fileName = "AutoLog";
                 string fullPath = Path.Combine(Application.persistentDataPath, arc.Value.GetType().FullName.Replace('.', '\\'), fileName) + ".AD.log";
                 var dic = FileC.CreateDirectroryOfFile(fullPath);
                 if (dic.GetFiles().Length > 100) dic.Delete();
                 arc.Value.GetModel<ADMessageRecord>().Save(fullPath);
-                Debug.Log(fullPath + " 已保存");
+                AddMessage(fullPath + " 已保存","AutoSave");
             }
             AutoSaveArchitecturesDebugLogTimeLimitCounter.Init();
+
+            AddMessage(counter.ToString() + "个Log文件已生成", "AutoSave");
         }
 
         private void Update()
@@ -502,7 +506,7 @@ namespace AD
             if (IsAutoSaveArchitecturesDebugLog)
             {
                 AutoSaveArchitecturesDebugLogTimeLimitCounter.Update();
-                if (AutoSaveArchitecturesDebugLogTimeLimitCounter.LastDalteTime > AutoSaveArchitecturesDebugLogTimeLimit)
+                if (AutoSaveArchitecturesDebugLogTimeLimitCounter.KeepingSceond > AutoSaveArchitecturesDebugLogTimeLimit)
                 {
                     AutoSaving();
                 }

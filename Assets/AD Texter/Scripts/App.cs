@@ -39,17 +39,18 @@ namespace AD.Sample.Texter
             {
             }
 
-            public void DisplayProjectID(ProjectItemData data)
+            public UI.InputField DisplayProjectID(ProjectItemData data)
             {
                 PropertiesLayout.BeginHorizontal();
                 PropertiesLayout.Label("Project ID");
-                var inputI = PropertiesLayout.InputField(data.ProjectItemID, "Project ID");
+                UI.InputField inputI = PropertiesLayout.InputField(data.ProjectItemID, "Project ID");
                 inputI.AddListener(T =>
                 {
                     data.ProjectItemID = T;
                     inputI.text = data.ProjectItemID;
                 });
                 PropertiesLayout.EndHorizontal();
+                return inputI;
             }
         }
 
@@ -254,6 +255,11 @@ namespace AD.Sample.Texter
                     cat.SetParent(ProjectTextData.GetParent(data.ParentItemID));
                 }
             });
+
+            GameEditorApp.instance.RegisterCommand<RefreshHierarchyPanel>();
+            GameEditorApp.instance.RegisterCommand<RefreshPropertiesPanel>();
+            this.RegisterCommand<RefreshHierarchyPanel>();
+            this.RegisterCommand<RefreshPropertiesPanel>();
         }
 
         public override bool FromMap(IBaseMap from)

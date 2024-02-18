@@ -46,10 +46,11 @@ namespace AD.Experimental.GameEditor
         public static void SetParent(this ICanSerializeOnCustomEditor self, ICanSerializeOnCustomEditor _Right)
         {
             if (self == null && _Right == null) return;
+            if (self.ParentTarget == _Right) return;
             if (_Right == self) throw new ADException("Loop Serialize Editor");
             if (self.ParentTarget != null)
             {
-                if (self.GetChilds().Contains(_Right)) return;
+                //if (self.GetChilds().Contains(_Right)) return;
                 self.ParentTarget.GetChilds().Remove(self);
                 self.ParentTarget.MatchHierarchyEditor.MatchItem.Refresh();
             }

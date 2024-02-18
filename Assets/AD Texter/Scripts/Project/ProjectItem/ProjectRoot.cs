@@ -66,21 +66,12 @@ namespace AD.Sample.Texter.Project
                 new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
             };
             GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
+            App.instance.AddMessage("Project Root Setup");
         }
 
         private void Update()
         {
-            /*Vector3 mlt = InternalUtility.AnchoringLeftTop(MyEditGroup), mlb = InternalUtility.AnchoringLeftButtom(MyEditGroup);
-            Vector3 mrt = InternalUtility.AnchoringRightTop(MyEditGroup), mrb = InternalUtility.AnchoringRightButtom(MyEditGroup);
-            foreach (var child in Childs)
-            {
-                if (child is MonoBehaviour mono)
-                {
-                    var eg = mono.GetComponent<EditGroup>();
-                    Vector3 lt= InternalUtility.AnchoringLeftTop(eg),lb= InternalUtility.AnchoringLeftButtom(eg);
-                    Vector3 rt = InternalUtility.AnchoringRightTop(eg), rb = InternalUtility.AnchoringRightButtom(eg);
-                }
-            }*/
+
         }
 
         public void SetupChild(IProjectItem child)
