@@ -446,41 +446,44 @@ namespace AD.Utility.Object
         {
             dalte = 1;
             UpdateDirty();
+            Vector3 startPosition = Core.transform.position;
+            GameObject focus = PastOneTarget;
             if (Is2D)
             {
                 Vector3 oPanelVec = Vector3.zero;
                 switch (xyza)
                 {
                     case XYZA.X:
-                        oPanelVec = PastOneTarget.transform.position.SetX(Core.transform.position.x);
+                        Core.transform.position = focus.transform.position.SetX(startPosition.x);
                         break;
                     case XYZA.Y:
-                        oPanelVec = PastOneTarget.transform.position.SetY(Core.transform.position.y);
+                        Core.transform.position = focus.transform.position.SetY(startPosition.y);
                         break;
                     case XYZA.Z:
-                        oPanelVec = PastOneTarget.transform.position.SetZ(Core.transform.position.z);
+                        Core.transform.position = focus.transform.position.SetZ(startPosition.z);
                         break;
                 }
                 while (dalte > 0)
                 {
                     dalte = Mathf.Max(0, dalte - Time.deltaTime);
-                    Core.transform.position = Vector3.Lerp(Core.transform.position, oPanelVec, FollowCurve.Evaluate(1 - dalte));
+                    Core.transform.position = Vector3.Lerp(startPosition, oPanelVec, FollowCurve.Evaluate(1 - dalte));
                     yield return null;
                 }
-                Core.transform.position = Vector3.Lerp(Core.transform.position, oPanelVec, 1);
+                Core.transform.position = Vector3.Lerp(startPosition, oPanelVec, 1);
             }
             else
             {
                 Core.transform.LookAt(Target.transform);
-                if (Core.transform.localEulerAngles.x > 190) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(-10);
-                if (Core.transform.localEulerAngles.x < 170) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(10);
+                if (Core.transform.localEulerAngles.x > 190) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(-1);
+                if (Core.transform.localEulerAngles.x < 170) Core.transform.localEulerAngles = Core.transform.localEulerAngles.AddX(1);
+                Vector3 fposition = focus.transform.position;
                 while (dalte > 0)
                 {
                     dalte = Mathf.Max(0, dalte - Time.deltaTime);
-                    Core.transform.position = Vector3.Lerp(Core.transform.position, PastOneTarget.transform.position - Core.transform.forward * 10, FollowCurve.Evaluate(1 - dalte));
+                    Core.transform.position = Vector3.Lerp(startPosition, fposition - Core.transform.forward * 10, FollowCurve.Evaluate(1 - dalte));
                     yield return null;
                 }
-                Core.transform.position = Vector3.Lerp(Core.transform.position, PastOneTarget.transform.position - Core.transform.forward * 10, 1);
+                Core.transform.position = Vector3.Lerp(startPosition, fposition - Core.transform.forward * 10, 1);
             }
         }
     }

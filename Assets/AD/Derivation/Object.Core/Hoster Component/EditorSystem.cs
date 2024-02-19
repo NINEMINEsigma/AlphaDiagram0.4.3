@@ -7,10 +7,16 @@ using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 namespace AD.Experimental.GameEditor
 {
+    public interface ICatchCameraRayUpdate : IADEventSystemHandler
+    {
+        void OnRayCatching();
+    }
+
     public class EditorSystem : MonoBehaviour, IADSystem,IMainHoster
     {
         #region IADSystem
@@ -117,29 +123,31 @@ namespace AD.Experimental.GameEditor
             }
         }
 
-        private void DragingFocusObject(Transform FoucesOne, Transform CoreOne)
+        private void DragingFocusObject(Transform FocusOne, Transform CoreOne)
         {
+            ADEventSystemExtension.Execute<ICatchCameraRayUpdate>(FocusOne.gameObject, null, (T, P) => T.OnRayCatching());
+
             Vector2 dragVec = TouchPanel.DeltaDragVec;
             float DragDelta = DragSpeed * Time.deltaTime;
             if (CoreCamera.Is2D)
             {
                 if (!Keyboard.current.wKey.isPressed && !Keyboard.current.sKey.isPressed && !Keyboard.current.upArrowKey.isPressed && !Keyboard.current.downArrowKey.isPressed)
-                    FoucesOne.position += DragDelta * dragVec.x * CoreOne.right;
+                    FocusOne.position += DragDelta * dragVec.x * CoreOne.right;
                 if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed && !Keyboard.current.leftArrowKey.isPressed && !Keyboard.current.rightArrowKey.isPressed)
-                    FoucesOne.position += DragDelta * dragVec.y * CoreOne.up;
+                    FocusOne.position += DragDelta * dragVec.y * CoreOne.up;
             }
             else
             {
                 if (Keyboard.current.spaceKey.isPressed || Keyboard.current.leftShiftKey.isPressed)
                 {
-                    FoucesOne.position += DragSpeed * Time.deltaTime * dragVec.y * CoreOne.forward;
+                    FocusOne.position += DragSpeed * Time.deltaTime * dragVec.y * CoreOne.forward;
                 }
                 else
                 {
                     if (!Keyboard.current.wKey.isPressed && !Keyboard.current.sKey.isPressed && !Keyboard.current.upArrowKey.isPressed && !Keyboard.current.downArrowKey.isPressed)
-                        FoucesOne.position += DragDelta * dragVec.x * CoreOne.right;
+                        FocusOne.position += DragDelta * dragVec.x * CoreOne.right;
                     if (!Keyboard.current.aKey.isPressed && !Keyboard.current.dKey.isPressed && !Keyboard.current.leftArrowKey.isPressed && !Keyboard.current.rightArrowKey.isPressed)
-                        FoucesOne.position += DragDelta * dragVec.y * CoreOne.up;
+                        FocusOne.position += DragDelta * dragVec.y * CoreOne.up;
                 }
             }
         }

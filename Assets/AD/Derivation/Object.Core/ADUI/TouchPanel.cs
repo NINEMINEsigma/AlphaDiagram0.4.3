@@ -43,7 +43,12 @@ namespace AD.UI
 
         private void LateUpdate()
         {
-            IsPointerMoving = false;
+            if (_Past != Mouse.current.position.ReadValue())
+            {
+                _Past = Mouse.current.position.ReadValue();
+                IsPointerMoving = true;
+            }
+            else IsPointerMoving = false;
         }
 
         public override void InitializeContext()
@@ -55,6 +60,7 @@ namespace AD.UI
         }
 
         [SerializeField] private Vector2 _Drag = Vector2.zero;
+        private Vector2 _Past;
 
         public ADEvent<Vector2> OnEvent = new();
         public ADEvent<Vector3> OnClickWhenCurrentWasPressLeft = new(), OnClickWhenCurrentWasPressRight = new();
@@ -76,19 +82,16 @@ namespace AD.UI
         public void OnBeginDrag(PointerEventData eventData)
         {
             dragVec = Vector2.zero;
-            IsPointerMoving = false;
         }
 
         public void OnDrag(PointerEventData eventData)
         {
             dragVec = eventData.delta;
-            IsPointerMoving = true;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
             dragVec = Vector2.zero;
-            IsPointerMoving = false;
         }
 
         public RegisterInfo LeftRegisterInfo, RightRegisterInfo;
