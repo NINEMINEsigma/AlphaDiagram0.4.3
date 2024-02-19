@@ -38,6 +38,7 @@ namespace AD.Utility
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public static string[] assemblyNames = new string[] { "Assembly-CSharp-firstpass", "Assembly-CSharp" };
 
+        public static readonly BindingFlags PublicFlags = BindingFlags.Public | BindingFlags.Instance;
         public static readonly BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
         public static readonly BindingFlags AllBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance;
 
