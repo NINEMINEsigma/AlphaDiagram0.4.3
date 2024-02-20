@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -80,7 +79,7 @@ namespace AD.Utility
                 ID = iD;
             }
 
-            public virtual Dictionary<string,string> values { get; set; } = new();
+            public virtual Dictionary<string, string> values { get; set; } = new();
 
             public virtual string this[string key] => values.TryGetValue(key, out var value) ? value : key;
 
@@ -108,13 +107,43 @@ namespace AD.Utility
 
         #endregion
 
-        public static string Link(this string[] self,int first,int end)
+        public static string Link(this string[] self, int first, int end)
         {
             string result = "";
-            while (first<end)
+            while (first < end - 1)
             {
                 result += self[first++] + " ";
             }
+            result += self[end - 1];
+            return result;
+        }
+
+        public static string Link(this string[] self)
+        {
+            return self.Link(0, self.Length);
+        }
+
+        public static string LinkAndInsert(this string[] self, char key)
+        {
+            string result = "";
+            int first = 0, end = self.Length;
+            while (first < end - 1)
+            {
+                result += self[first++] + key;
+            }
+            result += self[end - 1];
+            return result;
+        }
+
+        public static string LinkAndInsert(this string[] self, string key)
+        {
+            string result = "";
+            int first = 0, end = self.Length;
+            while (first < end - 1)
+            {
+                result += self[first++] + key;
+            }
+            result += self[end - 1];
             return result;
         }
 

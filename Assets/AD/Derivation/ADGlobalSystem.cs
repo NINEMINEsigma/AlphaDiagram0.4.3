@@ -167,18 +167,20 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240219/1911";
+        public static string Version => "AD/0.4.3/20240220/1807";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
         #region Attribute
 
-        private static bool AppQuitting = true;
+        public static bool AppQuitting { get; private set; } = true;
+        private static bool IsJumpScene = false;
         public static ADGlobalSystem _m_instance = null;
         public static ADGlobalSystem instance
         {
             get
             {
+                if (IsJumpScene) return null;
                 if (AppQuitting) return _m_instance;
                 if (_m_instance == null)
                 {
@@ -227,6 +229,7 @@ namespace AD
 
         public static T GenerateElement<T>() where T : ADUI
         {
+            if (IsJumpScene || AppQuitting) return null;
             try
             {
                 return instance.GetFieldByName<T>("_" + typeof(T).Name);
@@ -273,6 +276,7 @@ namespace AD
 
         private static void ReleaseThisFrameUpdate(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> key)
         {
+            if (IsJumpScene || AppQuitting) return;
             try
             {
                 if (key.Key.All((P) => (!P.GetType().Equals(typeof(MulHitSameControl)) && P.wasReleasedThisFrame)))
@@ -288,6 +292,7 @@ namespace AD
         }
         private static void PressThisFrameUpdate(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> key)
         {
+            if (IsJumpScene || AppQuitting) return;
             try
             {
                 if (key.Key.All((P) => P is IMulHitControl IMul ? IMul.WasPressedThisFrame() : P.wasPressedThisFrame))
@@ -303,6 +308,7 @@ namespace AD
         }
         private static void PressButtonUpdate(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> key)
         {
+            if (IsJumpScene || AppQuitting) return;
             try
             {
                 if (key.Key.All((P) => (!P.GetType().Equals(typeof(MulHitSameControl)) && P.isPressed)))
@@ -319,8 +325,9 @@ namespace AD
 
         public static RegisterInfo AddListener(ButtonControl key, UnityEngine.Events.UnityAction action, PressType type = PressType.JustPressed)
         {
+            if (IsJumpScene || AppQuitting) return null;
             KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> pair
-                = instance.multipleInputController.FirstOrDefault((P) => { return P.Key[0].Equals(key) && P.Key.Count == 1; });
+            = instance.multipleInputController.FirstOrDefault((P) => { return P.Key[0].Equals(key) && P.Key.Count == 1; });
             if (pair.Equals(default(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>>)))
             {
                 List<ButtonControl> currentList = new List<ButtonControl> { key };
@@ -344,6 +351,7 @@ namespace AD
         }
         public static RegisterInfo AddListener(List<ButtonControl> keys, UnityEngine.Events.UnityAction action, PressType type = PressType.JustPressed)
         {
+            if (IsJumpScene || AppQuitting) return null;
             KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> pair
                 = instance.multipleInputController.FirstOrDefault((P) => { return P.Key.Intersect(keys).ToList().Count == keys.Count; });
 
@@ -382,6 +390,7 @@ namespace AD
         }
         public static void RemoveListener(ButtonControl key, UnityEngine.Events.UnityAction action, PressType type = PressType.JustPressed)
         {
+            if (IsJumpScene || AppQuitting) return;
             KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> pair
                 = instance.multipleInputController.FirstOrDefault((P) => { return P.Key[0].Equals(key) && P.Key.Count == 1; });
             if (!pair.Equals(default(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>>)) && pair.Value.ContainsKey(type))
@@ -392,6 +401,7 @@ namespace AD
         }
         public static void RemoveListener(List<ButtonControl> keys, UnityEngine.Events.UnityAction action, PressType type = PressType.JustPressed)
         {
+            if (IsJumpScene || AppQuitting) return;
             KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> pair
                 = instance.multipleInputController.FirstOrDefault((P) => { return P.Key.Intersect(keys).ToList().Count == keys.Count; });
             if (!pair.Equals(default(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>>)) && pair.Value.ContainsKey(type))
@@ -408,6 +418,7 @@ namespace AD
         }
         public static void RemoveAllListeners(ButtonControl key, PressType type = PressType.JustPressed)
         {
+            if (IsJumpScene || AppQuitting) return;
             KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> pair
                 = instance.multipleInputController.FirstOrDefault((P) => { return P.Key[0].Equals(key) && P.Key.Count == 1; });
             if (!pair.Equals(default(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>>)) && pair.Value.ContainsKey(type))
@@ -418,6 +429,7 @@ namespace AD
         }
         public static void RemoveAllListeners(List<ButtonControl> keys, PressType type = PressType.JustPressed)
         {
+            if (IsJumpScene || AppQuitting) return;
             KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> pair
                 = instance.multipleInputController.FirstOrDefault((P) => { return P.Key.Intersect(keys).ToList().Count == keys.Count; });
             if (!pair.Equals(default(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>>)) && pair.Value.ContainsKey(type))
@@ -434,6 +446,7 @@ namespace AD
         }
         public static void RemoveAllButtonListeners()
         {
+            if (IsJumpScene || AppQuitting) return;
             instance.multipleInputController = new();
             instance.mulHitControls = new();
         }
@@ -446,6 +459,7 @@ namespace AD
         /// <returns></returns>
         public static RegisterInfo AddShortcutKeyCombinations(List<ButtonControl> keys, UnityEngine.Events.UnityAction action)
         {
+            if (IsJumpScene || AppQuitting) return null;
             List<ButtonControl> buttons = new List<ButtonControl> { new MulHitSomeControl(keys) };
             ADOrderlyEvent currentEv = new();
             Dictionary<PressType, ADOrderlyEvent> currentDic = new()
@@ -468,7 +482,13 @@ namespace AD
         protected override void Awake()
         {
             Debug.Log("Version : " + Version);
-            if (_m_instance != null && _m_instance != this) DestroyImmediate(_m_instance.gameObject);
+            if (_m_instance != null && _m_instance != this)
+            {
+                DebugExtenion.Log();
+                Debug.LogError(this);
+                Debug.LogError(_m_instance);
+                DestroyImmediate(_m_instance.gameObject);
+            }
             _m_instance = this;
             if (IsEnableSceneController) base.Awake();
 
@@ -477,7 +497,12 @@ namespace AD
             AutoSaveArchitecturesDebugLogTimeLimitCounter = TimeExtension.GetTimer();
 
             AppQuitting = false;
+            IsJumpScene = false;
+
+            AutoSavingTask = System.Threading.Tasks.Task.Run(TryAutoSaving);
         }
+
+        private System.Threading.Tasks.Task AutoSavingTask;
 
         private void AutoSaving()
         {
@@ -501,20 +526,27 @@ namespace AD
             AddMessage(counter.ToString() + "个Log文件已生成", "AutoSave");
         }
 
-        private void Update()
+        private void TryAutoSaving()
         {
-            if (IsAutoSaveArchitecturesDebugLog)
+            while (true)
             {
-                AutoSaveArchitecturesDebugLogTimeLimitCounter.Update();
-                if (AutoSaveArchitecturesDebugLogTimeLimitCounter.KeepingSceond > AutoSaveArchitecturesDebugLogTimeLimit)
+                if (IsJumpScene || AppQuitting) return;
+                System.Threading.Thread.Sleep(100);
+                if (IsAutoSaveArchitecturesDebugLog)
                 {
-                    AutoSaving();
+                    AutoSaveArchitecturesDebugLogTimeLimitCounter.Update();
+                    if (AutoSaveArchitecturesDebugLogTimeLimitCounter.KeepingSceond > AutoSaveArchitecturesDebugLogTimeLimit)
+                    {
+                        AutoSaving();
+                    }
                 }
             }
         }
 
         private void LateUpdate()
         {
+            if (IsJumpScene || AppQuitting) return;
+
             Instance_Update();
             KeyControl_Update();
             Record_Update();
@@ -559,6 +591,17 @@ namespace AD
         {
             AppQuitting = true;
             SaveRecord();
+        }
+
+        private void OnDestroy()
+        {
+            if (_m_instance == this)
+            {
+                _m_instance = null;
+            }
+            if (AutoSavingTask != null && (AutoSavingTask.IsCanceled || AutoSavingTask.IsCompleted || AutoSavingTask.IsFaulted))
+                AutoSavingTask?.Dispose();
+            StopAllCoroutines();
         }
 
         #endregion
@@ -1028,9 +1071,11 @@ namespace AD
 
         public override void OnEnd()
         {
+            DebugExtenion.Log();
             if (IsEnableSceneController)
             {
                 if (this.TargetSceneName == _BackSceneTargetSceneName) this.TargetSceneName = PreviousSceneName;
+                AddMessage("Scene Jump to " + TargetSceneName + " 1/2");
                 PreviousSceneName = SceneExtension.GetCurrent().name;
                 base.OnEnd();
             }
@@ -1051,10 +1096,16 @@ namespace AD
                     waitClock -= Time.deltaTime;
                     yield return null;
                 }
+                AddMessage("Scene Jump to " + TargetSceneName + " 2/2");
                 CurrentAsyncOperation.allowSceneActivation = true;
                 CurrentAsyncOperation = null;
+                IsJumpScene = true;
             }
-            else yield return base.HowToLoadScene();
+            else
+            {
+                IsJumpScene = true;
+                yield return base.HowToLoadScene();
+            }
         }
 
         public Func<float, bool> WhenEndScene = null;
@@ -1109,6 +1160,7 @@ namespace AD
 
         public static void AddMessageListener(string layer, MonoBehaviour listener)
         {
+            if (IsJumpScene || AppQuitting) return;
             instance.CastListeners ??= new();
             RemoveMessageListener(listener);
             instance.CastListeners.TryAdd(layer, new());
@@ -1117,6 +1169,7 @@ namespace AD
 
         public static string RemoveMessageListener(MonoBehaviour listener)
         {
+            if (IsJumpScene || AppQuitting) return null;
             if (instance.CastListeners != null)
             {
                 foreach (var lay in instance.CastListeners)
@@ -1136,6 +1189,7 @@ namespace AD
 
         public HashSet<object> SendMessage(string key, params object[] args)
         {
+            if (IsJumpScene || AppQuitting) return null;
             if (CastListeners.TryGetValue(key, out var value))
             {
                 HashSet<object> result = new();
@@ -1191,6 +1245,7 @@ namespace AD
 
         public static CoroutineInfo OpenCoroutine(IEnumerator coroutiner)
         {
+            if (IsJumpScene || AppQuitting) return null;
             return new CoroutineInfo(instance.StartCoroutine(coroutiner));
         }
 

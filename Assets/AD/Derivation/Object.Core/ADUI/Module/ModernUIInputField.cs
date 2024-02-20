@@ -44,17 +44,11 @@ namespace AD.UI
 
         protected override void Start()
         {
-            base.Start();
+            ADUI.Initialize(this, this.NumericManagerName);
 
             Source.source.onSelect.AddListener(delegate { AnimateIn(); });
             Source.source.onEndEdit.AddListener(delegate { AnimateOut(); });
             UpdateState();
-
-            if (this.NumericManagerName != DefaultNumericManagerName)
-            {
-                ADGlobalSystem.instance.StringValues.TryGetValue(this.NumericManagerName, out string str);
-                this.text = str;
-            }
         }
 
         public ModernUIInputField SetTitle(string title)
@@ -177,7 +171,7 @@ namespace AD.UI
 
         protected override void HowSetupByNumericManager()
         {
-            if (GetValue_NumericManagerName(NumericManagerName, out string str))
+            if (string.IsNullOrEmpty(this.text) && GetValue_NumericManagerName(NumericManagerName, out string str))
                 this.text = str;
         }
     } 

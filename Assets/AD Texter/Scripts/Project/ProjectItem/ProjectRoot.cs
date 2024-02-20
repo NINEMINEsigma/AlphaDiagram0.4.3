@@ -10,7 +10,7 @@ using AD.Utility.Object;
 
 namespace AD.Sample.Texter.Project
 {
-    public class ProjectRoot : MonoBehaviour, IProjectItemRoot
+    public class ProjectRoot : MonoBehaviour, IProjectItemRoot, ICatchCameraRayUpdate
     {
         public class ProjectRootBlock : ProjectItemBlock
         {
@@ -67,11 +67,6 @@ namespace AD.Sample.Texter.Project
             };
             GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
             App.instance.AddMessage("Project Root Setup");
-        }
-
-        private void Update()
-        {
-
         }
 
         public void SetupChild(IProjectItem child)
@@ -173,5 +168,12 @@ namespace AD.Sample.Texter.Project
             GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
         }
 
+        public void OnRayCatching()
+        {
+            foreach (var item in Childs.GetSubList<ICanSerializeOnCustomEditor, IUpdateOnChange>())
+            {
+                item.OnChange();
+            }
+        }
     }
 }

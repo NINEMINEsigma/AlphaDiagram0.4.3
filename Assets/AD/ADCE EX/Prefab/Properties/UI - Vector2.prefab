@@ -73,11 +73,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5606413212555144972, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 426.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5606413212555144972, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 61
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5606413212555144972, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -95,6 +95,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: UI - Vector2
       objectReference: {fileID: 0}
+    - target: {fileID: 6317401098366408658, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -136
+      objectReference: {fileID: 0}
+    - target: {fileID: 6317401098366408658, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 28
+      objectReference: {fileID: 0}
+    - target: {fileID: 6317401098366408658, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 63
+      objectReference: {fileID: 0}
     - target: {fileID: 6317401098366408659, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -102,6 +114,18 @@ PrefabInstance:
     - target: {fileID: 7266742105340242094, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266742105340242095, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -136
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266742105340242095, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 28
+      objectReference: {fileID: 0}
+    - target: {fileID: 7266742105340242095, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -63
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
@@ -135,11 +159,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Selected: 0
   ElementArea: PropertyModule
+  IsChildAllLinkAtMyTransformAsChild: 0
   X: {fileID: 8824582382702700091}
   Y: {fileID: 5261465841505737030}
   Z: {fileID: 0}
   W: {fileID: 0}
   past: 
+  curselect: 0
+  Catcher: {x: 0, y: 0}
 --- !u!114 &8824582382702700091 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7266742105340242088, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}

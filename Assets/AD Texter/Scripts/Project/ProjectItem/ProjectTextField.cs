@@ -18,14 +18,6 @@ namespace AD.Sample.Texter
         public string text;
         public string description;
 
-        /*public ProjectTextData()
-            : this("", "", "New ProjectTextData", ProjectItemData.ProjectRootID, Vector2.zero) { }
-        public ProjectTextData(string text, string description, string projectItemID, string parentItemID, Vector2 projectItemPosition)
-            : base(projectItemID, parentItemID, projectItemPosition)
-        {
-            this.text = text;
-            this.description = description;
-        }*/
         public ProjectTextData(ProjectTextField projectItem, string text = "", string description = "") : base(projectItem)
         {
             this.text = text;
@@ -87,8 +79,7 @@ namespace AD.Sample.Texter
 
 namespace AD.Sample.Texter.Project
 {
-
-    public class ProjectTextField : MonoBehaviour, IProjectItemWhereNeedInitData
+    public class ProjectTextField : MonoBehaviour, IProjectItemWhereNeedInitData, IUpdateOnChange, ICatchCameraRayUpdate
     {
         public class ProjectTextFieldBlock : ProjectItemBlock
         {
@@ -104,10 +95,7 @@ namespace AD.Sample.Texter.Project
                 var data = that.ProjectTextSourceData;
                 this.MatchItem.SetTitle("Texter");
 
-                DisplayProjectID(data).AddListener(T =>
-                {
-                    that.MatchHierarchyEditor.As<HierarchyBlock<ProjectTextField>>().Title = T;
-                });
+                DisplayProjectID(data);
 
                 var inputT = PropertiesLayout.InputField(data.text, "Text");
                 inputT.AddListener(T => data.text = T);
@@ -160,16 +148,17 @@ namespace AD.Sample.Texter.Project
 
         private void Start()
         {
-            GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
+            MyEditGroup.OnEnter.AddListener(EnterMe);
             if (IsSetupProjectTextSourceData)
             {
-                transform.position = App.GetOriginPosition(ProjectTextSourceData.ProjectItemPosition);
+                this.SetParent(ProjectItemData.GetParent(ProjectTextSourceData.ParentItemID));
+                transform.localPosition = App.GetOriginPosition(ProjectTextSourceData.ProjectItemPosition);
             }
             else
             {
                 ProjectTextSourceData = new(this);
             }
-            MatchHierarchyEditor = new HierarchyBlock<ProjectTextField>(this, ProjectTextSourceData.ParentItemID);
+            MatchHierarchyEditor = new HierarchyBlock<ProjectTextField>(this, nameof(ProjectTextField).Translate());
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
             {
                 new ProjectTextFieldBlock(this),
@@ -244,19 +233,13 @@ namespace AD.Sample.Texter.Project
             {
                 var currentData = App.instance.GetController<ProjectManager>().CurrentProjectData;
                 ProjectTextSourceData.ProjectItemPosition = new Vector2(transform.position.x, transform.position.z);
-                if (currentData.TryGetValue(new(ProjectItemBindKey), out var data))
+                if (currentData.TryGetValue(new(ProjectItemBindKey), out ProjectItemDataCache data))
                 {
-                    if (this.ParentTarget is ProjectRoot) this.SourceData.ParentItemID = ProjectItemData.ProjectRootID;
-                    else if(this.ParentTarget is IProjectItemWhereNeedInitData pad) this.SourceData.ParentItemID = pad.SourceData.ProjectItemID;
-                    this.name = SourceData.ProjectItemID;
-                    data.MatchElement.Set(this.SourceData);
-                    this.SourceData.ToMap(out ProjectData_BaseMap bm);
-                    data.MatchElementBM.Set(bm);
+                    WasRegisteredOnProjectItemData(data);
                 }
                 else
                 {
-                    this.SourceData.ToMap(out ProjectData_BaseMap bm);
-                    currentData.Add(new(ProjectItemBindKey), new(ProjectItemBindKey, SourceData, bm));
+                    RegisterOnProjectItemData(currentData);
                 }
                 ADGlobalSystem.AddMessage(nameof(ProjectTextField) + " " + SourceData.ProjectItemID.ToString(), "Save");
                 App.instance.AddMessage($"Save Text {SourceData.ProjectItemID} Data Successful");
@@ -267,6 +250,37 @@ namespace AD.Sample.Texter.Project
                 ADGlobalSystem.AddError(nameof(ProjectTextField) + " " + SourceData.ProjectItemID.ToString(), ex);
                 App.instance.AddMessage($"Save Text {SourceData.ProjectItemID} Data Failed");
                 return false;
+            }
+        }
+
+        private void RegisterOnProjectItemData(ProjectData currentData)
+        {
+            InitParentRef();
+            this.SourceData.ToMap(out ProjectData_BaseMap bm);
+            currentData.Add(new(ProjectItemBindKey), new(ProjectItemBindKey, SourceData, bm));
+        }
+
+        private void WasRegisteredOnProjectItemData(ProjectItemDataCache data)
+        {
+            InitParentRef();
+            this.name = SourceData.ProjectItemID;
+            data.MatchElement.Set(this.SourceData);
+            this.SourceData.ToMap(out ProjectData_BaseMap bm);
+            data.MatchElementBM.Set(bm);
+        }
+
+        private void InitParentRef()
+        {
+            //父物体是根或者父物体不存在（未知错误）
+            if (this.ParentTarget is ProjectRoot)
+                this.SourceData.ParentItemID = ProjectItemData.ProjectRootID;
+            //当父物体具有数据类时
+            else if (this.ParentTarget is IProjectItemWhereNeedInitData pad)
+                this.SourceData.ParentItemID = pad.SourceData.ProjectItemID;
+            //未知情况
+            else
+            {
+                ADGlobalSystem.ThrowLogicError("Bad Parent");
             }
         }
 
@@ -299,6 +313,10 @@ namespace AD.Sample.Texter.Project
         [SerializeField, Header("EditGroup")] private EditGroup m_EditGroup;
         public EditGroup MyEditGroup => m_EditGroup;
 
+        public LineRenderer MyLineRenderer;
+        public const int PointCount = 100;
+        public const float PointCountM = 1 / (float)PointCount;
+
         private void EnterMe()
         {
             if (GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.Contains(this.MatchHierarchyEditor)) return;
@@ -310,6 +328,40 @@ namespace AD.Sample.Texter.Project
                     newList.Add(sEditor);
             }
             GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
+        }
+
+        public void OnChange()
+        {
+            if (this.ParentTarget == null)
+            {
+                MyLineRenderer.positionCount = 0;
+            }
+            else
+            {
+                MyLineRenderer.positionCount = PointCount + 1;
+                Vector3 start = InternalUtility.OutPoint(this.ParentTarget.As<IProjectItem>().MyEditGroup), end = InternalUtility.InPoint(this.MyEditGroup, 0);
+                Vector3[] positions = new[]
+                {
+                    start,
+                    start+new Vector3(0, -0.1f,-1.5f),
+                    end+new Vector3(-1.5f,-0.1f,0),
+                    end
+                };
+                for (int i = 0; i <= PointCount; i++)
+                {
+                    MyLineRenderer.SetPosition(i, InternalUtility.CalculateCubicBezierPoint(i * PointCountM, positions[0], positions[1], positions[2], positions[3]));
+                }
+            }
+
+            foreach (var item in Childs.GetSubList<ICanSerializeOnCustomEditor,IUpdateOnChange>())
+            {
+                item.OnChange();
+            }
+        }
+
+        public void OnRayCatching()
+        {
+            OnChange();
         }
     }
 }

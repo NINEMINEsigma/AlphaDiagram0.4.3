@@ -118,6 +118,7 @@ namespace AD.Sample.Texter
 
         public override void Init()
         {
+            ProjectItemData.IDSet.Clear();
             loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
             loadingTask.Register();
             StartCoroutine(LoadEveryOne(loadingTask));
@@ -125,6 +126,8 @@ namespace AD.Sample.Texter
 
         private IEnumerator LoadEveryOne(TaskInfo loadingTask)
         {
+            DebugExtenion.Log();
+            Architecture.AddMessage("Start Loading Model");
             CurrentProjectData = new()
             {
                 DataAssetsForm = Architecture.GetModel<DataAssets>()
@@ -193,8 +196,9 @@ namespace AD.Sample.Texter
             if (LastFocusTarget == target)
             {
                 MainCameraCore.TryStartCoroutineMove();
+                LastFocusTarget = null;
             }
-            LastFocusTarget = target;
+            else LastFocusTarget = target;
         }
     }
 }

@@ -42,7 +42,8 @@ namespace AD.Utility
     [System.Serializable]
     public class EaseCurve: AlgorithmBase
     {
-        public EaseCurveType CurveType { get; private set; }
+        [SerializeField] private EaseCurveType m_CurveType;
+        public EaseCurveType CurveType { get => m_CurveType; private set => m_CurveType = value; }
 
         private static readonly Type[] _ArgsTypes = { typeof(float), typeof(bool) };
         public override Type[] ArgsTypes => _ArgsTypes;
@@ -55,7 +56,7 @@ namespace AD.Utility
             this.CurveType = EaseCurveType.Linear;
         }
 
-        public EaseCurve(EaseCurveType animationCurveType) //常用构造函数，根据类型
+        public EaseCurve(EaseCurveType animationCurveType) 
         {
             this.CurveType = animationCurveType;
         }
@@ -113,7 +114,7 @@ namespace AD.Utility
             };
         }
 
-        public float Evaluate(float t, EaseCurveType curveType, bool IsClamp) //根据Type选择曲线，并计算t点(0,1)时曲线的值，若越界返回0或1
+        public float Evaluate(float t, EaseCurveType curveType, bool IsClamp) 
         {
             float from = 0;
             float to = 1;

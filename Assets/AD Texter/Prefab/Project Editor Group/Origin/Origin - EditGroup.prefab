@@ -516,7 +516,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 415940091500993046, guid: 089b23de557b3a74baf57aaaa7dafb7f, type: 3}
       propertyPath: GameObjects.Data.Array.size
-      value: 5
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 415940091500993046, guid: 089b23de557b3a74baf57aaaa7dafb7f, type: 3}
       propertyPath: UIs.Data.Array.data[1].Value
@@ -547,6 +547,10 @@ PrefabInstance:
       value: Out Point
       objectReference: {fileID: 0}
     - target: {fileID: 415940091500993046, guid: 089b23de557b3a74baf57aaaa7dafb7f, type: 3}
+      propertyPath: GameObjects.Data.Array.data[5].Key
+      value: In Points
+      objectReference: {fileID: 0}
+    - target: {fileID: 415940091500993046, guid: 089b23de557b3a74baf57aaaa7dafb7f, type: 3}
       propertyPath: GameObjects.Data.Array.data[0].Value
       value: 
       objectReference: {fileID: 2218032018275283690}
@@ -566,6 +570,10 @@ PrefabInstance:
       propertyPath: GameObjects.Data.Array.data[4].Value
       value: 
       objectReference: {fileID: 3827049000457101823}
+    - target: {fileID: 415940091500993046, guid: 089b23de557b3a74baf57aaaa7dafb7f, type: 3}
+      propertyPath: GameObjects.Data.Array.data[5].Value
+      value: 
+      objectReference: {fileID: 5362757413433129645}
     - target: {fileID: 415940091535393014, guid: 089b23de557b3a74baf57aaaa7dafb7f, type: 3}
       propertyPath: m_SizeDelta.x
       value: 5
@@ -752,7 +760,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4672759761862811049, guid: 62064c441539ebe4cadf11794b86cba9, type: 3}
       propertyPath: m_Pivot.y
-      value: 0
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 4672759761862811049, guid: 62064c441539ebe4cadf11794b86cba9, type: 3}
       propertyPath: m_RootOrder
@@ -816,7 +824,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4672759761862811049, guid: 62064c441539ebe4cadf11794b86cba9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4672759761862811049, guid: 62064c441539ebe4cadf11794b86cba9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

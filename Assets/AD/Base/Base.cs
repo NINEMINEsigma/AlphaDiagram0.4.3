@@ -1,10 +1,10 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
+using AD.Utility;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -730,7 +730,7 @@ namespace AD.BASE
             }
         }
 
-        //���캯������public
+        //构造函数不能public
         protected ADArchitecture() { }
         ~ADArchitecture()
         {
@@ -1364,6 +1364,7 @@ namespace AD.BASE
 
         public void Invoke()
         {
+            DebugExtenion.Log();
             foreach (var index in InvokeArray)
             {
                 if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
@@ -1440,6 +1441,7 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0)
         {
+            DebugExtenion.Log();
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
@@ -1519,6 +1521,7 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0, T1 arg1)
         {
+            DebugExtenion.Log();
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
@@ -1600,6 +1603,7 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0, T1 arg1, T2 arg2)
         {
+            DebugExtenion.Log();
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
@@ -1683,6 +1687,7 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
+            DebugExtenion.Log();
             if (InvokeArray != null)
                 foreach (var index in InvokeArray)
                 {
@@ -1716,6 +1721,12 @@ namespace AD.BASE
     {
         public ADEvent() { }
         public ADEvent(UnityAction call) { this.AddListener(call); }
+
+        public new void Invoke()
+        {
+            DebugExtenion.Log();
+            base.Invoke();
+        }
     }
     [Serializable]
     public class ADEvent<T1> : UnityEvent<T1>
@@ -1726,28 +1737,72 @@ namespace AD.BASE
         public ADEvent Close(T1 a)
         {
             ADEvent result = new();
-            result.AddListener(() => this.Invoke(a));
+            result.AddListener(() => this.As<UnityEvent<T1>>().Invoke(a));
             return result;
         }
 
+        public new void Invoke(T1 a)
+        {
+            DebugExtenion.Log();
+            base.Invoke(a);
+        }
     }
     [Serializable]
     public class ADEvent<T1, T2> : UnityEvent<T1, T2>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1, T2> call) { this.AddListener(call); }
+
+        public ADEvent Close(T1 a, T2 b)
+        {
+            ADEvent result = new();
+            result.AddListener(() => this.As<UnityEvent<T1,T2>>().Invoke(a, b));
+            return result;
+        }
+
+        public new void Invoke(T1 a, T2 b)
+        {
+            DebugExtenion.Log();
+            base.Invoke(a, b);
+        }
     }
     [Serializable]
     public class ADEvent<T1, T2, T3> : UnityEvent<T1, T2, T3>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1, T2, T3> call) { this.AddListener(call); }
+
+        public ADEvent Close(T1 a, T2 b, T3 c)
+        {
+            ADEvent result = new();
+            result.AddListener(() => this.As<UnityEvent<T1, T2, T3>>().Invoke(a, b, c));
+            return result;
+        }
+
+        public new void Invoke(T1 a, T2 b, T3 c)
+        {
+            DebugExtenion.Log();
+            base.Invoke(a, b, c);
+        }
     }
     [Serializable]
     public class ADEvent<T1, T2, T3, T4> : UnityEvent<T1, T2, T3, T4>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1, T2, T3, T4> call) { this.AddListener(call); }
+
+        public ADEvent Close(T1 a, T2 b, T3 c, T4 d)
+        {
+            ADEvent result = new();
+            result.AddListener(() => this.As<UnityEvent<T1, T2, T3, T4>>().Invoke(a, b, c, d));
+            return result;
+        }
+
+        public new void Invoke(T1 a, T2 b, T3 c, T4 d)
+        {
+            DebugExtenion.Log();
+            base.Invoke(a, b, c, d);
+        }
     }
 
     #endregion
@@ -2420,11 +2475,13 @@ namespace AD.BASE
             {
                 architecture.AddMessage(" [ AD Error Message ] " + ex.SerializeMessage());
                 architecture.AddMessage(" [ AD Error Stack ] " + ex.SerializeStackTrace());
+                DebugExtenion.Log();
             }
             catch (Exception ex)
             {
                 architecture.AddMessage(" [ Unknow Error Message ] " + ex.Message);
                 architecture.AddMessage(" [ Unknow Error Stack ] " + ex.StackTrace);
+                DebugExtenion.Log();
             }
         }
 
@@ -2432,10 +2489,151 @@ namespace AD.BASE
             (GameObject target, BaseEventData data, ExecuteEvents.EventFunction<_IADEventSystemHandler> functor)
             where _IADEventSystemHandler : IADEventSystemHandler
         {
-            ExecuteEvents.Execute<_IADEventSystemHandler>(target, data, functor);
+            try
+            {
+                ExecuteEvents.Execute<_IADEventSystemHandler>(target, data, functor);
+            }
+            catch
+            {
+                DebugExtenion.Log();
+                throw;
+            }
         }
     }
 
     #endregion
 
+    #region Debug
+
+    public static class DebugExtenion
+    {
+        public static string LogPath => Path.Combine(Application.persistentDataPath, "Debug.dat");
+
+        public static string[] FilterdName = new string[] { "GetStackTraceModelName", "Log" };
+
+        static DebugExtenion()
+        {
+            FileC.DeleteFile(LogPath);
+            Application.logMessageReceived += LogHandler;
+        }
+
+        private static void LogHandler(string logString, string stackTrace, LogType type)
+        {
+            using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+            sws.WriteLine("{");
+            sws.WriteLine("\t[time]:" + DateTime.Now.ToString());
+            sws.WriteLine("\t[type]:" + type.ToString());
+            sws.WriteLine("\t[exception message]:" + logString);
+            sws.WriteLine("\t[stack trace]:\n" + stackTrace + "}");
+        }
+
+        public static void Log()
+        {
+            using StreamWriter sws = new StreamWriter(LogPath, true, System.Text.Encoding.UTF8);
+            sws.WriteLine(System.DateTime.Now.ToString() + " : " + GetStackTraceModelName().LinkAndInsert('|'));
+        }
+
+        public static string[] GetStackTraceModelName()
+        {
+            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame[] sfs = st.GetFrames();
+            List<string> result = new();
+            for (int i = sfs.Length - 1; i >= 0; i--)
+            {
+                //非用户代码,系统方法及后面的都是系统调用，不获取用户代码调用结束
+                if (System.Diagnostics.StackFrame.OFFSET_UNKNOWN == sfs[i].GetILOffset()) continue;
+
+                string _methodName = sfs[i].GetMethod().Name;
+                if (FilterdName.Contains(_methodName)) continue;
+                result.Add(_methodName + "%" + sfs[i].GetFileName() + ":" + sfs[i].GetFileLineNumber());
+            }
+            return result.ToArray();
+        }
+        public static string[] GetStackTraceModelName(int depth)
+        {
+            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackFrame[] sfs = st.GetFrames();
+            List<string> result = new();
+            for (int i = sfs.Length - 1; i >= 0; i--)
+            {
+                //非用户代码,系统方法及后面的都是系统调用，不获取用户代码调用结束
+                if (System.Diagnostics.StackFrame.OFFSET_UNKNOWN == sfs[i].GetILOffset()) continue;
+                if (depth-- <= 0) break;
+
+                string _methodName = sfs[i].GetMethod().Name;
+                if (FilterdName.Contains(_methodName)) continue;
+                result.Add(_methodName + "%" + sfs[i].GetFileName() + ":" + sfs[i].GetFileLineNumber());
+            }
+            return result.ToArray();
+        }
+    }
+
+    #endregion
+
+    #region ProcessStart
+
+    /// <summary>
+    /// PC Window
+    /// </summary>
+    public static class WindowProcessExtenion
+    {
+        public static void StartProcess(string path,string Arguments)
+        {
+            var pro = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = path,
+                    Arguments = Arguments
+                }
+            };
+            pro.Start();
+        }
+
+        public static void ReStart()
+        {
+            string[] strs = new string[]
+             {
+            "@echo off",
+            "echo wscript.sleep 1000 > sleep.vbs",
+            "start /wait sleep.vbs",
+            "start /d \"{0}\" {1}",
+            "del /f /s /q sleep.vbs",
+            "exit"
+             };
+            string path = Application.dataPath + "/../";
+
+
+            List<string> prefabs = new List<string>(Directory.GetFiles(Application.dataPath + "/../", "*.exe", SearchOption.AllDirectories));
+            foreach (string keyx in prefabs)
+            {
+                string _path = Application.dataPath;
+                _path = _path.Remove(_path.LastIndexOf("/")) + "/";
+                Debug.LogError(_path);
+                string _name = Path.GetFileName(keyx);
+                strs[3] = string.Format(strs[3], _path, _name);
+                Application.OpenURL(path);
+            }
+
+            string batPath = Application.dataPath + "/../restart.bat";
+            if (File.Exists(batPath))
+            {
+                File.Delete(batPath);
+            }
+            using (FileStream fileStream = File.OpenWrite(batPath))
+            {
+                using StreamWriter writer = new(fileStream, System.Text.Encoding.GetEncoding("UTF-8"));
+                foreach (string s in strs)
+                {
+                    writer.WriteLine(s);
+                }
+                writer.Close();
+            }
+            Application.Quit();
+            Application.OpenURL(batPath);
+
+        }
+    }
+
+    #endregion
 }

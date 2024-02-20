@@ -142,12 +142,12 @@ namespace AD.Sample.Texter
 
             public static GameObject InPoints(EditGroup target)
             {
-                return InternalObtainGameObject(target, "InPoints");
+                return InternalObtainGameObject(target, "In Points");
             }
 
             public static void SetInPointCount(EditGroup target, int count)
             {
-                GameObject inPoint = InternalObtainGameObject(target, "InPoints");
+                GameObject inPoint = InternalObtainGameObject(target, "In Points");
                 int e = inPoint.transform.childCount;
                 for (int i = 0; i < e; i++)
                 {
@@ -168,7 +168,7 @@ namespace AD.Sample.Texter
             public static int GetInPointCount(EditGroup target)
             {
                 int result = 0;
-                GameObject inPoint = InternalObtainGameObject(target, "InPoints");
+                GameObject inPoint = InternalObtainGameObject(target, "In Points");
                 int e = inPoint.transform.childCount;
                 for (int i = 0; i < e; i++)
                 {
@@ -178,17 +178,17 @@ namespace AD.Sample.Texter
                 return result;
             }
 
-            public static Vector3 InPoint(EditGroup target,int index)
+            public static Vector3 InPoint(EditGroup target, int index)
             {
                 int result = 0;
-                GameObject inPoint = InternalObtainGameObject(target, "InPoints");
+                GameObject inPoint = InternalObtainGameObject(target, "In Points");
                 int e = inPoint.transform.childCount;
                 for (int i = 0; i < e; i++)
                 {
                     var cat = inPoint.transform.GetChild(i);
                     if (cat.gameObject.activeSelf)
                     {
-                        if(result==index)
+                        if (result == index)
                         {
                             return cat.position;
                         }
@@ -197,12 +197,50 @@ namespace AD.Sample.Texter
                 }
                 return inPoint.transform.GetChild(0).position;
             }
+
+            public static Vector3 InPoint(EditGroup target, int index, out GameObject InPointResult)
+            {
+                int result = 0;
+                GameObject inPoint = InternalObtainGameObject(target, "In Points");
+                int e = inPoint.transform.childCount;
+                for (int i = 0; i < e; i++)
+                {
+                    var cat = inPoint.transform.GetChild(i);
+                    if (cat.gameObject.activeSelf)
+                    {
+                        if (result == index)
+                        {
+                            InPointResult = cat.gameObject;
+                            return cat.position;
+                        }
+                        result++;
+                    }
+                }
+                InPointResult = inPoint.transform.GetChild(0).gameObject;
+                return inPoint.transform.GetChild(0).position;
+            }
+
+            public static Vector3 CalculateCubicBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+            {
+                float u = 1 - t;
+                float tt = t * t;
+                float uu = u * u;
+                float uuu = uu * u;
+                float ttt = tt * t;
+
+                Vector3 p = uuu * p0;
+                p += 3 * uu * t * p1;
+                p += 3 * u * tt * p2;
+                p += ttt * p3;
+
+                return p;
+            }
         }
     }
 
     public class App : ADArchitecture<App>
     {
-        public static GenerateTargetEntry[] Get(List<GameObject> sources,bool isModern)
+        public static GenerateTargetEntry[] Get(List<GameObject> sources, bool isModern)
         {
             Type TargetCT = null;
             return sources.GetSubList(
@@ -222,8 +260,8 @@ namespace AD.Sample.Texter
                         {
                             var newChild = T.PrefabInstantiate().GetComponent(TargetCT) as IProjectItem;
                             _Parent.MatchHierarchyEditor.IsOpenListView = false;
-                            newChild.SetParent(_Parent);
                             newChild.As<MonoBehaviour>().transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
+                            newChild.SetParent(_Parent);
                             return newChild;
                         },
                         T.name,
@@ -252,7 +290,7 @@ namespace AD.Sample.Texter
                     cat.ProjectTextSourceData = data;
                     cat.name = cat.SourceData.ProjectItemID;
                     cat.IsSetupProjectTextSourceData = true;
-                    cat.SetParent(ProjectTextData.GetParent(data.ParentItemID));
+                    //cat.SetParent(ProjectTextData.GetParent(data.ParentItemID));
                 }
             });
 

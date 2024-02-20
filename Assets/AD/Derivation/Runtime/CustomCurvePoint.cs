@@ -11,8 +11,8 @@ namespace AD.Experimental.Runtime
         [Tooltip("锁定Y轴")] public bool m_isLockY = true;
         [Tooltip("锁定Z轴")] public bool m_isLockZ = false;
 
-        [HideInInspector] public GameObject m_controlObject;
-        [HideInInspector] public GameObject m_controlObject2;
+        [HideInInspector] public CustomCurvePoint m_controlObject;
+        [HideInInspector] public CustomCurvePoint m_controlObject2;
 
         public CustomCurve LinkCurve;
         public bool IsAnchorPoint;

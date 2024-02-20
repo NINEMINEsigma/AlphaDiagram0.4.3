@@ -52,12 +52,19 @@ namespace AD.Experimental.Localization.Cache
 
         public override bool Equals(object obj)
         {
-            return IdentifyID.Equals(obj);
+            if (obj is CacheAssetsKey key) 
+                return IdentifyID.Equals(key.IdentifyID);
+            else 
+                return base.Equals(obj);
         }
 
         public override int GetHashCode()
         {
             return IdentifyID.GetHashCode();
+        }
+        public override string ToString()
+        {
+            return IdentifyID;
         }
     }
     /// <summary>
@@ -339,7 +346,7 @@ namespace AD.Experimental.Localization.Cache
             }
         }
 
-        [SerializeField] private Context datas = new();
+        [SerializeField] protected Context datas = new();
 
         public IEnumerator<ICanCacheData<T, P>> GetEnumerator()
         {

@@ -520,7 +520,7 @@ Transform:
   m_Children:
   - {fileID: 1051270148}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1209061514
 GameObject:
@@ -696,7 +696,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4538837733359995695, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00012373924
+      value: -0.00090026855
       objectReference: {fileID: 0}
     - target: {fileID: 6317214944257746823, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_text
@@ -740,7 +740,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7880167675412995188, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 7880167675412995188, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1482,7 +1482,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1867921913
 GameObject:
@@ -1760,6 +1760,10 @@ MonoBehaviour:
   ProjectTransformRoot: {fileID: 1162533632}
   ProjectRootMono: {fileID: 1696605981247371494}
   MainCameraCore: {fileID: 1342043927}
+  ADGTimeC:
+    clockS: 638439868866351089
+    clockE: 638439868866351089
+    clockU: 0
   ProjectPrefabModel:
     Root: {fileID: 0}
     Prefabs:
@@ -1783,6 +1787,7 @@ MonoBehaviour:
   OnGenerate:
     m_PersistentCalls:
       m_Calls: []
+  LastFocusTarget: {fileID: 0}
 --- !u!1001 &1696605981247371493
 PrefabInstance:
   m_ObjectHideFlags: 0

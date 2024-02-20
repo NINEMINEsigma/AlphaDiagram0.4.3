@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using AD.BASE;
 using AD.UI;
 using AD.Utility;
@@ -48,18 +47,46 @@ namespace AD.Experimental.GameEditor
             if (self == null && _Right == null) return;
             if (self.ParentTarget == _Right) return;
             if (_Right == self) throw new ADException("Loop Serialize Editor");
-            if (self.ParentTarget != null)
+
+            if (ADGlobalSystem.AppQuitting)
             {
                 //if (self.GetChilds().Contains(_Right)) return;
-                self.ParentTarget.GetChilds().Remove(self);
-                self.ParentTarget.MatchHierarchyEditor.MatchItem.Refresh();
+                self.ParentTarget?.GetChilds().Remove(self);
+                self.ParentTarget = _Right;
+                _Right?.GetChilds().Add(self);
             }
-            self.ParentTarget = _Right;
-            if (_Right != null)
+            else
             {
-                _Right.GetChilds().Add(self);
-                if (_Right.MatchHierarchyEditor != null && _Right.MatchHierarchyEditor.MatchItem != null)
-                    _Right.MatchHierarchyEditor.MatchItem.Refresh();
+                IUpdateOnChange onChange0 = null, onChange1 = null, onChange2 = null;
+                if (self.ParentTarget != null)
+                {
+                    //if (self.GetChilds().Contains(_Right)) return;
+                    self.ParentTarget.GetChilds().Remove(self);
+                    self.ParentTarget.MatchHierarchyEditor.MatchItem.Refresh();
+                    if (self.ParentTarget is IUpdateOnChange onChange)
+                    {
+                        onChange0 = onChange;
+                    }
+                }
+                self.ParentTarget = _Right;
+                if (self is IUpdateOnChange sonChange)
+                {
+                    onChange1 = sonChange;
+                }
+                if (_Right != null)
+                {
+                    _Right.GetChilds().Add(self);
+                    if (_Right.MatchHierarchyEditor != null && _Right.MatchHierarchyEditor.MatchItem != null)
+                        _Right.MatchHierarchyEditor.MatchItem.Refresh();
+                    if (_Right is IUpdateOnChange onChange)
+                    {
+                        onChange2 = onChange;
+                    }
+                }
+
+                onChange0?.OnChange();
+                onChange1?.OnChange();
+                onChange2?.OnChange();
             }
         }
 
@@ -147,5 +174,10 @@ namespace AD.Experimental.GameEditor
         PropertiesItem MatchItem { get; set; }
         ICanSerializeOnCustomEditor MatchTarget { get; }
         bool IsDirty { get; set; }
+    }
+
+    public interface IUpdateOnChange
+    {
+        void OnChange();
     }
 }

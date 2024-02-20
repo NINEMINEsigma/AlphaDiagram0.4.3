@@ -73,7 +73,7 @@ namespace AD.Utility.Object
 
         private void Update()
         {
-            if (Application.isEditor && IsExecuteAlways == false) return;
+            if (Application.isEditor && !Application.isPlaying && IsExecuteAlways == false) return;
             foreach (var current in SourcePairs)
             {
                 if (string.IsNullOrEmpty(current.Key)) continue;

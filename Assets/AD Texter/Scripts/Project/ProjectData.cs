@@ -30,12 +30,16 @@ namespace AD.Sample.Texter
 
         public IEnumerator Load(TaskInfo loadingTask)
         {
+            DebugExtenion.Log();
+            App.instance.AddMessage("Start Loading Data To Items 1/2");
+
             TimeClocker timer = TimeExtension.GetTimer();
 
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
             FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
             var fileList = FileC.FindAll(fileListPath, ProjectItemDataExtension);
             yield return new WaitForEndOfFrame();
+            App.instance.AddMessage("Start Loading Data To Items 2/2");
             if (fileList != null)
             {
                 List<ProjectItemData> projectItemDatas = new();
@@ -74,10 +78,16 @@ namespace AD.Sample.Texter
 
         public IEnumerator Save(TaskInfo savingTask)
         {
+            DebugExtenion.Log();
+            App.instance.AddMessage("Start Saving Data");
+
             TimeClocker timer = TimeExtension.GetTimer();
 
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
             FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
+
+            this.datas.RemoveNullValues();
+
             int i = 0, e = this.Count;
             foreach (var item in this)
             {
@@ -175,9 +185,9 @@ namespace AD.Sample.Texter
         public ProjectItemData(IProjectItemWhereNeedInitData matchProjectItem) : this(matchProjectItem, "New Object", ProjectRootID, Vector2.zero) { }
         protected ProjectItemData(IProjectItemWhereNeedInitData matchProjectItem, string projectItemID, string parentItemID, Vector2 projectItemPosition)
         {
-            MatchProjectItem = matchProjectItem;
+            _MatchProjectItem = matchProjectItem;
             ProjectItemID = projectItemID;
-            ParentItemID = parentItemID == null ? ProjectItemData.ProjectRootID : projectItemID;
+            ParentItemID = parentItemID ?? ProjectItemData.ProjectRootID;
             ProjectItemPosition = projectItemPosition;
         }
         ~ProjectItemData()
@@ -185,28 +195,58 @@ namespace AD.Sample.Texter
             IDSet.Remove(ProjectItemID);
         }
 
-        public IProjectItemWhereNeedInitData MatchProjectItem;
+        private IProjectItemWhereNeedInitData _MatchProjectItem;
+        public IProjectItemWhereNeedInitData MatchProjectItem
+        {
+            get => _MatchProjectItem;
+            set
+            {
+                _MatchProjectItem = value;
+                Internal_Set_ProjectItemID(ProjectItemID);
+            }
+        }
         private string projectItemID;
         public string ProjectItemID
         {
             get => projectItemID;
             set
             {
-                if (projectItemID == value) return;
-                else
-                {
-                    int counter = 1;
-                    string newID = value;
-                    while (IDSet.ContainsKey(newID))
-                    {
-                        newID = value + $"({counter})";
-                    }
-                    if (projectItemID != null) IDSet.Remove(projectItemID);
-                    IDSet.Add(newID, this.MatchProjectItem);
-                    projectItemID = newID;
-                }
+                Internal_Set_ProjectItemID(value);
             }
         }
+
+        private void Internal_Set_ProjectItemID(string value)
+        {
+            if (value == null)
+            {
+                ADGlobalSystem.Error("ProjectItemID : value arg is null");
+                return;
+            }
+            if (projectItemID == value)
+            {
+                if(IDSet.ContainsKey(projectItemID))
+                {
+                    IDSet[projectItemID] = MatchProjectItem;
+                }
+                else
+                {
+                    IDSet.Add(projectItemID, MatchProjectItem);
+                }
+            }
+            else
+            {
+                int counter = 1;
+                string newID = value;
+                while (IDSet.ContainsKey(newID))
+                {
+                    newID = value + $"({counter++})";
+                }
+                if (projectItemID != null) IDSet.Remove(projectItemID);
+                IDSet.Add(newID, this.MatchProjectItem);
+                projectItemID = newID;
+            }
+        }
+
         public string ParentItemID;
         public Vector2 ProjectItemPosition;
 
@@ -237,7 +277,7 @@ namespace AD.Sample.Texter
         public virtual bool FromMap(ProjectData_BaseMap from)
         {
             this.ProjectItemID = from.ProjectItemID;
-            this.ParentItemID = from.ParentItemID == null ? ProjectItemData.ProjectRootID : from.ProjectItemID;
+            this.ParentItemID = from.ParentItemID ?? ProjectItemData.ProjectRootID;
             this.ProjectItemPosition = from.ProjectItemPosition;
             return true;
         }
@@ -316,7 +356,7 @@ namespace AD.Sample.Texter
             public virtual bool FromObject(ProjectItemData from)
             {
                 this.ProjectItemID = from.ProjectItemID;
-                this.ParentItemID = from.ParentItemID == null ? ProjectItemData.ProjectRootID : from.ProjectItemID;
+                this.ParentItemID = from.ParentItemID ?? ProjectItemData.ProjectRootID;
                 this.ProjectItemPosition = from.ProjectItemPosition;
                 return true;
             }

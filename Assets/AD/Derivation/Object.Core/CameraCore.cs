@@ -162,7 +162,7 @@ namespace AD.Utility.Object
             {
                 //Detect Clear
                 if (IsLockKeyBoardDetectForMove == false &&
-                    PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove()))
+                    PrimitiveExtension.ExecuteAny(ForwardMove(), BackMove(), LeftMove(), RightMove(), UpMove(), DownMove(), DragMove2D()))
                     ClearDirty();
             }
             if (Keyboard.current.zKey.isPressed && Keyboard.current.xKey.isPressed && Mouse.current.leftButton.wasPressedThisFrame) UndoPast();
@@ -180,7 +180,7 @@ namespace AD.Utility.Object
             {
                 PastOneTarget = FoucsOneTarget;
                 var targetOOO = Target == null ? FoucsOneTarget : Target;
-                if (targetOOO != null && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, false);
+                if (targetOOO != null && targetOOO.transform.parent && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, false);
                 FoucsOneTarget = null;
             }
         }
@@ -220,16 +220,19 @@ namespace AD.Utility.Object
                 }
                 var cat = RayForm.NearestRaycastHitForm.collider.gameObject;
                 var targetOOO = Target == null ? FoucsOneTarget : Target;
-                if (targetOOO != null && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, true);
+                if (targetOOO != null && targetOOO.transform.parent && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer))
+                    layer.ParentGroup.DoUpdate(this, true);
                 Target = cat;
             }
             else
             {
                 var targetOOO = Target == null ? FoucsOneTarget : Target;
-                if (targetOOO != null && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer)) layer.ParentGroup.DoUpdate(this, FoucsOneTarget != null);
+                if (targetOOO != null && targetOOO.transform.parent && targetOOO.transform.parent.TryGetComponent(out ColliderLayer layer))
+                    layer.ParentGroup.DoUpdate(this, FoucsOneTarget != null);
                 Target = null;
             }
         }
+
 
         #region Transform
 
@@ -257,6 +260,17 @@ namespace AD.Utility.Object
                     Core.transform.localEulerAngles
                     .AddX(rotionSpeedVec.y * dragVec.y * Time.deltaTime * rotionSpeed)
                     .AddY(-rotionSpeedVec.x * dragVec.x * Time.deltaTime * rotionSpeed);
+        }
+
+        private bool DragMove2D()
+        {
+            if (Mouse.current.middleButton.isPressed)
+            {
+                Core.transform.position -= moveSpeedVec.y * moveSpeed * Time.deltaTime * Core.transform.up * Mouse.current.delta.ReadValue().y;
+                Core.transform.position -= moveSpeedVec.x * moveSpeed * Time.deltaTime * Core.transform.right * Mouse.current.delta.ReadValue().x;
+                return true;
+            }
+            return false;
         }
 
         private bool DownMove()
@@ -454,13 +468,13 @@ namespace AD.Utility.Object
                 switch (xyza)
                 {
                     case XYZA.X:
-                        Core.transform.position = focus.transform.position.SetX(startPosition.x);
+                        oPanelVec = focus.transform.position.SetX(startPosition.x);
                         break;
                     case XYZA.Y:
-                        Core.transform.position = focus.transform.position.SetY(startPosition.y);
+                        oPanelVec = focus.transform.position.SetY(startPosition.y);
                         break;
                     case XYZA.Z:
-                        Core.transform.position = focus.transform.position.SetZ(startPosition.z);
+                        oPanelVec = focus.transform.position.SetZ(startPosition.z);
                         break;
                 }
                 while (dalte > 0)

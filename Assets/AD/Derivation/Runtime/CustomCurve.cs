@@ -1,89 +1,104 @@
+using System;
 using System.Collections.Generic;
 using AD.BASE;
+using AD.Utility;
 using UnityEngine;
 
 namespace AD.Experimental.Runtime
 {
     public class CustomCurve : MonoBehaviour
     {
-        public List<Transform> m_allPoints;
+        public List<CustomCurvePoint> m_allPoints;
         [SerializeField] private CustomCurvePoint m_anchorPoint;
         [SerializeField] private CustomCurvePoint m_controlPoint;
         private GameObject m_pointParent;
         [SerializeField] private LineRenderer m_lineRenderer;
 
+        public EaseCurve EaseCurve = new();
+
         private int m_curveCount = 0;
-        [SerializeField] private int SEGMENT_COUNT = 60;//曲线取点个数（取点越多这个长度越趋向于精确）
+        public int SEGMENT_COUNT = 60;//曲线取点个数（取点越多这个长度越趋向于精确）
 
         public void Init()
         {
-            var anchorPoint = LoadPoint(m_anchorPoint,transform.position).gameObject;
-            m_allPoints.Add(anchorPoint.transform);
+            foreach (var item in m_allPoints)
+            {
+                DeletePoint(item);
+            }
+            m_allPoints.Add(LoadPoint(m_anchorPoint,transform.position));
         }
+
         public void AddPoint(Vector3 anchorPointPos)
         {
-            //初始化时m_allPoints添加了一个player
-            if (m_allPoints.Count == 0) return;
-            Transform lastPoint = m_allPoints[m_allPoints.Count - 1];
-            CustomCurvePoint controlPoint2 = LoadPoint(m_controlPoint, lastPoint.position + new Vector3(0, 0, -1));
+            if (m_allPoints.Count == 0)
+            {
+                Init();
+            }
+            CustomCurvePoint lastPoint = m_allPoints[^1];
+            CustomCurvePoint controlPoint2 = LoadPoint(m_controlPoint, lastPoint.transform.position + new Vector3(0, 0, -1));
             CustomCurvePoint controlPoint = LoadPoint(m_controlPoint, anchorPointPos + new Vector3(0, 0, 1));
             CustomCurvePoint anchorPoint = LoadPoint(m_anchorPoint, anchorPointPos);
 
-            anchorPoint.GetComponent<CustomCurvePoint>().m_controlObject = controlPoint.gameObject;
-            lastPoint.GetComponent<CustomCurvePoint>().m_controlObject2 = controlPoint2.gameObject;
+            controlPoint2.transform.SetParent(anchorPoint.transform,false);
+            controlPoint.transform.SetParent(anchorPoint.transform,false);
 
-            m_allPoints.Add(controlPoint2.transform);
-            m_allPoints.Add(controlPoint.transform);
-            m_allPoints.Add(anchorPoint.transform);
+            anchorPoint.m_controlObject = controlPoint;
+            lastPoint.m_controlObject2 = controlPoint2;
+
+            m_allPoints.Add(controlPoint2);
+            m_allPoints.Add(controlPoint);
+            m_allPoints.Add(anchorPoint);
+
+            controlPoint2.IsAnchorPoint = false;
+            controlPoint.IsAnchorPoint = false;
+            anchorPoint.IsAnchorPoint = true;
 
             DrawCurve();
         }
-
         public void AddPoint()
         {
             AddPoint(transform.position);
         }
-        public void DeletePoint(GameObject anchorPoint)
+
+        public void DeletePoint(CustomCurvePoint anchorPoint)
         {
-            if (anchorPoint == null) return;
-            CustomCurvePoint curvePoint = anchorPoint.GetComponent<CustomCurvePoint>();
-            if (curvePoint && anchorPoint.tag.Equals("AnchorPoint"))
+            if (anchorPoint == null && !anchorPoint.IsAnchorPoint) return;
+
+            if (anchorPoint.m_controlObject)
             {
-                if (curvePoint.m_controlObject)
+                m_allPoints.Remove(anchorPoint.m_controlObject);
+                Destroy(anchorPoint.m_controlObject.gameObject);
+            }
+            if (anchorPoint.m_controlObject2)
+            {
+                m_allPoints.Remove(anchorPoint.m_controlObject2);
+                Destroy(anchorPoint.m_controlObject2.gameObject);
+            }
+            if (m_allPoints[^1] == anchorPoint)
+            {
+                m_allPoints.Remove(anchorPoint);
+                CustomCurvePoint lastPoint = m_allPoints[^2];
+                CustomCurvePoint lastPointCtrObject = lastPoint.m_controlObject2;
+                if (lastPointCtrObject)
                 {
-                    m_allPoints.Remove(curvePoint.m_controlObject.transform);
-                    Destroy(curvePoint.m_controlObject);
+                    m_allPoints.Remove(lastPointCtrObject);
+                    Destroy(lastPointCtrObject.gameObject);
+                    lastPoint.m_controlObject2 = null;
                 }
-                if (curvePoint.m_controlObject2)
-                {
-                    m_allPoints.Remove(curvePoint.m_controlObject2.transform);
-                    Destroy(curvePoint.m_controlObject2);
-                }
-                if (m_allPoints.IndexOf(curvePoint.transform) == (m_allPoints.Count - 1))
-                {//先判断删除的是最后一个元素再移除
-                    m_allPoints.Remove(curvePoint.transform);
-                    Transform lastPoint = m_allPoints[m_allPoints.Count - 2];
-                    GameObject lastPointCtrObject = lastPoint.GetComponent<CustomCurvePoint>().m_controlObject2;
-                    if (lastPointCtrObject)
-                    {
-                        m_allPoints.Remove(lastPointCtrObject.transform);
-                        Destroy(lastPointCtrObject);
-                        lastPoint.GetComponent<CustomCurvePoint>().m_controlObject2 = null;
-                    }
-                }
-                else
-                {
-                    m_allPoints.Remove(curvePoint.transform);
-                }
-                Destroy(anchorPoint);
-                if (m_allPoints.Count == 1)
-                {
-                    m_lineRenderer.positionCount = 0;
-                }
+            }
+            else
+            {
+                m_allPoints.Remove(anchorPoint);
+            }
+            Destroy(anchorPoint.gameObject);
+            if (m_allPoints.Count == 1)
+            {
+                m_lineRenderer.positionCount = 0;
             }
 
             DrawCurve();
         }
+
         public void UpdateLine(CustomCurvePoint curvePoint, Vector3 offsetPos1, Vector3 offsetPos2)
         {
             if (curvePoint)
@@ -110,39 +125,192 @@ namespace AD.Experimental.Runtime
             return pathPoints;
         }
 
-        public void DrawCurve()//画曲线
+        public void DrawCurve()
         {
             if (m_allPoints.Count < 4) return;
             m_curveCount = (int)m_allPoints.Count / 3;
+            m_lineRenderer.positionCount = m_curveCount * SEGMENT_COUNT;
             for (int j = 0; j < m_curveCount; j++)
             {
                 for (int i = 1; i <= SEGMENT_COUNT; i++)
                 {
-                    float t = (float)i / (float)SEGMENT_COUNT;
+                    float t = EaseCurve.Evaluate((float)i / (float)SEGMENT_COUNT, false);
                     int nodeIndex = j * 3;
                     Vector3 pixel =
                         CalculateCubicBezierPoint(t,
-                                                  m_allPoints[nodeIndex].position,
-                                                  m_allPoints[nodeIndex + 1].position,
-                                                  m_allPoints[nodeIndex + 2].position,
-                                                  m_allPoints[nodeIndex + 3].position);
-                    m_lineRenderer.positionCount = j * SEGMENT_COUNT + i;
+                                                  m_allPoints[nodeIndex].transform.position,
+                                                  m_allPoints[nodeIndex + 1].transform.position,
+                                                  m_allPoints[nodeIndex + 2].transform.position,
+                                                  m_allPoints[nodeIndex + 3].transform.position);
                     m_lineRenderer.SetPosition((j * SEGMENT_COUNT) + (i - 1), pixel);
                 }
             }
         }
+
         private CustomCurvePoint LoadPoint(CustomCurvePoint pointPrefab, Vector3 pos)
         {
             if (null == m_pointParent) m_pointParent = this.gameObject;
             CustomCurvePoint newpoint = pointPrefab.PrefabInstantiate();
             newpoint.Setup(this);
             newpoint.gameObject.name = newpoint.gameObject.name.Replace("(Clone)", "");
-            newpoint.gameObject.transform.SetParent(m_pointParent.transform);
+            //newpoint.gameObject.transform.SetParent(m_pointParent.transform);
             newpoint.gameObject.transform.position = pos;
             return newpoint;
         }
 
-        //贝塞尔曲线公式：B(t)=P0*(1-t)^3 + 3*P1*t(1-t)^2 + 3*P2*t^2*(1-t) + P3*t^3 ,t属于[0,1].
+        Vector3 CalculateCubicBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
+        {
+            float u = 1 - t;
+            float tt = t * t;
+            float uu = u * u;
+            float uuu = uu * u;
+            float ttt = tt * t;
+
+            Vector3 p = uuu * p0;
+            p += 3 * uu * t * p1;
+            p += 3 * u * tt * p2;
+            p += ttt * p3;
+
+            return p;
+        }
+    }
+}
+
+namespace AD.Utility
+{
+    [Serializable]
+    public class CustomCurvePoint
+    {
+        public Vector3 Position;
+        public bool IsAnchorPoint;
+        public CustomCurvePoint m_controlObject;
+        public CustomCurvePoint m_controlObject2;
+
+        public CustomCurvePoint(Vector3 position, bool isAnchorPoint)
+        {
+            Position = position;
+            IsAnchorPoint = isAnchorPoint;
+        }
+
+        public static implicit operator Vector3(CustomCurvePoint point) => point.Position;
+    }
+
+    [Serializable]
+    public class CustomCurveSource
+    {
+        public List<CustomCurvePoint> m_allPoints;
+
+        public EaseCurve EaseCurve = new();
+
+        private int m_curveCount = 0;
+        public int SEGMENT_COUNT = 60;//曲线取点个数（取点越多这个长度越趋向于精确）
+
+        public event Action<Vector3[]> OnCurveDraw;
+
+        public void Init(Vector3 initPosition)
+        {
+            m_allPoints.Clear();
+            m_allPoints.Add(new(initPosition, true));
+        }
+
+        public void AddPoint(Vector3 anchorPointPos)
+        {
+            if (m_allPoints.Count == 0)
+            {
+                Init(Vector3.zero);
+            }
+            CustomCurvePoint lastPoint = m_allPoints[^1];
+            CustomCurvePoint controlPoint2 = LoadPoint(false, lastPoint + new Vector3(0, 0, -1));
+            CustomCurvePoint controlPoint = LoadPoint(false, anchorPointPos + new Vector3(0, 0, 1));
+            CustomCurvePoint anchorPoint = LoadPoint(true, anchorPointPos);
+
+            anchorPoint.m_controlObject = controlPoint;
+            lastPoint.m_controlObject2 = controlPoint2;
+
+            m_allPoints.Add(controlPoint2);
+            m_allPoints.Add(controlPoint);
+            m_allPoints.Add(anchorPoint);
+
+            DrawCurve();
+        }
+        public void AddPoint()
+        {
+            AddPoint(Vector3.zero);
+        }
+
+        public void DeletePoint(CustomCurvePoint anchorPoint)
+        {
+            if (anchorPoint == null && !anchorPoint.IsAnchorPoint) return;
+
+            if (anchorPoint.m_controlObject!=null)
+            {
+                m_allPoints.Remove(anchorPoint.m_controlObject);
+            }
+            if (anchorPoint.m_controlObject2!=null)
+            {
+                m_allPoints.Remove(anchorPoint.m_controlObject2);
+            }
+            if (m_allPoints[^1] == anchorPoint)
+            {
+                m_allPoints.Remove(anchorPoint);
+                CustomCurvePoint lastPoint = m_allPoints[^2];
+                CustomCurvePoint lastPointCtrObject = lastPoint.m_controlObject2;
+                if (lastPointCtrObject!=null)
+                {
+                    m_allPoints.Remove(lastPointCtrObject);
+                    lastPoint.m_controlObject2 = null;
+                }
+            }
+            else
+            {
+                m_allPoints.Remove(anchorPoint);
+            }
+
+            DrawCurve();
+        }
+
+        public void UpdateLine(CustomCurvePoint curvePoint, Vector3 offsetPos1, Vector3 offsetPos2)
+        {
+            if (curvePoint!=null)
+            {
+                if (curvePoint.m_controlObject!=null)
+                    curvePoint.m_controlObject.Position = curvePoint.Position + offsetPos1;
+                if (curvePoint.m_controlObject2!=null)
+                    curvePoint.m_controlObject2.Position = curvePoint.Position + offsetPos2;
+            }
+
+            DrawCurve();
+        }
+
+        public Vector3[] DrawCurve()
+        {
+            if (m_allPoints.Count < 4) return null;
+            m_curveCount = (int)m_allPoints.Count / 3;
+            Vector3[] line = new Vector3[m_curveCount * SEGMENT_COUNT];
+            for (int j = 0; j < m_curveCount; j++)
+            {
+                for (int i = 1; i <= SEGMENT_COUNT; i++)
+                {
+                    float t = EaseCurve.Evaluate((float)i / (float)SEGMENT_COUNT, false);
+                    int nodeIndex = j * 3;
+                    Vector3 pixel =
+                        CalculateCubicBezierPoint(t,
+                                                  m_allPoints[nodeIndex],
+                                                  m_allPoints[nodeIndex + 1],
+                                                  m_allPoints[nodeIndex + 2],
+                                                  m_allPoints[nodeIndex + 3].Position);
+                    line[(j * SEGMENT_COUNT) + (i - 1)] = pixel;
+                }
+            }
+            OnCurveDraw.Invoke(line);
+            return line;
+        }
+
+        private CustomCurvePoint LoadPoint(bool isAnchorPoint, Vector3 pos)
+        {
+            return new CustomCurvePoint(pos, isAnchorPoint);
+        }
+
         Vector3 CalculateCubicBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
         {
             float u = 1 - t;

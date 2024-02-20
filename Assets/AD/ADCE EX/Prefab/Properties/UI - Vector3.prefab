@@ -13,11 +13,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1758761271126356491, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -174
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: 1758761271126356491, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 87
+      value: 85
       objectReference: {fileID: 0}
     - target: {fileID: 1758761271126356491, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -89,11 +89,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5606413212555144972, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 426.4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5606413212555144972, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 61
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5606413212555144972, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -113,7 +113,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6317401098366408658, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -172
+      value: -174
       objectReference: {fileID: 0}
     - target: {fileID: 6317401098366408658, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -129,11 +129,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7266742105340242095, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_SizeDelta.x
-      value: -174
+      value: -180
       objectReference: {fileID: 0}
     - target: {fileID: 7266742105340242095, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -87
+      value: -85
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
@@ -178,11 +178,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Selected: 0
   ElementArea: PropertyModule
+  IsChildAllLinkAtMyTransformAsChild: 0
   X: {fileID: 1702769780592424369}
   Y: {fileID: 2653246602954410700}
   Z: {fileID: 7715144893494308629}
   W: {fileID: 0}
   past: 
+  curselect: 0
+  Catcher: {x: 0, y: 0, z: 0}
 --- !u!114 &7715144893494308629 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1758761271126356492, guid: 425fd145a0b636e43a571a3a61cf6ad9, type: 3}
