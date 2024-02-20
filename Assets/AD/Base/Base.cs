@@ -1061,7 +1061,7 @@ namespace AD.BASE
         {
             if (arg != null && arg is not T)
             {
-                throw new ArgumentException(string.Format("Passed argument 'args[0]' is of the wrong type. Type:{0} Expected:{1}", arg.GetType(), typeof(T)));
+                throw new ArgumentException(string.Format("Passed argument is the wrong type. Type:{0} Expected:{1}", arg.GetType(), typeof(T)));
             }
         }
 
