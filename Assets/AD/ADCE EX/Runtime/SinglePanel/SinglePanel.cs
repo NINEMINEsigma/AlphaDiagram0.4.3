@@ -13,7 +13,7 @@ namespace AD.Experimental.GameEditor
         public override CustomWindowElement Init()
         {
             base.Init();
-            isCanRefresh = false;
+            //isCanRefresh = false;
             return this;
         }
     }
@@ -32,26 +32,67 @@ namespace AD.Experimental.GameEditor
             return Current;
         }
 
-        public CustomWindowElement OnMenuInit(Dictionary<int, Dictionary<string, ADEvent>> Menu)
+        public override CustomWindowElement ObtainElement(Vector2 rect)
         {
-            CustomWindowElement singlePanel = ObtainElement(new Vector2(200, 500)).SetTitle("Menu".Translate());
+            return ObtainElement().SetRect(rect);
+        }
 
-            int iiiindex = 0;
-            foreach (var layer in Menu)
+        public CustomWindowElement OnMenuInit(Dictionary<int, Dictionary<string, ADEvent>> Menu, string title = "Menu")
+        {
+            int counter = 0;
+            foreach (var item in Menu)
             {
-                foreach (var item in layer.Value)
+                foreach (var single in item.Value)
                 {
-                    singlePanel.GenerateButton(iiiindex.ToString() + "_" + item.Key, new Vector2(200, 23)).SetTitle(item.Key).AddListener(item.Value.Invoke);
+                    counter++;
                 }
-                singlePanel.SetItemOnWindow(iiiindex++.ToString() + "Layer", GameObject.Instantiate(SinglePanelLinePerfab.gameObject), new Vector2(200, 5));
+                counter++;
+            }
+
+            CustomWindowElement singlePanel = ObtainElement(new Vector2(200, Mathf.Min(counter * 23, 800))).SetTitle(title.Translate());
+
+            if (counter * 23 > 800)
+            {
+                var listView = ADGlobalSystem.GenerateElement<ListView>().PrefabInstantiate();
+                singlePanel.SetADUIOnWindow<ListView>("ListView", listView, new Vector2(200, 800));
+
+                int iiiindex = 0;
+                int icounter = 0;
+                foreach (var layer in Menu)
+                {
+                    foreach (var item in layer.Value)
+                    {
+                        AD.UI.Button button = AD.UI.Button.Generate(iiiindex.ToString() + "_" + item.Key).SetTitle(item.Key).AddListener(item.Value.Invoke);
+                        button.transform.As<RectTransform>().sizeDelta = new Vector2(200, 23);
+                        listView.Add(icounter++, button.gameObject);
+                    }
+                    GameObject obj = SinglePanelLinePerfab.PrefabInstantiate();
+                    obj.name = iiiindex.ToString() + "_Layer";
+                    obj.transform.As<RectTransform>().sizeDelta = new Vector2(200, 5);
+                    listView.Add(icounter++, obj);
+                }
+            }
+            else
+            {
+                int iiiindex = 0;
+                foreach (var layer in Menu)
+                {
+                    foreach (var item in layer.Value)
+                    {
+                        singlePanel.GenerateButton(iiiindex.ToString() + "_" + item.Key, new Vector2(200, 23)).SetTitle(item.Key).AddListener(item.Value.Invoke);
+                    }
+                    singlePanel.SetItemOnWindow(iiiindex++.ToString() + "Layer", SinglePanelLinePerfab.PrefabInstantiate(), new Vector2(200, 5));
+                }
+
+                singlePanel.RefreshAllChild();
             }
 
             return singlePanel;
         }
 
-        public CustomWindowElement OnMenuInitWithRect(Dictionary<int, Dictionary<string, ADEvent>> Menu,RectTransform TargetUI)
+        public CustomWindowElement OnMenuInitWithRect(Dictionary<int, Dictionary<string, ADEvent>> Menu, RectTransform TargetUI, string title = "Menu")
         {
-            var singlePanel = OnMenuInit(Menu);
+            var singlePanel = OnMenuInit(Menu, title);
             var rects = singlePanel.rectTransform.GetRect();
             var targetRects = TargetUI.GetRect();
             Vector3 lt = rects[0], rb = rects[2];

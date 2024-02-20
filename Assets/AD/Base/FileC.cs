@@ -40,6 +40,20 @@ namespace AD.BASE
             else return true;
         }
 
+        public static void ReCreateDirectroryOfFile(string filePath, bool recursive = true)
+        {
+            if (string.IsNullOrEmpty(filePath)) throw new ADException("FileC.TryCreateDirectroryOfFile arg : filePath is null or empty");
+            var dir_name = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(dir_name))
+            {
+                Directory.CreateDirectory(dir_name);
+            }
+            else
+            {
+                Directory.Delete(dir_name, recursive);
+            }
+        }
+
         //生成这个文件的文件路径（不包含本身）
         public static DirectoryInfo CreateDirectroryOfFile(string filePath)
         {

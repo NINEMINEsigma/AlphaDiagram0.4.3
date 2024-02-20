@@ -5,7 +5,6 @@ using UnityEngine;
 using AD.UI;
 using System.Linq;
 using UnityEngine.Playables;
-using AD.Utility;
 
 namespace AD
 {
@@ -37,6 +36,7 @@ namespace AD
         SerializedProperty _ColorManager;
         SerializedProperty _AudioSource;
         SerializedProperty _CustomWindowElement;
+        SerializedProperty _ListView;
 
         SerializedProperty RecordPath;
 
@@ -93,6 +93,7 @@ namespace AD
             _ColorManager = serializedObject.FindProperty(nameof(_ColorManager));
             _AudioSource = serializedObject.FindProperty(nameof(_AudioSource));
             _CustomWindowElement = serializedObject.FindProperty(nameof(_CustomWindowElement));
+            _ListView = serializedObject.FindProperty(nameof(_ListView));
             RecordPath = serializedObject.FindProperty(nameof(RecordPath));
             OnSceneStart = serializedObject.FindProperty(nameof(OnSceneStart));
             OnSceneEnd = serializedObject.FindProperty(nameof(OnSceneEnd));
@@ -263,6 +264,7 @@ namespace AD
             EditorGUILayout.PropertyField(_ColorManager);
             EditorGUILayout.PropertyField(_AudioSource);
             EditorGUILayout.PropertyField(_CustomWindowElement);
+            EditorGUILayout.PropertyField(_ListView);
             GUILayout.Space(2);
             GUILayout.EndVertical();
         }
@@ -368,6 +370,15 @@ namespace AD
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._CustomWindowElement);
             target.name = "CustomWindowElement";
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/ListView", false, 30)]
+        private static void ListView(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._ListView);
+            target.name = "ListView";
             GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;

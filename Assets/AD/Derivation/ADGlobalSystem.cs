@@ -226,6 +226,7 @@ namespace AD
         public ColorManager _ColorManager;
         public AudioSourceController _AudioSource;
         public CustomWindowElement _CustomWindowElement;
+        public ListView _ListView;
 
         public static T GenerateElement<T>() where T : ADUI
         {

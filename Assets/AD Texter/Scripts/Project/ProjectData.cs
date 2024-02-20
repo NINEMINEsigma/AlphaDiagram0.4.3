@@ -84,7 +84,7 @@ namespace AD.Sample.Texter
             TimeClocker timer = TimeExtension.GetTimer();
 
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
-            FileC.TryCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
+            FileC.ReCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
 
             this.datas.RemoveNullValues();
 

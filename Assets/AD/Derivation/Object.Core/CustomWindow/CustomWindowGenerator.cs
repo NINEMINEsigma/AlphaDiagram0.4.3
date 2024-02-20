@@ -112,6 +112,16 @@ namespace AD.UI
             return cat;
         }
 
+        public virtual CustomWindowElement ObtainElement(out CustomWindowElement window)
+        {
+            return window = ObtainElement();
+        }
+
+        public virtual CustomWindowElement ObtainElement(Vector2 rect, out CustomWindowElement window)
+        {
+            return window = ObtainElement(rect);
+        }
+
         public static void Despawn(CustomWindowElement element)
         {
             element.gameObject.SetActive(false);

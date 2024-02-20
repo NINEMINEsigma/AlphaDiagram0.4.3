@@ -177,13 +177,15 @@ namespace AD.Sample.Texter.Project
         private void TryDestory()
         {
             GameEditorApp.instance
-                .GetSystem<CustomWindowGenerator>()
-                .ObtainElement(new(200, 60))
+                .GetSystem<GameEditorWindowGenerator>()
+                .ObtainElement(new(100, 60),out var window)
                 .SetTitle("Warning : Will Delete Child".Translate())
                 .GenerateButton("Yes".Translate())
                 .AddListener(() =>
                 {
                     GameObject.Destroy(gameObject);
+                    GameEditorApp.instance.GetSystem<SinglePanelGenerator>().Current.BackPool();
+                    window.BackPool();
                     GameEditorApp.instance.SendCommand<RefreshHierarchyPanel>();
                     GameEditorApp.instance.SendCommand<RefreshPropertiesPanel>();
                 });
@@ -194,6 +196,7 @@ namespace AD.Sample.Texter.Project
             if (ADGlobalSystem.instance == null) return;
             App.instance.GetController<ProjectManager>().CurrentProjectData.Remove(new(ProjectItemBindKey));
             this.ProjectTextSourceData = null;
+            GameEditorApp.instance.GetController<Hierarchy>().RemoveOnTop(this.MatchHierarchyEditor);
             this.MatchHierarchyEditor = null;
             this.MatchPropertiesEditors.Clear();
             this.SetParent(null);
@@ -215,7 +218,7 @@ namespace AD.Sample.Texter.Project
 
         public void ClickOnRight()
         {
-            GameEditorApp.instance.GetSystem<SinglePanelGenerator>().OnMenuInit(OnMenu);
+            GameEditorApp.instance.GetSystem<SinglePanelGenerator>().OnMenuInitWithRect(OnMenu, this.MatchHierarchyEditor.MatchItem.transform as RectTransform, "Text Menu");
         }
 
         public List<ICanSerializeOnCustomEditor> Childs = new();

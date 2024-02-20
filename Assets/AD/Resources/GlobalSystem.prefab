@@ -71,6 +71,79 @@ MonoBehaviour:
   _ColorManager: {fileID: 386324562519897791, guid: ab8b8639395bd52468868944346a646a, type: 3}
   _AudioSource: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
   _CustomWindowElement: {fileID: 74856100616418833, guid: 312f31ed2782b8f48b2b5e85ef045aa2, type: 3}
+  _ListView: {fileID: 7771118446552276518, guid: 5f9b6ed662399af418a91e58e39244e5, type: 3}
+  IsAutoSaveArchitecturesDebugLog: 0
+  AutoSaveArchitecturesDebugLogTimeLimit: 60
+  AutoSaveArchitecturesDebugLogTimeLimitCounter:
+    clockS: 638440739541654620
+    clockE: 638440739541654620
+    clockU: 0
   _IsOnValidate: 1
   RecordPath: null
   record: []
+  IsEnableSceneController: 0
+  isAsyncToLoadNextScene: 0
+  WaitTime: 1.5
+  IntValues:
+    Data: []
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
+    OnReplace:
+      m_PersistentCalls:
+        m_Calls: []
+  FloatValues:
+    Data:
+    - Key: MainVolume_Percent
+      Value: 0.3074997
+    - Key: MainVolume
+      Value: 6.149994
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
+    OnReplace:
+      m_PersistentCalls:
+        m_Calls: []
+  StringValues:
+    Data:
+    - Key: CurrentCreaterName
+      Value: "\u7559\u767D"
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
+    OnReplace:
+      m_PersistentCalls:
+        m_Calls: []
+  CastListeners:
+    Data: []
+    OnAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnTryAdd:
+      m_PersistentCalls:
+        m_Calls: []
+    OnRemove:
+      m_PersistentCalls:
+        m_Calls: []
+    OnReplace:
+      m_PersistentCalls:
+        m_Calls: []
+  IsPermittedBroadcast: 1
