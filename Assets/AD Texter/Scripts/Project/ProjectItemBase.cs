@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using AD.Experimental.GameEditor;
 using System;
 using AD.Utility.Object;
+using AD.BASE;
 
 namespace AD.Sample.Texter
 {
@@ -14,7 +15,7 @@ namespace AD.Sample.Texter
         EditGroup MyEditGroup { get; }
     }
 
-    public interface IProjectItemWhereNeedInitData: IProjectItem
+    public interface IProjectItemWhereNeedInitData : IProjectItem, ICanInitialize
     {
         ProjectItemData SourceData { get; set; }
         string ProjectItemBindKey { get; }

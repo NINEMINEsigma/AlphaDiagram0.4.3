@@ -65,7 +65,7 @@ namespace AD.Sample.Texter
                     ProjectItemData projcetdata = projectItemDatas[i];
                     if (timer.LastDalteSceond > 0.1f)
                     {
-                        loadingTask.TaskValue = (float)i / (float)e + 1.3f;
+                        loadingTask.TaskValue = (float)i / (float)e + 1.2f;
                         yield return new WaitForEndOfFrame();
                         timer.Update();
                     }
@@ -241,7 +241,11 @@ namespace AD.Sample.Texter
                 {
                     newID = value + $"({counter++})";
                 }
-                if (projectItemID != null) IDSet.Remove(projectItemID);
+                if (projectItemID != null)
+                {
+                    IDSet.Remove(projectItemID);
+                    App.instance.GetController<ProjectManager>().CurrentProjectData.Remove(new(projectItemID));
+                }
                 IDSet.Add(newID, this.MatchProjectItem);
                 projectItemID = newID;
             }

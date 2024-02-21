@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Linq;
 using static AD.Utility.ReflectionExtension;
 using Unity.VisualScripting;
+using AD.BASE;
 
 namespace AD.Experimental.GameEditor
 {
@@ -14,43 +15,82 @@ namespace AD.Experimental.GameEditor
         public HierarchyBlock(T that, string name)
         {
             this.that = that;
-            this.Title = name;
+            this._Title = name;
+        }
+
+        public HierarchyBlock(T that, BindProperty<string> name)
+        {
+            this.that = that;
+            this._p_Title = name;
+            this._p_Title.AddListenerOnSet(TitleLinking);
+        }
+
+        public HierarchyBlock(T that, Func<string> name, Action<string> name_seter)
+        {
+            this.that = that;
+            this._f_Title = name;
+            this._f_Title_seter = name_seter;
+        }
+
+        public HierarchyBlock(T that, Func<string> name)
+        {
+            this.that = that;
+            this._f_Title = name;
+        }
+
+        private void TitleLinking(string T)
+        {
+            this.MatchItem.SetTitle(T);
+        }
+
+        ~HierarchyBlock()
+        {
+            this._p_Title?.RemoveListenerOnSet(TitleLinking);
         }
 
         protected readonly T that;
 
-        private HierarchyItem _MatchItem;
         public HierarchyItem MatchItem
         {
-            get => _MatchItem; set
+            get => MatchItems.Count == 0 ? null : MatchItems[0];
+            set
             {
-                _MatchItem = value;
+                if (MatchItems.Count == 0) MatchItems.Add(value);
+                else MatchItems[0] = value;
                 value.SetTitle(this.Title);
             }
         }
+        public List<HierarchyItem> MatchItems { get; private set; } = new();
 
         public ICanSerializeOnCustomEditor MatchTarget { get => that; }
 
         public bool IsOpenListView { get; set; }
         public int SerializeIndex { get => MatchTarget.SerializeIndex; set => throw new NotImplementedException(); }
 
-        public virtual void OnSerialize()
+        public virtual void OnSerialize(HierarchyItem MatchItem)
         {
-            CustomEditorUtility.BaseHierarchyItemSerialize(this);
             MatchItem.SetTitle(Title);
         }
 
-        private string _Title;
+        private BindProperty<string> _p_Title = null;
+        private string _Title = null;
+        private Func<string> _f_Title = null;
+        private Action<string> _f_Title_seter = null;
         public virtual string Title
         {
             get
             {
-                return _Title;
+                if (_p_Title != null) return _p_Title.Get();
+                else if (_f_Title != null) return _f_Title();
+                else return _Title;
             }
             set
             {
-                _Title = value;
-                MatchItem?.SetTitle(_Title);
+                if (_p_Title != null) _p_Title.Set(value);
+                else if (_f_Title != null) _f_Title_seter?.Invoke(value);
+                else _Title = value;
+                if (MatchItem != null)
+                    MatchItem.SetTitle(Title);
             }
         }
     }

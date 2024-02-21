@@ -4,7 +4,6 @@ using AD.BASE;
 using AD.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace AD.Experimental.GameEditor
 {
@@ -72,32 +71,27 @@ namespace AD.Experimental.GameEditor
         public void ClearAndRefresh()
         {
             EditorAssets.PropertiesListView.Clear();
-            if (MatchTarget != null)
+            if (MatchTarget == null) return;
+            foreach (var target in CurrentPropertiesEditors)
             {
-                foreach (var target in CurrentPropertiesEditors)
-                {
-                    var rect = RegisterPropertiesItem(target);
-                    //target.OnSerialize();
-                }
-                EditorAssets.PropertiesListView.SortChilds();
+                RegisterPropertiesItem(target);
             }
+            EditorAssets.PropertiesListView.SortChilds();
         }
 
         public void RefreshPanel(PointerEventData axisEventData = null)
         {
-            if (MatchTarget != null)
+            if (MatchTarget == null) return;
+            foreach (var target in CurrentPropertiesEditors)
             {
-                foreach (var target in CurrentPropertiesEditors)
+                if (target.IsDirty)
                 {
-                    if (target.IsDirty)
-                    {
-                        target.MatchItem.Init();
-                        target.OnSerialize();
-                        target.IsDirty = false;
-                    }
+                    target.MatchItem.Init();
+                    target.OnSerialize();
+                    target.IsDirty = false;
                 }
-                EditorAssets.PropertiesListView.SortChilds();
             }
+            EditorAssets.PropertiesListView.SortChilds();
         }
     }
 }

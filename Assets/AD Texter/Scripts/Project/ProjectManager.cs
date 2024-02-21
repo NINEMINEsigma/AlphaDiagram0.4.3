@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Experimental.SceneTrans;
@@ -30,7 +29,7 @@ namespace AD.Sample.Texter
 
         public override void Init()
         {
-
+            //Not Init
         }
 
         public override IADModel Load(string path)
@@ -70,7 +69,7 @@ namespace AD.Sample.Texter
 
             public override void Init()
             {
-
+                //Not Init
             }
 
             public override IADModel Load(string path)
@@ -197,6 +196,14 @@ namespace AD.Sample.Texter
             {
                 MainCameraCore.TryStartCoroutineMove();
                 LastFocusTarget = null;
+                if (target.transform.parent != null && target.transform.parent.TryGetComponent<ColliderLayer>(out var colliderLayer))
+                {
+                    if (colliderLayer.ParentGroup.gameObject.ObtainComponent(out IProjectItem item))
+                    {
+                        UIApp.GetController<Properties>().MatchTarget = item;
+                        UIApp.GetController<Properties>().ClearAndRefresh();
+                    }
+                }
             }
             else LastFocusTarget = target;
         }

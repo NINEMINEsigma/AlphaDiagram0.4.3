@@ -3,13 +3,13 @@
 		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
 		"value" : {
 			"__type" : "AD.Sample.Texter.Data.ProjectTextData_BaseMap,Assembly-CSharp",
-			"text" : "",
-			"description" : "",
-			"ProjectItemID" : "New Object",
+			"text" : "111",
+			"description" : "1",
+			"ProjectItemID" : "Text 1",
 			"ParentItemID" : "ProjectRoot",
 			"ProjectItemPosition" : {
-				"x" : 5.825814,
-				"y" : -2.12451649
+				"x" : 2.32742143,
+				"y" : 5.03282642
 			}
 		}
 	}

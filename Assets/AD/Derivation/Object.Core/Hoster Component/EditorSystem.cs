@@ -22,7 +22,16 @@ namespace AD.Experimental.GameEditor
 
         public Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; set; } = new();
 
-        public HierarchyItem MatchItem { get; set ; }
+        public HierarchyItem MatchItem
+        {
+            get => MatchItems.Count == 0 ? null : MatchItems[0];
+            set
+            {
+                if (MatchItems.Count == 0) MatchItems.Add(value);
+                else MatchItems[0] = value;
+            }
+        }
+        public List<HierarchyItem> MatchItems { get; private set; } = new();
 
         public ICanSerializeOnCustomEditor MatchTarget => this;
 
@@ -224,9 +233,9 @@ namespace AD.Experimental.GameEditor
             return false;
         }
 
-        public void OnSerialize()
+        public void OnSerialize(HierarchyItem MatchItem)
         {
-            this.MatchItem.SetTitle("Editor System");
+            MatchItem.SetTitle("Editor System");
         }
 
         public List<ICanSerializeOnCustomEditor> GetChilds()

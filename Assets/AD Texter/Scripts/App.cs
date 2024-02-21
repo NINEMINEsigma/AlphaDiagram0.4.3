@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
@@ -48,6 +49,10 @@ namespace AD.Sample.Texter
                 {
                     data.ProjectItemID = T;
                     inputI.text = data.ProjectItemID;
+                    foreach (var item in this.MatchTarget.MatchHierarchyEditor.MatchItems)
+                    {
+                        this.MatchTarget.MatchHierarchyEditor.OnSerialize(item);
+                    }
                 });
                 PropertiesLayout.EndHorizontal();
                 return inputI;
@@ -261,7 +266,7 @@ namespace AD.Sample.Texter
                             var newChild = T.PrefabInstantiate().GetComponent(TargetCT) as IProjectItem;
                             _Parent.MatchHierarchyEditor.IsOpenListView = false;
                             newChild.As<MonoBehaviour>().transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
-                            newChild.SetParent(_Parent);
+                            newChild.MyEditGroup.StartCoroutine(WaitForSetParent(newChild, _Parent));
                             return newChild;
                         },
                         T.name,
@@ -279,6 +284,22 @@ namespace AD.Sample.Texter
             return new Vector3(vec.x, 0, vec.y);
         }
 
+        public static IEnumerator WaitForInit(IProjectItemWhereNeedInitData item)
+        {
+            yield return null;
+            yield return null;
+            yield return null;
+            item.Init();
+        }
+
+        private static IEnumerator WaitForSetParent(IProjectItem newChild, IProjectItem _Parent)
+        {
+            yield return null;
+            yield return null;
+            yield return null;
+            newChild.SetParent(_Parent);
+        }
+
         public override void Init()
         {
             OnGenerate.AddListener(T =>
@@ -290,7 +311,6 @@ namespace AD.Sample.Texter
                     cat.ProjectTextSourceData = data;
                     cat.name = cat.SourceData.ProjectItemID;
                     cat.IsSetupProjectTextSourceData = true;
-                    //cat.SetParent(ProjectTextData.GetParent(data.ParentItemID));
                 }
             });
 

@@ -36,9 +36,9 @@ namespace AD.Experimental.GameEditor
         public static HierarchyItem RegisterHierarchyItem(this ISerializeHierarchyEditor self, ISerializeHierarchyEditor target)
         {
             HierarchyItem hierarchyItem = self.MatchItem.ListSubListView.GenerateItem() as HierarchyItem;
-            target.MatchItem = hierarchyItem;
+            target.MatchItems.Add(hierarchyItem);
             hierarchyItem.MatchEditor = target;
-            target.OnSerialize();
+            target.OnSerialize(hierarchyItem);
             return hierarchyItem;
         }
 
@@ -90,7 +90,6 @@ namespace AD.Experimental.GameEditor
             }
         }
 
-        //需要在自定义的ISerializeHierarchyEditor.OnSerialize的最前面使用
         public static void BaseHierarchyItemSerialize(this ISerializeHierarchyEditor self)
         {
             if (self.IsOpenListView)
@@ -99,7 +98,10 @@ namespace AD.Experimental.GameEditor
                 foreach (var item in self.MatchTarget.GetChilds())
                 {
                     item.MatchHierarchyEditor.BaseHierarchyItemSerialize();
-                    item.MatchHierarchyEditor.OnSerialize();
+                    foreach (var itemSingle in item.MatchHierarchyEditor.MatchItems)
+                    {
+                        item.MatchHierarchyEditor.OnSerialize(itemSingle);
+                    }
                 }
             }
         }
@@ -133,7 +135,7 @@ namespace AD.Experimental.GameEditor
     {
         public override void OnExecute()
         {
-            Architecture.GetController<Hierarchy>().RefreshPanel();
+            GameEditorApp.instance.GetController<Hierarchy>().RefreshPanel();
         }
     }
 
@@ -141,21 +143,23 @@ namespace AD.Experimental.GameEditor
     {
         public override void OnExecute()
         {
-            Architecture.GetController<Hierarchy>().RefreshPanel();
+            GameEditorApp.instance.GetController<Properties>().RefreshPanel();
         }
     }
 
     public interface ICanSerialize
     {
-        void OnSerialize();
         int SerializeIndex { get; set; }
     }
 
     public interface ISerializeHierarchyEditor : ICanSerialize
     {
-        HierarchyItem MatchItem { get; set; }
+        void OnSerialize(HierarchyItem MatchItem);
+
         ICanSerializeOnCustomEditor MatchTarget { get; }
         bool IsOpenListView { get; set; }
+        HierarchyItem MatchItem { get; set; }
+        List<HierarchyItem> MatchItems { get; }
     }
 
     public interface ICanSerializeOnCustomEditor
@@ -171,6 +175,8 @@ namespace AD.Experimental.GameEditor
 
     public interface ISerializePropertiesEditor : ICanSerialize
     {
+        void OnSerialize();
+
         PropertiesItem MatchItem { get; set; }
         ICanSerializeOnCustomEditor MatchTarget { get; }
         bool IsDirty { get; set; }

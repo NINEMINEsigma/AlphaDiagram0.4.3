@@ -51,6 +51,7 @@ namespace AD.BASE
             else
             {
                 Directory.Delete(dir_name, recursive);
+                Directory.CreateDirectory(dir_name);
             }
         }
 

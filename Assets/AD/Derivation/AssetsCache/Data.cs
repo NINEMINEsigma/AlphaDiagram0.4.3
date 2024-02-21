@@ -333,7 +333,7 @@ namespace AD.Experimental.Localization.Cache
         }
 
         [Serializable]
-        public class Context : ADSerializableDictionary<CacheAssetsKey, Value>, ISerializationCallbackReceiver
+        public class Context : ADSerializableDictionary<Key, Value>, ISerializationCallbackReceiver
         {
             public override void OnAfterDeserialize()
             {
@@ -358,7 +358,7 @@ namespace AD.Experimental.Localization.Cache
             return this.GetEnumerator();
         }
 
-        public ICollection<KeyValuePair<CacheAssetsKey, Value>> GetReadOnlyData()
+        public ICollection<KeyValuePair<Key, Value>> GetReadOnlyData()
         {
             return datas.AsReadOnlyCollection();
         }
@@ -368,15 +368,15 @@ namespace AD.Experimental.Localization.Cache
             return datas;
         }
 
-        public void Add(CacheAssetsKey key, Value cache) => TryAdd(key, cache);
+        public void Add(Key key, Value cache) => TryAdd(key, cache);
 
-        public bool TryAdd(CacheAssetsKey key, Value cache)
+        public bool TryAdd(Key key, Value cache)
         {
             return datas.TryAdd(key, cache);
         }
 
         //返回值为尝试Add之前尝试获取的结果
-        public bool AddOrGet(CacheAssetsKey key, Value cache, out Value result_slot)
+        public bool AddOrGet(Key key, Value cache, out Value result_slot)
         {
             bool result = datas.TryGetValue(key, out result_slot);
             if (!result)
@@ -392,12 +392,12 @@ namespace AD.Experimental.Localization.Cache
             datas.Clear();
         }
 
-        public bool Contains(CacheAssetsKey key)
+        public bool Contains(Key key)
         {
             return datas.ContainsKey(key);
         }
 
-        public bool TryGetValue(CacheAssetsKey key, out Value result)
+        public bool TryGetValue(Key key, out Value result)
         {
             return datas.TryGetValue(key, out result);
         }
@@ -407,7 +407,7 @@ namespace AD.Experimental.Localization.Cache
             return datas.ContainsValue(value);
         }
 
-        public bool TryGetKey(Value value, out List<CacheAssetsKey> result)
+        public bool TryGetKey(Value value, out List<Key> result)
         {
             result = null;
             bool isFind = false;
@@ -423,7 +423,7 @@ namespace AD.Experimental.Localization.Cache
             return isFind;
         }
 
-        public void Remove(CacheAssetsKey key)
+        public void Remove(Key key)
         {
             datas.Remove(key);
         }

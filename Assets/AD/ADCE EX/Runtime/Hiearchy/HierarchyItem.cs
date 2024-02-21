@@ -16,6 +16,11 @@ namespace AD.Experimental.GameEditor
 
         public ISerializeHierarchyEditor MatchEditor;
 
+        private bool DetectStats()
+        {
+            return MatchEditor != null && MatchEditor.MatchTarget != null;
+        }
+
         public override int SortIndex { get => MatchEditor.SerializeIndex; set { } }
 
         public override ListViewItem Init()
@@ -45,17 +50,26 @@ namespace AD.Experimental.GameEditor
             if (Mouse.current.rightButton.wasPressedThisFrame) OnRightClick();
         }
 
+        public void OnDisable()
+        {
+            MatchEditor?.MatchItems.Remove(this);
+            MatchEditor = null;
+        }
+
         private void OnRightClick()
         {
+            if (!DetectStats()) return;
             if (!ListToggle.Selected) return;
-            MatchEditor?.MatchTarget.ClickOnRight();
+            MatchEditor.MatchTarget.ClickOnRight();
         }
 
         public void OnClickAndRefresh(bool boolen)
         {
+            if (!DetectStats()) return;
             MatchEditor.IsOpenListView = boolen;
             if (boolen == true) OpenListView(); else CloseListView();
-            MatchEditor?.MatchTarget.ClickOnLeft();
+            MatchEditor.OnSerialize(this);
+            MatchEditor.MatchTarget.ClickOnLeft();
             GameEditorApp.instance.CurrentHierarchyItem = this;
             GameEditorApp.instance.SendImmediatelyCommand<CurrentItemSelectOnHierarchyPanel>();
         }
@@ -110,9 +124,9 @@ namespace AD.Experimental.GameEditor
         private HierarchyItem RegisterHierarchyItem(ISerializeHierarchyEditor target)
         {
             HierarchyItem hierarchyItem = ListSubListView.GenerateItem() as HierarchyItem;
-            target.MatchItem = hierarchyItem;
+            target.MatchItems.Add(hierarchyItem);
             hierarchyItem.MatchEditor = target;
-            target.OnSerialize();
+            target.OnSerialize(hierarchyItem);
             hierarchyItem.name = hierarchyItem.SortIndex.ToString();
             return hierarchyItem;
         }
@@ -125,6 +139,7 @@ namespace AD.Experimental.GameEditor
 
         public void Refresh()
         {
+            if (!DetectStats()) return;
             CloseListView();
             if (this.MatchEditor.IsOpenListView)
                 OpenListView();

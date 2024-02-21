@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
-using AD.UI;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -55,7 +52,16 @@ public class TestObject : AD.Experimental.GameEditor.ICanSerializeOnCustomEditor
 
 public class TestSerializeHierarchyEditor : ISerializeHierarchyEditor
 {
-    public HierarchyItem MatchItem { get ; set ; }
+    public HierarchyItem MatchItem
+    {
+        get => MatchItems.Count == 0 ? null : MatchItems[0];
+        set
+        {
+            if (MatchItems.Count == 0) MatchItems.Add(value);
+            else MatchItems[0] = value;
+        }
+    }
+    public List<HierarchyItem> MatchItems { get; private set; } = new();
 
     public ICanSerializeOnCustomEditor MatchTarget { get; private set; }
 
@@ -68,10 +74,9 @@ public class TestSerializeHierarchyEditor : ISerializeHierarchyEditor
 
     public int SerializeIndex { get => MatchTarget.SerializeIndex; set => throw new ADException(); }
 
-    public void OnSerialize()
+    public void OnSerialize(HierarchyItem MatchItem)
     {
         MatchItem.SetTitle(MatchTarget.SerializeIndex.ToString());
-        this.BaseHierarchyItemSerialize();
     }
 }
 

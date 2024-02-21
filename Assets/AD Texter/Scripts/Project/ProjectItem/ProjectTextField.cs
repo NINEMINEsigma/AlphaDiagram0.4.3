@@ -148,39 +148,55 @@ namespace AD.Sample.Texter.Project
 
         private void Start()
         {
+            StartCoroutine(App.WaitForInit(this));
+        }
+
+        public void Init()
+        {
             MyEditGroup.OnEnter.AddListener(EnterMe);
             if (IsSetupProjectTextSourceData)
             {
-                this.SetParent(ProjectItemData.GetParent(ProjectTextSourceData.ParentItemID));
                 transform.localPosition = App.GetOriginPosition(ProjectTextSourceData.ProjectItemPosition);
+                this.SetParent(ProjectItemData.GetParent(ProjectTextSourceData.ParentItemID));
             }
             else
             {
                 ProjectTextSourceData = new(this);
             }
-            MatchHierarchyEditor = new HierarchyBlock<ProjectTextField>(this, nameof(ProjectTextField).Translate());
+            MatchHierarchyEditor = new HierarchyBlock<ProjectTextField>(this, () => this.SourceData.ProjectItemID);
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
             {
                 new ProjectTextFieldBlock(this),
                 new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
             };
-            App.instance.AddMessage($"Project Item(Text) {ProjectTextSourceData.ParentItemID} Setup");
+            App.instance.AddMessage($"Project Item(Text) {ProjectTextSourceData.ProjectItemID} Setup");
             OnMenu = new()
             {
                 [0] = new Dictionary<string, ADEvent>()
                 {
-                    {"Delete",new(()=>TryDestory()) }
+                    {"Delete",new(()=>
+                        { 
+                            GameObject.Destroy(gameObject);
+                            GameEditorApp.instance.GetSystem<SinglePanelGenerator>().Current.BackPool();
+                        }) 
+                    }
                 }
             };
         }
 
-        private void TryDestory()
+        private void OnEnable()
+        {
+            OnChange();
+        }
+
+        /*
+          private void TryDestory()
         {
             GameEditorApp.instance
                 .GetSystem<GameEditorWindowGenerator>()
-                .ObtainElement(new(100, 60),out var window)
+                .ObtainElement(new(200, 60), out var window)
                 .SetTitle("Warning : Will Delete Child".Translate())
-                .GenerateButton("Yes".Translate())
+                .GenerateButton("Yes".Translate(), new Vector2(200, 60))
                 .AddListener(() =>
                 {
                     GameObject.Destroy(gameObject);
@@ -190,13 +206,14 @@ namespace AD.Sample.Texter.Project
                     GameEditorApp.instance.SendCommand<RefreshPropertiesPanel>();
                 });
         }
+        */
 
         private void OnDestroy()
         {
             if (ADGlobalSystem.instance == null) return;
             App.instance.GetController<ProjectManager>().CurrentProjectData.Remove(new(ProjectItemBindKey));
-            this.ProjectTextSourceData = null;
             GameEditorApp.instance.GetController<Hierarchy>().RemoveOnTop(this.MatchHierarchyEditor);
+            this.ProjectTextSourceData = null;
             this.MatchHierarchyEditor = null;
             this.MatchPropertiesEditors.Clear();
             this.SetParent(null);
@@ -207,7 +224,7 @@ namespace AD.Sample.Texter.Project
             child.As<MonoBehaviour>().transform.position = this.transform.position + new Vector3(2.5f, 0, 0);
         }
 
-        public string ProjectItemBindKey => this.SourceData.ParentItemID;
+        public string ProjectItemBindKey => this.SourceData.ProjectItemID;
 
         public void ClickOnLeft()
         {

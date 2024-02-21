@@ -95,7 +95,16 @@ namespace AD.Experimental.HosterSystem
         public bool IsOpenListView { get; set; } = false;
         public ISerializeHierarchyEditor MatchHierarchyEditor { get => this; set { throw new ADException("Not Support"); } }
 
-        public HierarchyItem MatchItem { get; set; }
+        public HierarchyItem MatchItem
+        {
+            get => MatchItems.Count == 0 ? null : MatchItems[0];
+            set
+            {
+                if (MatchItems.Count == 0) MatchItems.Add(value);
+                else MatchItems[0] = value;
+            }
+        }
+        public List<HierarchyItem> MatchItems { get; private set; } = new();
         public ICanSerializeOnCustomEditor MatchTarget => this;
         public ICanSerializeOnCustomEditor ParentTarget { get; set; }
 
@@ -165,9 +174,9 @@ namespace AD.Experimental.HosterSystem
             else return default;
         }
 
-        public void OnSerialize()
+        public void OnSerialize(HierarchyItem MatchItem)
         {
-            this.MatchItem.SetTitle("Root(Base Group)");
+            MatchItem.SetTitle("Root(Base Group)");
         }
 
         public bool RemoveHosterComponent<T>() where T : IHosterComponent, new()
@@ -325,7 +334,16 @@ namespace AD.Experimental.HosterSystem
         public bool IsOpenListView { get; set; } = false;
         public ISerializeHierarchyEditor MatchHierarchyEditor { get => this; set { throw new ADException("Not Support"); } }
 
-        public HierarchyItem MatchItem { get; set; }
+        public HierarchyItem MatchItem
+        {
+            get => MatchItems.Count == 0 ? null : MatchItems[0];
+            set
+            {
+                if (MatchItems.Count == 0) MatchItems.Add(value);
+                else MatchItems[0] = value;
+            }
+        }
+        public List<HierarchyItem> MatchItems { get; private set; } = new();
         public ICanSerializeOnCustomEditor MatchTarget => this;
         public ICanSerializeOnCustomEditor ParentTarget { get; set; }
 
@@ -426,7 +444,7 @@ namespace AD.Experimental.HosterSystem
             else return default;
         }
 
-        public abstract void OnSerialize();
+        public abstract void OnSerialize(HierarchyItem MatchItem);
 
         public bool RemoveHosterComponent<T>() where T : IHosterComponent, new()
         {

@@ -679,11 +679,9 @@ namespace AD.BASE
         {
             AD.BASE.FileC.TryCreateDirectroryOfFile(path);
             string message = What();
-            using (FileStream fs = File.Create(path))
-            {
-                byte[] info = Encoding.Default.GetBytes(message);
-                fs.Write(info, 0, info.Length);
-            }
+            using FileStream fs = File.Create(path);
+            byte[] info = Encoding.UTF8.GetBytes(message);
+            fs.Write(info, 0, info.Length);
         }
 
         public virtual IADModel Load(string path)
@@ -2445,9 +2443,28 @@ namespace AD.BASE
             return GameObject.Instantiate(self.gameObject).GetComponent<T>();
         }
 
-        public static T PrefabInstantiate<T,_PrefabType>(this _PrefabType self) where T : Component where _PrefabType : Component
+        public static T PrefabInstantiate<T, _PrefabType>(this _PrefabType self) where T : Component where _PrefabType : Component
         {
             return GameObject.Instantiate(self.gameObject).GetComponent<T>();
+        }
+
+        public static T ObtainComponent<T>(this GameObject self, out T[] components) where T : class
+        {
+            components = self.GetComponents<T>();
+            return components.Length > 0 ? components[0] : null;
+        }
+
+        public static T ObtainComponent<T>(this GameObject self) where T : class
+        {
+            var components = self.GetComponents<T>();
+            return components.Length > 0 ? components[0] : null;
+        }
+
+        public static bool ObtainComponent<T>(this GameObject self, out T component) where T : class
+        {
+            var components = self.GetComponents<T>();
+            component = components.Length > 0 ? components[0] : null;
+            return component != null;
         }
     }
 
@@ -2507,9 +2524,11 @@ namespace AD.BASE
 
     public static class DebugExtenion
     {
-        public static string LogPath => Path.Combine(Application.persistentDataPath, "Debug.dat");
+        public static string LogPath = Path.Combine(Application.persistentDataPath, "Debug.dat");
 
-        public static string[] FilterdName = new string[] { "GetStackTraceModelName", "Log" };
+        public static bool LogMethodEnabled = true;
+
+        public static string[] FilterdName = new string[] { "GetStackTraceModelName" };
 
         static DebugExtenion()
         {
@@ -2521,16 +2540,38 @@ namespace AD.BASE
         {
             using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
             sws.WriteLine("{");
-            sws.WriteLine("\t[time]:" + DateTime.Now.ToString());
-            sws.WriteLine("\t[type]:" + type.ToString());
-            sws.WriteLine("\t[exception message]:" + logString);
-            sws.WriteLine("\t[stack trace]:\n" + stackTrace + "}");
+            sws.WriteLine("[time]:" + DateTime.Now.ToString());
+            sws.WriteLine("[type]:" + type.ToString());
+            sws.WriteLine("[exception message]:" + logString);
+            sws.WriteLine("[stack trace]:\n" + stackTrace + "}");
         }
 
         public static void Log()
         {
-            using StreamWriter sws = new StreamWriter(LogPath, true, System.Text.Encoding.UTF8);
-            sws.WriteLine(System.DateTime.Now.ToString() + " : " + GetStackTraceModelName().LinkAndInsert('|'));
+            if (LogMethodEnabled)
+            {
+                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                var temp = GetStackTraceModelName();
+                if (temp[^1] == nameof(Log))
+                {
+                    var newcat = temp.SubArray(0, temp.Length - 1);
+                }
+                sws.WriteLine(System.DateTime.Now.ToString() + " : " + temp.LinkAndInsert('|'));
+            }
+        }
+
+        public static void LogMessage(string message)
+        {
+            if (LogMethodEnabled)
+            {
+                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                var temp = GetStackTraceModelName();
+                if (temp[^1] == nameof(LogMessage))
+                {
+                    var newcat = temp.SubArray(0, temp.Length - 1);
+                }
+                sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " : " + temp.LinkAndInsert('|'));
+            }
         }
 
         public static string[] GetStackTraceModelName()

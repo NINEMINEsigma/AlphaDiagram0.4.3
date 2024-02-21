@@ -43,6 +43,10 @@ namespace AD.Experimental.GameEditor
             {
                 //RefreshPanel();
                 ClearAndRefresh();
+                if (Architecture.GetController<Properties>().MatchTarget != null && Architecture.GetController<Properties>().MatchTarget.MatchHierarchyEditor == editor)
+                {
+                    Architecture.GetController<Properties>().MatchTarget = null;
+                }
                 Architecture.GetController<Properties>().ClearAndRefresh();
             }
         }
@@ -106,10 +110,10 @@ namespace AD.Experimental.GameEditor
         private HierarchyItem RegisterHierarchyItem(ISerializeHierarchyEditor target)
         {
             HierarchyItem hierarchyItem = EditorAssets.HierarchyListView.GenerateItem() as HierarchyItem;
-            target.MatchItem = hierarchyItem;
             hierarchyItem.MatchEditor = target;
+            target.MatchItems.Add(hierarchyItem);
             target.BaseHierarchyItemSerialize();
-            target.OnSerialize();
+            target.OnSerialize(hierarchyItem);
             hierarchyItem.name = hierarchyItem.SortIndex.ToString();
             return hierarchyItem;
         }
@@ -121,17 +125,20 @@ namespace AD.Experimental.GameEditor
             GameEditorApp.instance.SendImmediatelyCommand<CurrentItemSelectOnHierarchyPanel>();
             foreach (var item in TargetTopObjectEditors)
             {
-                item.MatchItem = RegisterHierarchyItem(item);
+                RegisterHierarchyItem(item);
             }
             EditorAssets.HierarchyListView.SortChilds();
         }
 
-        public void RefreshPanel(PointerEventData axisEventData=null)
+        public void RefreshPanel(PointerEventData axisEventData = null)
         {
             foreach (var target in TargetTopObjectEditors)
             {
                 target.BaseHierarchyItemSerialize();
-                target.OnSerialize();
+                foreach (var item in target.MatchItems)
+                {
+                    target.OnSerialize(item);
+                }
             }
             EditorAssets.HierarchyListView.SortChilds();
         }

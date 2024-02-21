@@ -84,6 +84,36 @@ namespace AD.Utility
             }
             return result;
         }
+
+        public static T[] SubArray<T>(this T[] self, int start, int end)
+        {
+            T[] result = new T[end - start];
+            for (int i = start; i < end; i++)
+            {
+                result[i] = self[i];
+            }
+            return result;
+        }
+
+        public static T[] SubArray<T>(this T[] self, T[] buffer, int start, int end)
+        {
+            if (buffer == null || buffer.Length < end - start) throw new ADException("Buffer is null or too small");
+            for (int i = start; i < end; i++)
+            {
+                buffer[i] = self[i];
+            }
+            return buffer;
+        }
+
+        public static T[] SafeSubArray<T>(this T[] self, T[] buffer, int start, int end)
+        {
+            if (buffer == null) return SubArray(self, start, end);
+            for (int i = start, e = Mathf.Min(start + buffer.Length, end); i < e; i++)
+            {
+                buffer[i] = self[i];
+            }
+            return buffer;
+        }
     }
 
     [System.Serializable]

@@ -12,7 +12,8 @@ namespace AD.UI
         {
             get
             {
-                _CustomWindowGeneratorPool ??= new GameObject("CustomWindowGenerator Pool");
+                if (_CustomWindowGeneratorPool == null)
+                    _CustomWindowGeneratorPool = new GameObject("CustomWindowGenerator Pool");
                 return _CustomWindowGeneratorPool;
             }
         }
@@ -27,7 +28,8 @@ namespace AD.UI
         {
             get
             {
-                _CustomWindowGeneratorPool ??= new GameObject(typeof(T).Name + " Pool");
+                if (_CustomWindowGeneratorPool == null)
+                    _CustomWindowGeneratorPool = new GameObject(typeof(T).Name + " Pool");
                 return _CustomWindowGeneratorPool;
             }
         }
