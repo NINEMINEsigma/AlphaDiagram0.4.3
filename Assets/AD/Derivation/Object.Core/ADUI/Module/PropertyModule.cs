@@ -16,14 +16,14 @@ namespace AD.UI
             get => _Childs;
             set
             {
-                _Childs = value;
                 if (IsChildAllLinkAtMyTransformAsChild)
                 {
-                    for (int i = 0,e= transform.childCount; i < e; i++)
+                    foreach (var child in _Childs)
                     {
-                        GameObject.Destroy(transform.GetChild(i).gameObject);
+                        
                     }
                 }
+                _Childs = value;
             }
         }
         private GridLayoutGroup _GridLayoutGroup = null;
@@ -31,7 +31,7 @@ namespace AD.UI
 
         public PropertyModule()
         {
-            ElementArea = "PropertyModule";
+            ElementArea = this.GetType().Name;
         }
 
         protected virtual void Start()
@@ -86,10 +86,10 @@ namespace AD.UI
 
         public void Add(int key, GameObject child)
         {
-            if (Childs.ContainsKey(key))
-                LetChildDestroy(Childs[key]);
             if (child != null)
             {
+                if (Childs.ContainsKey(key))
+                    LetChildDestroy(Childs[key]);
                 Childs[key] = child;
                 LetChildAdd(child);
             }
@@ -108,15 +108,21 @@ namespace AD.UI
         public void Remove(int index)
         {
             if (Childs.ContainsKey(index))
+            {
                 LetChildDestroy(Childs[index]);
-            Childs.Remove(index);
+                Childs.Remove(index);
+            }
         }
 
         public void Remove(GameObject target)
         {
-            var result = Childs.FirstOrDefault(T => T.Value == target);
-            Remove(result.Key);
-            GameObject.Destroy(result.Value);
+            foreach (var child in Childs)
+            {
+                if(child.Value==target)
+                {
+                    Remove(child.Key);
+                }
+            }
         }
 
         protected Dictionary<string, Queue<GameObject>> Pool = new();

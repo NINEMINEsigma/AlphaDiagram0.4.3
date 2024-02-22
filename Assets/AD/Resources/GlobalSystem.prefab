@@ -72,6 +72,7 @@ MonoBehaviour:
   _AudioSource: {fileID: 1273201300325413191, guid: 711c6dbbd6f2fc043895cdc8329b55a9, type: 3}
   _CustomWindowElement: {fileID: 74856100616418833, guid: 312f31ed2782b8f48b2b5e85ef045aa2, type: 3}
   _ListView: {fileID: 7771118446552276518, guid: 5f9b6ed662399af418a91e58e39244e5, type: 3}
+  _TouchPanel: {fileID: 654491615134191917, guid: d52b56293b7adf74e9328d79d24c1402, type: 3}
   IsAutoSaveArchitecturesDebugLog: 0
   AutoSaveArchitecturesDebugLogTimeLimit: 60
   AutoSaveArchitecturesDebugLogTimeLimitCounter:

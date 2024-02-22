@@ -167,7 +167,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240220/1807";
+        public static string Version => "AD/0.4.3/20240220/2032";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -227,6 +227,7 @@ namespace AD
         public AudioSourceController _AudioSource;
         public CustomWindowElement _CustomWindowElement;
         public ListView _ListView;
+        public TouchPanel _TouchPanel;
 
         public static T GenerateElement<T>() where T : ADUI
         {

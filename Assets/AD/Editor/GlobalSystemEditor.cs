@@ -37,6 +37,7 @@ namespace AD
         SerializedProperty _AudioSource;
         SerializedProperty _CustomWindowElement;
         SerializedProperty _ListView;
+        SerializedProperty _TouchPanel;
 
         SerializedProperty RecordPath;
 
@@ -94,6 +95,7 @@ namespace AD
             _AudioSource = serializedObject.FindProperty(nameof(_AudioSource));
             _CustomWindowElement = serializedObject.FindProperty(nameof(_CustomWindowElement));
             _ListView = serializedObject.FindProperty(nameof(_ListView));
+            _TouchPanel = serializedObject.FindProperty(nameof(_TouchPanel));
             RecordPath = serializedObject.FindProperty(nameof(RecordPath));
             OnSceneStart = serializedObject.FindProperty(nameof(OnSceneStart));
             OnSceneEnd = serializedObject.FindProperty(nameof(OnSceneEnd));
@@ -265,6 +267,7 @@ namespace AD
             EditorGUILayout.PropertyField(_AudioSource);
             EditorGUILayout.PropertyField(_CustomWindowElement);
             EditorGUILayout.PropertyField(_ListView);
+            EditorGUILayout.PropertyField(_TouchPanel);
             GUILayout.Space(2);
             GUILayout.EndVertical();
         }
@@ -379,6 +382,15 @@ namespace AD
         {
             var target = GameObject.Instantiate(ADGlobalSystem.instance._ListView);
             target.name = "ListView";
+            GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
+            Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
+            Selection.activeObject = target.gameObject;
+        }
+        [MenuItem("GameObject/AD/TouchPanel", false, 30)]
+        private static void TouchPanel(UnityEditor.MenuCommand menuCommand)
+        {
+            var target = GameObject.Instantiate(ADGlobalSystem.instance._TouchPanel);
+            target.name = "TouchPanel";
             GameObjectUtility.SetParentAndAlign(target.gameObject, menuCommand.context as GameObject);
             Undo.RegisterCreatedObjectUndo(target.gameObject, "Create " + target.name);
             Selection.activeObject = target.gameObject;
