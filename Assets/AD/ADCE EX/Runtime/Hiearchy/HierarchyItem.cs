@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AD.BASE;
 using AD.UI;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -61,6 +62,10 @@ namespace AD.Experimental.GameEditor
             if (!DetectStats()) return;
             if (!ListToggle.Selected) return;
             MatchEditor.MatchTarget.ClickOnRight();
+            if(MatchEditor.MatchTarget is ISetupSingleMenuOnClickRight cMenu)
+            {
+                GameEditorApp.instance.GetSystem<SinglePanelGenerator>().OnMenuInitWithRect(cMenu.OnMenu, this.transform as RectTransform, cMenu.OnMenuTitle);
+            }
         }
 
         public void OnClickAndRefresh(bool boolen)
@@ -82,14 +87,29 @@ namespace AD.Experimental.GameEditor
             Vector2 temp = this.transform.As<RectTransform>().sizeDelta;
             this.transform.As<RectTransform>().sizeDelta = new Vector2(temp.x, temp.y + DefaultHight * t);
             AddtionalLevel += t;
-            MatchEditor.MatchTarget.ParentTarget?.MatchHierarchyEditor.MatchItem.AddRectHightLevel(t);
+            if(MatchEditor.MatchTarget.ParentTarget!=null)
+            {
+                foreach (var item in MatchEditor.MatchTarget.ParentTarget.MatchHierarchyEditor.MatchItems)
+                {
+                    item.AddRectHightLevel(t);
+                }
+            }
         }
 
         public void ClearRectHightLevel()
         {
             Vector2 temp = this.transform.As<RectTransform>().sizeDelta;
             this.transform.As<RectTransform>().sizeDelta = new Vector2(temp.x, DefaultHight);
-            MatchEditor?.MatchTarget.ParentTarget?.MatchHierarchyEditor.MatchItem.AddRectHightLevel(-AddtionalLevel);
+            if (MatchEditor != null)
+            {
+                if (MatchEditor.MatchTarget.ParentTarget != null)
+                {
+                    foreach (var item in MatchEditor.MatchTarget.ParentTarget.MatchHierarchyEditor.MatchItems)
+                    {
+                        item.AddRectHightLevel(-AddtionalLevel);
+                    }
+                }
+            }
             AddtionalLevel = 0;
         }
 
@@ -116,7 +136,7 @@ namespace AD.Experimental.GameEditor
             ListSubListView.Clear();
             foreach (var item in childs)
             {
-                item.MatchHierarchyEditor.MatchItem = RegisterHierarchyItem(item.MatchHierarchyEditor);
+                RegisterHierarchyItem(item.MatchHierarchyEditor);
             }
             ListSubListView.SortChilds();
         }

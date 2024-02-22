@@ -40,7 +40,10 @@ namespace AD.Experimental.GameEditor
 
         private void TitleLinking(string T)
         {
-            this.MatchItem.SetTitle(T);
+            foreach (var item in MatchItems)
+            {
+                item.SetTitle(T);
+            }
         }
 
         ~HierarchyBlock()
@@ -89,8 +92,10 @@ namespace AD.Experimental.GameEditor
                 if (_p_Title != null) _p_Title.Set(value);
                 else if (_f_Title != null) _f_Title_seter?.Invoke(value);
                 else _Title = value;
-                if (MatchItem != null)
-                    MatchItem.SetTitle(Title);
+                foreach (var item in MatchItems)
+                {
+                    item.Refresh();
+                }
             }
         }
     }

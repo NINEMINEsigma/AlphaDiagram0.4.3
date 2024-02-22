@@ -33,15 +33,6 @@ namespace AD.Experimental.GameEditor
 
     public static class CustomEditorUtility
     {
-        public static HierarchyItem RegisterHierarchyItem(this ISerializeHierarchyEditor self, ISerializeHierarchyEditor target)
-        {
-            HierarchyItem hierarchyItem = self.MatchItem.ListSubListView.GenerateItem() as HierarchyItem;
-            target.MatchItems.Add(hierarchyItem);
-            hierarchyItem.MatchEditor = target;
-            target.OnSerialize(hierarchyItem);
-            return hierarchyItem;
-        }
-
         public static void SetParent(this ICanSerializeOnCustomEditor self, ICanSerializeOnCustomEditor _Right)
         {
             if (self == null && _Right == null) return;
@@ -62,7 +53,10 @@ namespace AD.Experimental.GameEditor
                 {
                     //if (self.GetChilds().Contains(_Right)) return;
                     self.ParentTarget.GetChilds().Remove(self);
-                    self.ParentTarget.MatchHierarchyEditor.MatchItem.Refresh();
+                    foreach (var item in self.ParentTarget.MatchHierarchyEditor.MatchItems)
+                    {
+                        item.Refresh();
+                    }
                     if (self.ParentTarget is IUpdateOnChange onChange)
                     {
                         onChange0 = onChange;
@@ -76,8 +70,11 @@ namespace AD.Experimental.GameEditor
                 if (_Right != null)
                 {
                     _Right.GetChilds().Add(self);
-                    if (_Right.MatchHierarchyEditor != null && _Right.MatchHierarchyEditor.MatchItem != null)
-                        _Right.MatchHierarchyEditor.MatchItem.Refresh();
+                    if (_Right.MatchHierarchyEditor != null)
+                        foreach (var item in _Right.MatchHierarchyEditor.MatchItems)
+                        {
+                            item.Refresh();
+                        }
                     if (_Right is IUpdateOnChange onChange)
                     {
                         onChange2 = onChange;
@@ -90,30 +87,32 @@ namespace AD.Experimental.GameEditor
             }
         }
 
-        public static void BaseHierarchyItemSerialize(this ISerializeHierarchyEditor self)
+        public static void BaseHierarchyItemSerialize(this ISerializeHierarchyEditor self, int depth)
         {
-            if (self.IsOpenListView)
+            depth++;
+            if (self.IsOpenListView && depth < 4)
             {
-                self.MatchItem.Refresh();
+                foreach (var item in self.MatchItems)
+                {
+                    item.Refresh();
+                }
                 foreach (var item in self.MatchTarget.GetChilds())
                 {
-                    item.MatchHierarchyEditor.BaseHierarchyItemSerialize();
+                    item.MatchHierarchyEditor.BaseHierarchyItemSerialize(depth);
                     foreach (var itemSingle in item.MatchHierarchyEditor.MatchItems)
                     {
                         item.MatchHierarchyEditor.OnSerialize(itemSingle);
                     }
                 }
             }
-        }
-
-        public static void SetTitle(ISerializeHierarchyEditor editor, string title)
-        {
-            editor.MatchItem.SetTitle(title);
-        }
-
-        public static void SetMaxSubItemCount(ISerializeHierarchyEditor editor, int max)
-        {
-            editor.MatchItem.ExtensionOpenSingleItemSum = (max - HierarchyItem.MaxOpenSingleItemSum) > 0 ? max - HierarchyItem.MaxOpenSingleItemSum : 1;
+            else
+            {
+                self.IsOpenListView = false;
+                foreach (var item in self.MatchItems)
+                {
+                    item.Refresh();
+                }
+            }
         }
     }
 
@@ -126,7 +125,6 @@ namespace AD.Experimental.GameEditor
             {
                 Architecture.GetController<Properties>().MatchTarget = cat.MatchEditor.MatchTarget;
                 Architecture.GetController<Properties>().ClearAndRefresh();
-
             }
         }
     }
@@ -158,7 +156,7 @@ namespace AD.Experimental.GameEditor
 
         ICanSerializeOnCustomEditor MatchTarget { get; }
         bool IsOpenListView { get; set; }
-        HierarchyItem MatchItem { get; set; }
+        //HierarchyItem MatchItem { get; set; }
         List<HierarchyItem> MatchItems { get; }
     }
 
@@ -185,5 +183,11 @@ namespace AD.Experimental.GameEditor
     public interface IUpdateOnChange
     {
         void OnChange();
+    }
+
+    public interface ISetupSingleMenuOnClickRight
+    {
+        Dictionary<int, Dictionary<string, ADEvent>> OnMenu { get; }
+        string OnMenuTitle { get; }
     }
 }

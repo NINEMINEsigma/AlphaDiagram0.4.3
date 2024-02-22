@@ -5,11 +5,11 @@
 			"__type" : "AD.Sample.Texter.Data.ProjectTextData_BaseMap,Assembly-CSharp",
 			"text" : "222",
 			"description" : "2",
-			"ProjectItemID" : "Text 2XXX",
+			"ProjectItemID" : "Text 2024 2 22",
 			"ParentItemID" : "ProjectRoot",
 			"ProjectItemPosition" : {
-				"x" : 7.406098,
-				"y" : -0.0536488146
+				"x" : 7.44494867,
+				"y" : 0.08184233
 			}
 		}
 	}

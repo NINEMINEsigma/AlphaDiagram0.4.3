@@ -31,10 +31,11 @@ namespace AD.Experimental.GameEditor
 
         public void AddOnTop(ISerializeHierarchyEditor editor)
         {
-            TargetTopObjectEditors.Add(editor);
-            //RefreshPanel();
-            ClearAndRefresh();
-            Architecture.GetController<Properties>().ClearAndRefresh();
+            if (!TargetTopObjectEditors.Contains(editor))
+            {
+                TargetTopObjectEditors.Add(editor);
+                ClearAndRefresh();
+            }
         }
 
         public void RemoveOnTop(ISerializeHierarchyEditor editor)
@@ -62,7 +63,10 @@ namespace AD.Experimental.GameEditor
                     GameEditorApp.instance.RegisterController(this);
                     IsRegister = true;
                 }
-                catch { }
+                catch(Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
         }
 
@@ -74,9 +78,6 @@ namespace AD.Experimental.GameEditor
 
         public override void Init()
         {
-            //EditorAssets.behaviourContext.OnPointerEnterEvent = ADUI.InitializeContextSingleEvent(EditorAssets.behaviourContext.OnPointerEnterEvent, RefreshPanel);
-            //EditorAssets.behaviourContext.OnPointerExitEvent = ADUI.InitializeContextSingleEvent(EditorAssets.behaviourContext.OnPointerExitEvent, RefreshPanel);
-
             TargetTopObjectEditors = new();
             ClearAndRefresh();
         }
@@ -85,11 +86,6 @@ namespace AD.Experimental.GameEditor
         {
             get
             {
-                if (index < 0 || index > TargetTopObjectEditors.Count)
-                {
-                    Debug.LogError("Over Bound");
-                    return null;
-                }
                 return TargetTopObjectEditors[index];
             }
             set
@@ -97,11 +93,6 @@ namespace AD.Experimental.GameEditor
                 if (index == -1)
                 {
                     TargetTopObjectEditors.Add(value);
-                }
-                else if (index < 0 || index > TargetTopObjectEditors.Count)
-                {
-                    Debug.LogError("Over Bound");
-                    return;
                 }
                 else TargetTopObjectEditors[index] = value;
             }
@@ -112,7 +103,7 @@ namespace AD.Experimental.GameEditor
             HierarchyItem hierarchyItem = EditorAssets.HierarchyListView.GenerateItem() as HierarchyItem;
             hierarchyItem.MatchEditor = target;
             target.MatchItems.Add(hierarchyItem);
-            target.BaseHierarchyItemSerialize();
+            target.BaseHierarchyItemSerialize(0);
             target.OnSerialize(hierarchyItem);
             hierarchyItem.name = hierarchyItem.SortIndex.ToString();
             return hierarchyItem;
@@ -122,7 +113,7 @@ namespace AD.Experimental.GameEditor
         {
             EditorAssets.HierarchyListView.Clear();
             GameEditorApp.instance.CurrentHierarchyItem = null;
-            GameEditorApp.instance.SendImmediatelyCommand<CurrentItemSelectOnHierarchyPanel>();
+            //GameEditorApp.instance.SendImmediatelyCommand<CurrentItemSelectOnHierarchyPanel>();
             foreach (var item in TargetTopObjectEditors)
             {
                 RegisterHierarchyItem(item);
@@ -134,7 +125,7 @@ namespace AD.Experimental.GameEditor
         {
             foreach (var target in TargetTopObjectEditors)
             {
-                target.BaseHierarchyItemSerialize();
+                target.BaseHierarchyItemSerialize(0);
                 foreach (var item in target.MatchItems)
                 {
                     target.OnSerialize(item);

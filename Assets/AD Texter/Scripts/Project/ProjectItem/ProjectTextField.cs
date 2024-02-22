@@ -79,7 +79,7 @@ namespace AD.Sample.Texter
 
 namespace AD.Sample.Texter.Project
 {
-    public class ProjectTextField : MonoBehaviour, IProjectItemWhereNeedInitData, IUpdateOnChange, ICatchCameraRayUpdate
+    public class ProjectTextField : MonoBehaviour, IProjectItemWhereNeedInitData, IUpdateOnChange, ICatchCameraRayUpdate, ISetupSingleMenuOnClickRight
     {
         public class ProjectTextFieldBlock : ProjectItemBlock
         {
@@ -231,11 +231,12 @@ namespace AD.Sample.Texter.Project
 
         }
 
-        public Dictionary<int, Dictionary<string, ADEvent>> OnMenu;
+        public Dictionary<int, Dictionary<string, ADEvent>> OnMenu { get; set; }
+        public string OnMenuTitle => "Text Menu";
 
         public void ClickOnRight()
         {
-            GameEditorApp.instance.GetSystem<SinglePanelGenerator>().OnMenuInitWithRect(OnMenu, this.MatchHierarchyEditor.MatchItem.transform as RectTransform, "Text Menu");
+
         }
 
         public List<ICanSerializeOnCustomEditor> Childs = new();

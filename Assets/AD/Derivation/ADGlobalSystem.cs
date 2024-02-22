@@ -181,7 +181,7 @@ namespace AD
             get
             {
                 if (IsJumpScene) return null;
-                if (AppQuitting) return _m_instance;
+                if (AppQuitting) return null;
                 if (_m_instance == null)
                 {
                     var cat = GameObject.FindObjectsOfType(typeof(ADGlobalSystem));
