@@ -221,7 +221,7 @@ namespace AD.UI
                     }
                 }
             }
-            WorldPointer = position.SetZ(Depth);
+            WorldPointer = position;//.SetZ(Depth);
             OpenView();
             //var rect = transform.As<RectTransform>().rect;
             var pos = Mouse.current.position.ReadValue();

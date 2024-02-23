@@ -2548,6 +2548,7 @@ namespace AD.BASE
 
         public static void Log()
         {
+#if UNITY_EDITOR
             if (LogMethodEnabled)
             {
                 using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
@@ -2558,10 +2559,12 @@ namespace AD.BASE
                 }
                 sws.WriteLine(System.DateTime.Now.ToString() + " : " + temp.LinkAndInsert('|'));
             }
+#endif
         }
 
         public static void LogMessage(string message)
         {
+#if UNITY_EDITOR
             if (LogMethodEnabled)
             {
                 using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
@@ -2572,6 +2575,7 @@ namespace AD.BASE
                 }
                 sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " : " + temp.LinkAndInsert('|'));
             }
+#endif
         }
 
         public static string[] GetStackTraceModelName()
