@@ -349,7 +349,7 @@ namespace Dreamteck.Splines.Editor
             {
                 if (addComp.isClosed && i == points.Length - 1) break;
 
-                Handles.Label(points[i].position + Camera.current.transform.up * HandleUtility.GetHandleSize(points[i].position) * 0.3f, (i + 1).ToString());
+                Handles.Label(points[i].position + 0.3f * HandleUtility.GetHandleSize(points[i].position) * Camera.current.transform.up, (i + 1).ToString());
                 if (SplineEditorHandles.CircleButton(points[availablePoints[i]].position, Quaternion.LookRotation(-camTransform.forward, camTransform.up), HandleUtility.GetHandleSize(points[availablePoints[i]].position) * 0.1f, 2f, addComp.editorPathColor))
                 {
                     AddConnection(addComp, availablePoints[i]);

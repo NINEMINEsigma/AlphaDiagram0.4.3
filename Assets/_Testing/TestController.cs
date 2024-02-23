@@ -1,33 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
-using AD.UI;
+﻿using UnityEngine;
 using AD.Utility;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace TTT
 {
+
     public class TestController : MonoBehaviour
     {
-        public string path;
-        public string objName;
-        public AssetBundleInfo info;
-        public RawImage RawImage;
+        public MeshFilter meshFilter;
 
-        public void TetsRun()
+        public CustomCurveSource Curve = new();
+        public AnimationCurve Size = new();
+
+        private void Start()
         {
-            info ??= new(path);
-            if (!info)
-            {
-                info.UnLoad();
-                info = new(path);
-            }
-            info.Load(objName, T =>
-            {
-                Debug.Log(T.GetType().Name);
-                RawImage.source.texture = T as Texture;
-            });
+            meshFilter.mesh = new Mesh();
+            InitMesh();
         }
 
+        private void OnValidate()
+        {
+            InitMesh();
+        }
+
+        private void InitMesh()
+        {
+            MeshExtension.InitMesh(meshFilter, MeshExtension.GenerateCurveMeshData(Curve, MeshExtension.BuildNormalType.JustDirection, Vector3.right, Size));
+        }
     }
 }

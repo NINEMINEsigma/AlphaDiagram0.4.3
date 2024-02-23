@@ -132,7 +132,7 @@ namespace Dreamteck.Splines.Editor
                 {
                     if(Event.current.type == EventType.Repaint)
                     {
-                        Handles.Label(points[i].position + Camera.current.transform.up * HandleUtility.GetHandleSize(points[i].position) * 0.3f, (i + 1).ToString());
+                        Handles.Label(points[i].position + 0.3f * HandleUtility.GetHandleSize(points[i].position) * Camera.current.transform.up, (i + 1).ToString());
                     }
                 }
                 if (!eventModule.alt)

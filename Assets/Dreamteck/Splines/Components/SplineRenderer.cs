@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using Dreamteck.Splines;
-using Ichni;
 
 namespace Dreamteck.Splines
 {
@@ -39,16 +38,30 @@ namespace Dreamteck.Splines
         private bool _orthographic = false;
         private bool _init = false;
 
+        public static Camera MainCamera;
+        public static Camera CurrentCamera
+        {
+            get
+            {
+
+                if (Application.isPlaying)
+                {
+                    if (MainCamera != null) return MainCamera;
+                    else if (Camera.current != null) return Camera.current;
+                    else return Camera.main;
+                }
+                else
+                {
+                    if (Camera.current != null) return Camera.current;
+                    else if (MainCamera != null) return MainCamera;
+                    else return Camera.main;
+                }
+            }
+        }
+
         void Start()
         {
-            if (Camera.current != null)
-            {
-                _orthographic = Camera.current.orthographic;
-            } 
-            else if (Camera.main != null)
-            {
-                _orthographic = Camera.main.orthographic;
-            }
+            _orthographic = CurrentCamera.orthographic;
 
             CreateMesh();
         }
@@ -101,21 +114,7 @@ namespace Dreamteck.Splines
                 }
             }
 
-            if (Application.isPlaying)
-            {
-                if (EditorManager.cameraManager.nowCameraMode == "Scene Camera")
-                {
-                    RenderWithCamera(EditorManager.cameraManager.sceneCamera.m_camera);
-                }
-                else
-                {
-                    RenderWithCamera(EditorManager.cameraManager.mainGameCamera.m_camera);
-                }
-            }
-            else
-            {
-                RenderWithCamera(Camera.current);
-            }
+            RenderWithCamera(CurrentCamera);
         }
 
         public void GenerateVertices(Vector3 vertexDirection, bool orthoGraphic)
