@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using AD.BASE;
-using UnityEngine;
 
 namespace AD.Experimental.GameEditor
 {
@@ -16,7 +13,7 @@ namespace AD.Experimental.GameEditor
 
         public override void Init()
         {
-            Source.SetText("Custom Editor");
+            //Source.SetText("Custom Editor");
         }
 
         public void SetTitle(string title)

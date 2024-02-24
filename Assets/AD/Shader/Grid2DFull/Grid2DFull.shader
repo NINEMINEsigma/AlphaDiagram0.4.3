@@ -2,7 +2,7 @@ Shader "AD/infTutorial"
 {
     Properties
     {
-        //_PlaneLevel("High",float) = 0
+        _ColorLevel("Color Level",Range(0,1)) =1 
     }
     SubShader
     {
@@ -22,7 +22,7 @@ Shader "AD/infTutorial"
             #pragma vertex vert
             #pragma fragment frag
 
-            //float _PlaneLevel;
+            half _ColorLevel;
 
             struct Attributes
             {
@@ -100,7 +100,7 @@ Shader "AD/infTutorial"
 
                 //合并计算
                 half grid = smallGrid + middleGrid + largeGrid;
-                return half4(0.5, 0.5, 0.5 ,ground * grid * fading * 0.5); //顺便改色减淡一下
+                return half4(0.5, 0.5, 0.5 ,ground * grid * fading * 0.5 * _ColorLevel); //顺便改色减淡一下
             }
             ENDHLSL
         }
