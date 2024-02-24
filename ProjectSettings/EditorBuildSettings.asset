@@ -5,16 +5,19 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/AD Texter/Scenes/EntryScene.unity
     guid: 47869cbdc9a6aea43abd9c47ff730a96
-  - enabled: 1
+  - enabled: 0
     path: Assets/AD Texter/Scenes/ProjectScene.unity
     guid: 57fde834e23dcbd43a9289f18383d9a3
-  - enabled: 1
+  - enabled: 0
     path: Assets/AD Texter/Scenes/SettingScene.unity
     guid: c5d8bfc41fea5ce429023d135fc56ff4
-  - enabled: 1
+  - enabled: 0
     path: Assets/AD Texter/Scenes/Project SubScene/TextField.unity
     guid: 836c1efca17fb274aabb56044f618390
+  - enabled: 1
+    path: Assets/_Testing/TestXXXScene.unity
+    guid: 4b15ace48288bb4488f982cd07dda37e
   m_configObjects: {}

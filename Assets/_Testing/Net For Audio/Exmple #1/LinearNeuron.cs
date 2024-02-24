@@ -106,7 +106,7 @@ namespace AD.Experimental.Neuron.AudioSampling
             base.Start();
             ADGlobalSystem.instance.StartCoroutine(InitializeMonoMode());
 #else
-        public Neuron() :base()
+        public LinearNeuron() :base()
         {
             MatchHierarchyEditor = new HierarchyBlock<LinearNeuron>(this, this.instanceIndex.ToString());
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()

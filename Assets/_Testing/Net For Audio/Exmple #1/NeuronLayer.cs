@@ -1,11 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.UI;
-using AD.Utility;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace AD.Experimental.Neuron.AudioSampling
 {

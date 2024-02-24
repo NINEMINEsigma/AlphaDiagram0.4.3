@@ -114,6 +114,37 @@ namespace AD.Utility
             }
             return buffer;
         }
+
+        public static List<Value> GetSubListAboutSortValue<Key, Value>(this Dictionary<Key, Value> self) where Key : IComparable<Key>
+        {
+            List<(Key, Value)> temp = new();
+            foreach (var item in self)
+            {
+                temp.Add((item.Key, item.Value));
+            }
+            temp.Sort((T, P) => T.Item1.CompareTo(P.Item1));
+            List<Value> result = new();
+            for (int i = 0, e = temp.Count; i < e; i++)
+            {
+                result.Add(temp[i].Item2);
+            }
+            return result;
+        }
+
+        public static T[] Expand<T>(this T[] self, params T[] args)
+        {
+            T[] result = new T[args.Length + self.Length];
+            for (int i = 0, e = self.Length; i < e; i++)
+            {
+                result[i] = self[i];
+            }
+            for (int i = 0, e = args.Length, p = self.Length; i < e; i++)
+            {
+                result[i + p] = args[i];
+            }
+            return result;
+        }
+
     }
 
     [System.Serializable]

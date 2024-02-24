@@ -161,13 +161,14 @@ namespace AD
     {
         JustPressed,
         ThisFramePressed,
-        ThisFrameReleased
+        ThisFrameReleased,
+        None
     }
 
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240223/1207";
+        public static string Version => "AD/0.4.3/20240224/1517";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -553,6 +554,7 @@ namespace AD
             KeyControl_Update();
             Record_Update();
             Time_Update();
+            BuildTouching();
 
             void Instance_Update()
             {
@@ -579,6 +581,33 @@ namespace AD
             void Time_Update()
             {
                 TimeExtension.Update();
+            }
+
+            void BuildTouching()
+            {
+                var touchtemp = TouchExtension.Build().ToList();
+                for (int i = 0, e = Mathf.Min(Fingers.Count, touchtemp.Count); i < e; i++)
+                {
+                    Finger finger = Fingers[i];
+                    bool isUpdate = false;
+                    //找到相同的手指
+                    foreach (var touch in touchtemp)
+                    {
+                        if (touch.touch.fingerId == finger.data.touch.fingerId)
+                        {
+                            finger.data = touch;
+                            isUpdate = true;
+                            touchtemp.Remove(touch);
+                            break;
+                        }
+                    }
+                    //否则重新获取
+                    if (!isUpdate)
+                    {
+                        finger.data = touchtemp[i];
+                    }
+                    finger.Invoke();
+                }
             }
         }
 
@@ -1216,14 +1245,11 @@ namespace AD
 
         public static void DebugMessage(string message)
         {
-#if UNITY_EDITOR
             Debug.Log(message);
-#endif
         }
 
         public static void DebugMessage(string message, DebugMessageTypeKey mode)
         {
-#if UNITY_EDITOR
             switch (mode)
             {
                 case DebugMessageTypeKey.Message:
@@ -1238,7 +1264,6 @@ namespace AD
                 default:
                     break;
             }
-#endif
         }
 
         #endregion
@@ -1266,6 +1291,38 @@ namespace AD
             {
                 ADGlobalSystem.instance.StopCoroutine(coroutiner);
             }
+        }
+
+        #endregion
+
+        #region Touch
+
+        public class Finger
+        {
+            public Finger(int index)
+            {
+                Index = index;
+            }
+
+            public TouchExtension.TouchData data;
+            public readonly int Index;
+
+            public void Invoke()
+            {
+                if (data)
+                    OnTouch.Invoke(data);
+            }
+
+            public ADEvent<TouchExtension.TouchData> OnTouch = new();
+        }
+
+        public static List<Finger> Fingers = new();
+
+        public static Finger RegisterFinger()
+        { 
+            Finger result = new(Fingers.Count);
+            Fingers.Add(result);
+            return result;
         }
 
         #endregion
