@@ -1,4 +1,4 @@
-Shader "AD/Mask"
+Shader "AD/Mask/SelfMask"
 {
 	Properties
 	{
@@ -32,7 +32,7 @@ Shader "AD/Mask"
 		Pass
 		{
 			Name "CustomMask2"
-		CGPROGRAM
+			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 2.0

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Unlit_Mask 1
-  m_Shader: {fileID: 4800000, guid: 37b96d4a3fe45d14f8ecd00df7807fe8, type: 3}
+  m_Name: ComplexMask
+  m_Shader: {fileID: 4800000, guid: 35685d01ebd00e44a951cbb382c24a13, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -26,9 +26,23 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _d: 1
-    - _h: 1
-    - _k: 1.37
-    - _l: 0
-    m_Colors: []
+    - _ColorMask: 15
+    - _Contrast: 0
+    - _Distance: 0
+    - _DistanceKey: 0.001
+    - _Saturation: 0
+    - _Stencil: 0
+    - _StencilComp: 0
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _ToneIntensity: 0
+    - _UseUIAlphaClip: 0
+    - _high_xClip: 1
+    - _high_yClip: 1
+    - _low_xClip: 0
+    - _low_yClip: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _ToneColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

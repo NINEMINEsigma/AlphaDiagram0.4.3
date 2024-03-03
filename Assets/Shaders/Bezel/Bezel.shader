@@ -1,12 +1,9 @@
-Shader "Unlit/Mask"
+Shader "Unlit/Bezel"
 {
     Properties
     {
-        [PerRendererData] _MainTex ("Texture", 2D) = "white" {}
-        _k("K",float)=2
-        _d("Pos",Range(-1,1))=0
-        _l("l",Range(0,0.5))=0.5
-        _h("h",Range(0.5,1))=0.5
+        _MainTex ("Texture", 2D) = "white" {}
+        _Dis("Key",Range(0,0.5))=0.01
     }
     SubShader
     {
@@ -38,11 +35,7 @@ Shader "Unlit/Mask"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            float _k;
-            float _d;
-            float _w;
-            float _h;
-            float _l;
+            float _Dis;
 
             v2f vert (appdata v)
             {
@@ -55,13 +48,10 @@ Shader "Unlit/Mask"
 
             fixed4 frag (v2f i) : SV_Target
             {
-            clip(_k*i.uv.x-i.uv.y+_d);
-            clip(i.uv.y-(i.uv.x-0.5)*_k+_d);
-            clip(step(_l,i.uv.y)-0.1);
-            clip(step(i.uv.y,_h)-0.1);
-            //clip(0.5-(i.uv.x*_k-0.5)*2-0.01);
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
+                float b=step(i.uv.y,1-_Dis)*step(_Dis,i.uv.y)*step(i.uv.x,1-_Dis)*step(_Dis,i.uv.x);
+                col=col*b;
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
