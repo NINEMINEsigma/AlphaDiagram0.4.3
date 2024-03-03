@@ -120,7 +120,7 @@ namespace AD.UI
             Items.Add(obj);
         }
 
-        public static void Destory(IADUI obj)
+        public static void DestroyADUI(IADUI obj)
         {
             Items.Remove(obj);
         }

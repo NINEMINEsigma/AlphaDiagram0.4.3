@@ -79,7 +79,7 @@ namespace AD.UI
 
         protected virtual void OnDestroy()
         {
-            AD.UI.ADUI.Destory(this);
+            AD.UI.ADUI.DestroyADUI(this);
         }
 
         public override void InitializeContext()

@@ -34,7 +34,7 @@ namespace AD.Experimental.EditorAsset.Cache
     [Serializable]
     public class CacheAssetsKey : IComparable<CacheAssetsKey>
     {
-        public CacheAssetsKey() { }
+        public CacheAssetsKey() :this("New Key"){ }
 
         public CacheAssetsKey(string key)
         {
@@ -45,7 +45,9 @@ namespace AD.Experimental.EditorAsset.Cache
 
         public override bool Equals(object obj)
         {
-            return IdentifyID.Equals(obj);
+            if (obj is CacheAssetsKey ckey) return Equals(ckey);
+            else if (obj is string skey) return Equals(skey);
+            else return base.Equals(obj);
         }
 
         public bool Equals(CacheAssetsKey other)
@@ -61,6 +63,11 @@ namespace AD.Experimental.EditorAsset.Cache
         public override int GetHashCode()
         {
             return IdentifyID.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return IdentifyID;
         }
 
         public int CompareTo(CacheAssetsKey other)
@@ -104,16 +111,6 @@ namespace AD.Experimental.EditorAsset.Cache
         public string CacheKey => BindKey;
 
         [SerializeField] protected string BindKey;
-
-        public virtual bool Deserialize(string source)
-        {
-            return false;
-        }
-
-        public virtual string Serialize()
-        {
-            return null;
-        }
     }
 
     [Serializable]

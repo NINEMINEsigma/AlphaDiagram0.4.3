@@ -49,7 +49,7 @@ namespace AD.UI
 
         protected void OnDestroy()
         {
-            AD.UI.ADUI.Destory(this);
+            AD.UI.ADUI.DestroyADUI(this);
         }
 
         public void Init()

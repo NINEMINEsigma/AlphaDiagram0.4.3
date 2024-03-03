@@ -22,7 +22,7 @@ namespace AD.UI
 
         protected void OnDestroy()  
         {
-            AD.UI.ADUI.Destory(this);
+            AD.UI.ADUI.DestroyADUI(this);
         }
 
         public static AD.UI.RawImage Generate(string name = "New RawImage", Transform parent = null)

@@ -40,7 +40,7 @@ namespace AD.Experimental.Localization.Cache
     /// 以一个字符串作为识别ID的Key类
     /// <para>继承并重写Equals与GetHashCode以实现更加扩展性的功能</para>
     /// </summary>
-    public class CacheAssetsKey
+    public class CacheAssetsKey : IComparable<CacheAssetsKey>
     {
         public CacheAssetsKey() : this("New Key") { }
         public CacheAssetsKey(string key)
@@ -52,9 +52,11 @@ namespace AD.Experimental.Localization.Cache
 
         public override bool Equals(object obj)
         {
-            if (obj is CacheAssetsKey key) 
+            if (obj is CacheAssetsKey key)
                 return IdentifyID.Equals(key.IdentifyID);
-            else 
+            else if (obj is string skey)
+                return IdentifyID.Equals(skey);
+            else
                 return base.Equals(obj);
         }
 
@@ -65,6 +67,11 @@ namespace AD.Experimental.Localization.Cache
         public override string ToString()
         {
             return IdentifyID;
+        }
+
+        public int CompareTo(CacheAssetsKey other)
+        {
+            return this.IdentifyID.CompareTo(other.IdentifyID);
         }
     }
     /// <summary>

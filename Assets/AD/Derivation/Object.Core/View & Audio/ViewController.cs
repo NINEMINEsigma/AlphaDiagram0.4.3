@@ -291,7 +291,7 @@ namespace AD.UI
             base.OnDestroy();
             if (ViewImage != null)
             {
-                AD.UI.ADUI.Destory(this);
+                AD.UI.ADUI.DestroyADUI(this);
             }
         }
 

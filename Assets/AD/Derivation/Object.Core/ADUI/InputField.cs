@@ -27,7 +27,7 @@ namespace AD.UI
 
         protected void OnDestroy()
         {
-            AD.UI.ADUI.Destory(this);
+            AD.UI.ADUI.DestroyADUI(this);
         }
 
         public static AD.UI.InputField Generate(string name, string defaultText = "", string placeholderText = "Enter Text", Transform parent = null)

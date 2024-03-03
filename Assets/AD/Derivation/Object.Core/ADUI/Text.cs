@@ -23,7 +23,7 @@ namespace AD.UI
         }
         protected void OnDestory()
         {
-            AD.UI.ADUI.Destory(this);
+            AD.UI.ADUI.DestroyADUI(this);
         }
 
         private TextMeshProUGUI _source = null;

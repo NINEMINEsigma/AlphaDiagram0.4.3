@@ -89,7 +89,7 @@ namespace AD.UI
         protected void OnDestroy()
         {
             __unregisterInfo?.UnRegister();
-            AD.UI.ADUI.Destory(this);
+            AD.UI.ADUI.DestroyADUI(this);
         }
 
         public void Init()

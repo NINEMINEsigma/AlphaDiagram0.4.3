@@ -106,7 +106,7 @@ namespace AD.UI
 
         private void OnDestroy()
         {
-            ADUI.Destory(this);
+            ADUI.DestroyADUI(this);
         }
 
         public void Init()

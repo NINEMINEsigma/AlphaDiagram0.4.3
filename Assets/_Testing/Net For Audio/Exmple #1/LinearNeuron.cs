@@ -45,9 +45,9 @@ namespace AD.Experimental.Neuron.AudioSampling
             this.value = value;
         }
 
-        public override void Destory()
+        public override void DestroyADUI()
         {
-            base.Destory();
+            base.DestroyADUI();
             this.value = 0;
             this.OnChange.RemoveAllListeners();
         }

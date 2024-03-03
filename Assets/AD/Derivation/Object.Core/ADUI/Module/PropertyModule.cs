@@ -40,7 +40,7 @@ namespace AD.UI
         }
         protected virtual void OnDestroy()
         {
-            ADUI.Destory(this);
+            ADUI.DestroyADUI(this);
         }
 
         private bool _IsNeedLayoutGourp = false;

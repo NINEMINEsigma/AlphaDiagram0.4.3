@@ -36,7 +36,7 @@ namespace AD.UI
         }
         protected virtual void OnDestroy()
         {
-            ADUI.Destory(this);
+            ADUI.DestroyADUI(this);
             LeftRegisterInfo?.UnRegister();
             RightRegisterInfo?.UnRegister();
         }

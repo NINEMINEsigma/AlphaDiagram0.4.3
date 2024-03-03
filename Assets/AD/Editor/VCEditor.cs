@@ -40,7 +40,7 @@ public class VCEditor : IADUIEditor
 
     public override void OnContentGUI()
     {
-        if (that.ViewImage != null) this.HorizontalBlockWithBox(() =>
+        if (that.ViewImage != null)
         {
 
             EditorGUI.BeginChangeCheck();
@@ -57,11 +57,11 @@ public class VCEditor : IADUIEditor
                 EditorGUILayout.IntSlider("CurrentIndex", that.CurrentIndex, 0, that.SourcePairs.Count - 1, null);
 
                 GUI.enabled = true;
-                if (GUILayout.Button("NextLine", new GUILayoutOption[] { })) that.NextPair();
-                if (GUILayout.Button("Previous", new GUILayoutOption[] { })) that.PreviousPair();
-                if (GUILayout.Button("Random", new GUILayoutOption[] { })) that.RandomPair();
+                if (GUILayout.Button("NextLine")) that.NextPair();
+                if (GUILayout.Button("Previous")) that.PreviousPair();
+                if (GUILayout.Button("Random")) that.RandomPair();
             }
-        });
+        }
         else this.HelpBox("This GameObject is without Image , some functionality is limited", MessageType.Warning);
 
         if (GUILayout.Button("Try Cover Parent")) that.SetupCoverParent();
