@@ -158,7 +158,7 @@ namespace AD.UI
                 Destroy(tempAnimator);
             }
 
-            buttonVar.onClick.AddListener(delegate { clickEvent.Invoke(); });
+            buttonVar.onClick.AddListener(delegate { clickEvent?.Invoke(); });
 
             if (enableButtonSounds == true && useClickSound == true)
                 buttonVar.onClick.AddListener(delegate { soundSource.PlayOneShot(clickSound); });

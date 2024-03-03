@@ -37,8 +37,8 @@ namespace AD.UI
         protected virtual void OnDestroy()
         {
             ADUI.Destory(this);
-            LeftRegisterInfo.UnRegister();
-            RightRegisterInfo.UnRegister();
+            LeftRegisterInfo?.UnRegister();
+            RightRegisterInfo?.UnRegister();
         }
 
         private void LateUpdate()

@@ -26,6 +26,11 @@ namespace AD.Utility
             public int[] triangles;
         }
 
+        public static void RebuildMesh(this MeshFilter mesh, IEnumerable<VertexEntry> SourcePairs)
+        {
+            InitMesh(mesh, mesh.sharedMesh, SourcePairs);
+        }
+
         public static void InitMesh(this MeshFilter meshFilter, IEnumerable<VertexEntry> SourcePairs)
         {
             InitMesh(meshFilter, new Mesh(), SourcePairs);
@@ -33,9 +38,14 @@ namespace AD.Utility
 
         public static void InitMesh(this MeshFilter meshFilter, Mesh mesh, IEnumerable<VertexEntry> SourcePairs)
         {
-            meshFilter.sharedMesh = mesh;
-
+            mesh.Clear();
+            if (meshFilter.sharedMesh != mesh)
+                meshFilter.sharedMesh = mesh;
+#if UNITY_2022
+            var data = ToVertices(SourcePairs, Vector3.zero);
+#else
             var data = ToVertices(SourcePairs, meshFilter.transform.position);
+#endif
 
             meshFilter.sharedMesh.vertices = data.vertices;
             meshFilter.sharedMesh.triangles = data.triangles;
@@ -58,19 +68,19 @@ namespace AD.Utility
                 }
                 else
                 {
-                    Vector3 NormalVec = current.Normal.normalized * current.Size * 0.5f;
+                    Vector3 NormalVec = 0.5f * current.Size * current.Normal.normalized;
                     vertices.Add(current.Position + zeroPos - NormalVec);
                     vertices.Add(current.Position + zeroPos + NormalVec);
                 }
                 if (i > 0)
                 {
-                    int it = 1 + 2 * i;
-                    triangles.Add(it - 3);
-                    triangles.Add(it - 2);
-                    triangles.Add(it - 1);
-                    triangles.Add(it - 2);
-                    triangles.Add(it - 1);
-                    triangles.Add(it);
+                    int index0 = 2 * i - 2, index1 = 2 * i - 1, index2 = 2 * i, index3 = 1 + 2 * i;
+                    triangles.Add(index1);
+                    triangles.Add(index2);
+                    triangles.Add(index0);
+                    triangles.Add(index1);
+                    triangles.Add(index2);
+                    triangles.Add(index3);
                 }
                 i++;
             }
@@ -81,31 +91,56 @@ namespace AD.Utility
             return meshData;
         }
 
-        public static VertexEntry[] GenerateCurveMeshData(this CustomCurveSource self, BuildNormalType normalType, Vector3 Normal,EaseCurve size)
+        public static VertexEntry[] GenerateCurveMeshData(this ICustomCurveSource self, BuildNormalType normalType, Vector3 Normal, float headSize, float tailSize)
         {
-            Vector3[] line = CustomCurveSource.CreateCurve(self.allPoints, self.SEGMENT_COUNT, self.EaseCurve);
-            VertexEntry[] vertexs=new VertexEntry[line.Length];
-            for (int i = 0,e=line.Length; i <e ; i++)
-            {
-                var current= vertexs[i] = new VertexEntry();
-                current.Type = normalType;
-                current.Position = line[i];
-                current.Size = size.Evaluate((float)i / (float)e);
-                current.Normal = Normal;
-            }
-            return vertexs;
-        }
-
-        public static VertexEntry[] GenerateCurveMeshData(this CustomCurveSource self, BuildNormalType normalType, Vector3 Normal, AnimationCurve size)
-        {
-            Vector3[] line = CustomCurveSource.CreateCurve(self.allPoints, self.SEGMENT_COUNT, self.EaseCurve);
+            Vector3[] line = self.CreateCurve();
             VertexEntry[] vertexs = new VertexEntry[line.Length];
             for (int i = 0, e = line.Length; i < e; i++)
             {
                 var current = vertexs[i] = new VertexEntry();
                 current.Type = normalType;
                 current.Position = line[i];
-                current.Size = size.Evaluate((float)i / (float)e);
+                current.Size = Mathf.Lerp(headSize, tailSize, (float)i / (float)e);
+                current.Normal = Normal;
+            }
+            return vertexs;
+        }
+
+        public static VertexEntry[] GenerateCurveMeshData(this ICustomCurveSource self, BuildNormalType normalType, Vector3 Normal,EaseCurve size)
+        {
+            return GenerateCurveMeshData(self, normalType, Normal, size, 0, 1);
+        }
+
+        public static VertexEntry[] GenerateCurveMeshData(this ICustomCurveSource self, BuildNormalType normalType, Vector3 Normal, EaseCurve sizeCurve,float headSize,float tailSize)
+        {
+            Vector3[] line = self.CreateCurve();
+            VertexEntry[] vertexs = new VertexEntry[line.Length];
+            for (int i = 0, e = line.Length; i < e; i++)
+            {
+                var current = vertexs[i] = new VertexEntry();
+                current.Type = normalType;
+                current.Position = line[i];
+                current.Size = Mathf.Lerp(headSize, tailSize, sizeCurve.Evaluate((float)i / (float)e));
+                current.Normal = Normal;
+            }
+            return vertexs;
+        }
+
+        public static VertexEntry[] GenerateCurveMeshData(this ICustomCurveSource self, BuildNormalType normalType, Vector3 Normal, AnimationCurve size)
+        {
+            return GenerateCurveMeshData(self,normalType,Normal, size, 0, 1);   
+        }
+
+        public static VertexEntry[] GenerateCurveMeshData(this ICustomCurveSource self, BuildNormalType normalType, Vector3 Normal, AnimationCurve sizeCurve,float headSize,float tailSize)
+        {
+            Vector3[] line = self.CreateCurve();
+            VertexEntry[] vertexs = new VertexEntry[line.Length];
+            for (int i = 0, e = line.Length; i < e; i++)
+            {
+                var current = vertexs[i] = new VertexEntry();
+                current.Type = normalType;
+                current.Position = line[i];
+                current.Size = Mathf.Lerp(headSize, tailSize, sizeCurve.Evaluate((float)i / (float)e));
                 current.Normal = Normal;
             }
             return vertexs;

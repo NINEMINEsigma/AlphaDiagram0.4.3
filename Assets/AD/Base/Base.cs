@@ -780,7 +780,12 @@ namespace AD.BASE
 
         private object _p_last_object;
         private Type _p_last_type;
-        private object Get<_T>()
+        /// <summary>
+        /// When there are extremely common objects, you can try to override the method
+        /// </summary>
+        /// <typeparam name="_T"></typeparam>
+        /// <returns></returns>
+        protected virtual object Get<_T>()
         {
             if (typeof(_T) == _p_last_type) return _p_last_object;
             if (AD__Objects.TryGetValue(typeof(_T), out var result))
@@ -894,27 +899,32 @@ namespace AD.BASE
         }
 
         /// <summary>
-        /// _Command use this function cannot depend on this Architecture
+        /// _Command use this function should not depend on this Architecture
         /// <para> (because not SetArchitecture) </para>
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
         /// <returns></returns>
         public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new()
         {
-            SendImmediatelyCommand(new _Command());
+            if (Contains<_Command>()) SendCommand<_Command>();
+            else SendImmediatelyCommand(new _Command());
             return instance;
         }
 
         /// <summary>
-        /// _Command use this function cannot depend on this Architecture
+        /// _Command use this function should not depend on this Architecture
         /// <para> (because not SetArchitecture) </para>
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
         /// <returns></returns>
         public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand, new()
         {
-            RegisterCommand(command);
-            command.Execute();
+            if (Contains<_Command>()) SendCommand<_Command>();
+            else
+            {
+                RegisterCommand(command);
+                command.Execute();
+            }
             return instance;
         }
         #endregion

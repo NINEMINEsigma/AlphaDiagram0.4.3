@@ -139,38 +139,55 @@ namespace AD.Experimental.GameEditor
 
         public static void ApplyPropertiesLayout()
         {
-            foreach (var line in GUILayoutLineList)
+            try
             {
-                var rect = CurrentEditorThat.MatchItem.AddNewLevelLine(true, 1);
-                rect.GetComponent<AreaDetecter>().Message = line[0].Message;
-                int LineItemCount = line.Count;
-                int extensionalSpaceLine = 0;
-                foreach (var content in line)
+                foreach (var line in GUILayoutLineList)
                 {
-                    switch (content.ContentType)
+                    var rect = CurrentEditorThat.MatchItem.AddNewLevelLine(true, 1);
+                    rect.GetComponent<AreaDetecter>().Message = line[0].Message;
+                    int LineItemCount = line.Count;
+                    int extensionalSpaceLine = 0;
+                    foreach (var content in line)
                     {
-                        case GUIContent.GUIContentType.Space:
-                            {
-                                CurrentEditorThat.MatchItem.AddNewLevelLine(false, content.ExtensionalSpaceLine);
-                            }
-                            break;
-                        default:
-                            {
-                                if (content.ExtensionalSpaceLine > extensionalSpaceLine) extensionalSpaceLine = content.ExtensionalSpaceLine;
-                                content.RootObject.transform.SetParent(rect, false);
-                                var contentRect = content.RootObject.transform.As<UnityEngine.RectTransform>();
-                                contentRect.sizeDelta = new UnityEngine.Vector2(rect.sizeDelta.x / (float)LineItemCount, contentRect.sizeDelta.y);
-                            }
-                            break;
+                        switch (content.ContentType)
+                        {
+                            case GUIContent.GUIContentType.Space:
+                                {
+                                    CurrentEditorThat.MatchItem.AddNewLevelLine(false, content.ExtensionalSpaceLine);
+                                }
+                                break;
+                            default:
+                                {
+                                    if (content.ExtensionalSpaceLine > extensionalSpaceLine) extensionalSpaceLine = content.ExtensionalSpaceLine;
+                                    content.RootObject.transform.SetParent(rect, false);
+                                    var contentRect = content.RootObject.transform.As<UnityEngine.RectTransform>();
+                                    contentRect.sizeDelta = new UnityEngine.Vector2(rect.sizeDelta.x / (float)LineItemCount, contentRect.sizeDelta.y);
+                                }
+                                break;
+                        }
+                    }
+                    if (extensionalSpaceLine > 0)
+                        CurrentEditorThat.MatchItem.AddNewLevelLine(false, extensionalSpaceLine);
+                }
+            }
+            catch (Exception ex)
+            {
+                GameEditorApp.instance.GetController<Information>().Error("ApplyPropertiesLayout Failed : " + ex.Message);
+                foreach (var items in GUILayoutLineList)
+                {
+                    foreach (GUIContent item in items)
+                    {
+                        GameObject.Destroy(item.RootObject);
                     }
                 }
-                if (extensionalSpaceLine > 0)
-                    CurrentEditorThat.MatchItem.AddNewLevelLine(false, extensionalSpaceLine);
             }
-            CurrentEditorThat = null;
-            GUILayoutLineList.Clear();
-            EndHorizontal();
-            IsApply = true;
+            finally
+            {
+                CurrentEditorThat = null;
+                GUILayoutLineList.Clear();
+                EndHorizontal();
+                IsApply = true;
+            }
         }
 
         //public static T GenerateElement<T>() where T : ADUI

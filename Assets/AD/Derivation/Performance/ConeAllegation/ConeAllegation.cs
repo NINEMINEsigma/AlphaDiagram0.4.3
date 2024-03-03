@@ -79,6 +79,26 @@ namespace AD.Experimental.Performance
 
         }
 
+        private void OnDestroy()
+        {
+            foreach (var item in RayInfos_OnDrawFarView)
+            {
+                RayExtension.RayInfo.DestroyRayInfo(item.Value);
+            }
+            foreach (var item in RayInfos_OnDrawNearView)
+            {
+                RayExtension.RayInfo.DestroyRayInfo(item.Value);
+            }
+            foreach (var item in RayInfos_OnDrawFOV)
+            {
+                RayExtension.RayInfo.DestroyRayInfo(item.Value);
+            }
+            foreach (var item in RayInfos_OnDrawConeOfCameraVision)
+            {
+                RayExtension.RayInfo.DestroyRayInfo(item.Value);
+            }
+        }
+
         /// <summary>
         /// 绘制较远的视口
         /// </summary>

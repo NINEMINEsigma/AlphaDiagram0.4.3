@@ -11,9 +11,43 @@ namespace AD.Utility
             return self;
         }
 
+        public enum Vec22Vec3FillType
+        {
+            x, y, z
+        }
+
+        public static Vector3 ToVector3(this Vector2 self, Vec22Vec3FillType type, float filled = 0)
+        {
+            return type switch
+            {
+                Vec22Vec3FillType.x => new Vector3(filled, self.x, self.y),
+                Vec22Vec3FillType.y => new Vector3(self.x, filled, self.y),
+                Vec22Vec3FillType.z => new Vector3(self.x, self.y, filled),
+                _ => throw new AD.BASE.ADException("Unknown Axis"),
+            };
+        }
+
         public static Vector2 ToVector2(this Vector3 self)
         {
             return self;
+        }
+
+
+        public enum Vec32Vec2IgnoreType
+        {
+            x, y, z
+        }
+
+
+        public static Vector2 ToVector2(this Vector3 self, Vec32Vec2IgnoreType type)
+        {
+            return type switch
+            {
+                Vec32Vec2IgnoreType.x => new Vector2(self.y, self.z),
+                Vec32Vec2IgnoreType.y => new Vector2(self.x, self.z),
+                Vec32Vec2IgnoreType.z => new Vector2(self.x, self.y),
+                _ => throw new AD.BASE.ADException("Unknown Axis"),
+            };
         }
 
         public static Vector2 SetX(this Vector2 self, float x)

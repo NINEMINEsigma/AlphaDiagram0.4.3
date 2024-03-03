@@ -66,7 +66,7 @@ namespace AD.UI
             public string itemName = "Dropdown Item";
             [HideInInspector] public UnityEngine.UI.Toggle ToggleItem;
             public int selectOrder = 0;
-            public ToggleEvent toggleEvents;
+            public ToggleEvent toggleEvents = new();
         }
 
         protected override void Start()

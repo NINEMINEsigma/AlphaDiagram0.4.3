@@ -5,6 +5,8 @@ Shader "AD/2D/Line-Lit-Default"
         _MainTex("Diffuse", 2D) = "white" {}
         _MaskTex("Mask", 2D) = "white" {}
         _NormalMap("Normal Map", 2D) = "bump" {}
+        _BaseColor("Color", Color) = (1,1,1,1)
+        _BaseColorLevel("ColorUsingLevel", Range(0,1)) = 0.5
         _OffsetX("OffsetX", float) = 0
         _OffsetY("OffsetY", float) = 0
 
@@ -215,6 +217,8 @@ Shader "AD/2D/Line-Lit-Default"
             TEXTURE2D(_MainTex);
             SAMPLER(sampler_MainTex);
             float4 _MainTex_ST;
+            half4 _BaseColor;
+            half _BaseColorLevel;
 
             Varyings UnlitVertex(Attributes attributes)
             {
@@ -227,7 +231,7 @@ Shader "AD/2D/Line-Lit-Default"
                 o.positionWS = TransformObjectToWorld(v.positionOS);
                 #endif
                 o.uv = TRANSFORM_TEX(attributes.uv, _MainTex);
-                o.color = attributes.color;
+                o.color = attributes.color * ( 1 - _BaseColorLevel ) + _BaseColor * _BaseColorLevel;
                 return o;
             }
 

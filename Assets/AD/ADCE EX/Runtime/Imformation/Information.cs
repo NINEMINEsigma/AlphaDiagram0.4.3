@@ -118,7 +118,13 @@ namespace AD.Experimental.GameEditor
         {
             if (Current != null)
             {
-                Tasks.Add(task);
+                if(task.TaskIndex<Current.TaskIndex)
+                {
+                    Tasks.Add(Current);
+                    Current = task;
+                }
+                else Tasks.Add(task);
+                Tasks.Sort();
             }
             else Current = task;
             AddTaskCallBack.Invoke(task);
@@ -138,7 +144,7 @@ namespace AD.Experimental.GameEditor
             }
             else
             {
-                Tasks.Add(task);
+                Tasks.Remove(task);
                 Tasks.Sort();
             }
             RemoveTaskCallBack.Invoke(task);
@@ -160,7 +166,7 @@ namespace AD.Experimental.GameEditor
         {
             if (Current == task)
             {
-                if (Current == task && Tasks.Count == 0) return;
+                if (Tasks.Count == 0) return;
                 else
                 {
                     Current = Tasks[0];
@@ -282,6 +288,7 @@ namespace AD.Experimental.GameEditor
         public void SetLeft(string text)
         {
             LeftText.SetText(text);
+            LeftText.source.color = Color.white;
         }
 
         public void SetRight(string text)

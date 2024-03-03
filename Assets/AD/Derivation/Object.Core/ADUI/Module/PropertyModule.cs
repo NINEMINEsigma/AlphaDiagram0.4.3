@@ -90,7 +90,8 @@ namespace AD.UI
             {
                 if (Childs.ContainsKey(key))
                     LetChildDestroy(Childs[key]);
-                Childs[key] = child;
+                else
+                    Childs.TryAdd(key, child);
                 LetChildAdd(child);
             }
         }

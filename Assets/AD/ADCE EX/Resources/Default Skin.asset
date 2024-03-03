@@ -17,26 +17,26 @@ MonoBehaviour:
       IdentifyID: Button(ModernUI)
     data: {fileID: 11400000, guid: d640826f4710c93419b9572e6fbeda94, type: 2}
   - key:
-      IdentifyID: Dropdown(ModernUI)
-    data: {fileID: 11400000, guid: 841f54a7bb539ce45a55d364f886baf5, type: 2}
-  - key:
-      IdentifyID: FillBar(ModernUI)
-    data: {fileID: 11400000, guid: 9c73e9b673f890e468b9d98d646350dd, type: 2}
-  - key:
-      IdentifyID: Switch(ModernUI)
-    data: {fileID: 11400000, guid: 10f84090a24e43e47a18f738fe4e20e7, type: 2}
-  - key:
       IdentifyID: Button(UI)
     data: {fileID: 11400000, guid: 1c4a1de2b8482244ab9bf6e851e817cf, type: 2}
   - key:
       IdentifyID: ColorPanel(UI)
     data: {fileID: 11400000, guid: 8d36278c5036dba4fbd6885a1052d7fb, type: 2}
   - key:
+      IdentifyID: Dropdown(ModernUI)
+    data: {fileID: 11400000, guid: 841f54a7bb539ce45a55d364f886baf5, type: 2}
+  - key:
       IdentifyID: Dropdown(UI)
     data: {fileID: 11400000, guid: 9ca9e4c300ba2c742b40034a51d82ec4, type: 2}
   - key:
+      IdentifyID: FillBar(ModernUI)
+    data: {fileID: 11400000, guid: 9c73e9b673f890e468b9d98d646350dd, type: 2}
+  - key:
       IdentifyID: Image(UI)
     data: {fileID: 11400000, guid: 6bc4c35d711266141bd58806ac6c44a7, type: 2}
+  - key:
+      IdentifyID: InputField(ModernUI)
+    data: {fileID: 11400000, guid: 29a3805f1266a4b42aaf7607afe36c97, type: 2}
   - key:
       IdentifyID: InputField(UI)
     data: {fileID: 11400000, guid: 149d7ee4cfecbe54f959d9b512160ab1, type: 2}
@@ -49,6 +49,9 @@ MonoBehaviour:
   - key:
       IdentifyID: Slider(UI)
     data: {fileID: 11400000, guid: c2535a23a63dba24e82347f0a8f73948, type: 2}
+  - key:
+      IdentifyID: Switch(ModernUI)
+    data: {fileID: 11400000, guid: 10f84090a24e43e47a18f738fe4e20e7, type: 2}
   - key:
       IdentifyID: Text(UI)
     data: {fileID: 11400000, guid: 9e3300db911e72e4d87536ae8411abb8, type: 2}

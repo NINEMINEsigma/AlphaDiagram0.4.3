@@ -33,13 +33,13 @@ namespace AD.Experimental.GameEditor
 
     public static class CustomEditorUtility
     {
-        public static void SetParent(this ICanSerializeOnCustomEditor self, ICanSerializeOnCustomEditor _Right)
+        public static void SetParent(this ICanSerializeOnCustomEditor self, ICanSerializeOnCustomEditor _Right, bool JustSetParent = false)
         {
             if (self == null && _Right == null) return;
             if (self.ParentTarget == _Right) return;
             if (_Right == self) throw new ADException("Loop Serialize Editor");
 
-            if (ADGlobalSystem.AppQuitting)
+            if (ADGlobalSystem.AppQuitting || JustSetParent)
             {
                 //if (self.GetChilds().Contains(_Right)) return;
                 self.ParentTarget?.GetChilds().Remove(self);

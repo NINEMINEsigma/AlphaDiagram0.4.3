@@ -8,6 +8,9 @@ namespace AD.Utility
 {
     public static class RayExtension
     {
+        /// <summary>
+        /// 在使用结束后，为了销毁使用的Line，需要使用DestroyRayInfo方法手动清除实体，因为只有主线程能调用unity api
+        /// </summary>
         [Serializable]
         public class RayInfo
         {
@@ -141,9 +144,9 @@ namespace AD.Utility
 
             public LineRenderer Line;
 
-            ~RayInfo()
+            public static void DestroyRayInfo(RayInfo rayInfo)
             {
-                if (Line != null) GameObject.DestroyImmediate(Line.gameObject);
+                if (rayInfo.Line != null) GameObject.DestroyImmediate(rayInfo.Line.gameObject);
             }
         }
 

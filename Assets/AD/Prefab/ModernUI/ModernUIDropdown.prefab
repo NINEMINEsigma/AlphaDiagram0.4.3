@@ -35,7 +35,6 @@ RectTransform:
   - {fileID: 1695362349749063375}
   - {fileID: 1695362351176760377}
   m_Father: {fileID: 1695362349620201992}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -154,7 +153,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362349713964989}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -232,7 +230,6 @@ RectTransform:
   - {fileID: 1695362351056529268}
   - {fileID: 1695362349271010697}
   m_Father: {fileID: 1695362350753891868}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -294,7 +291,6 @@ RectTransform:
   - {fileID: 1695362349595437424}
   - {fileID: 1695362350753891868}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -315,9 +311,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Selected: 0
   ElementArea: ModernUIDropdown
+  IsChildAllLinkAtMyTransformAsChild: 0
   triggerObject: {fileID: 1695362349595437439}
   itemParent: {fileID: 1695362349749063375}
-  itemObject: {fileID: 2255264167481400922, guid: 59770683aec064a4fab4d6bf60fce2df, type: 3}
+  itemObject: {fileID: 2255264167481400922, guid: 59770683aec064a4fab4d6bf60fce2df,
+    type: 3}
   scrollbar: {fileID: 1695362351176760376}
   listParent: {fileID: 0}
   setItemText: {fileID: 0}
@@ -409,7 +407,7 @@ MonoBehaviour:
         m_CallState: 2
 --- !u!95 &1695362349713964991
 Animator:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -426,7 +424,8 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorControllerStateOnDisable: 0
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1695362349749063374
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,7 +458,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362349271010697}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -545,7 +543,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362351153126547}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
@@ -621,7 +618,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362351153126547}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -659,7 +655,8 @@ MonoBehaviour:
   m_text: MULTI SELECT TITLE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e19e7b858b7058d478d5725621422819, type: 2}
-  m_sharedMaterial: {fileID: -8493678639131513909, guid: e19e7b858b7058d478d5725621422819, type: 2}
+  m_sharedMaterial: {fileID: -8493678639131513909, guid: e19e7b858b7058d478d5725621422819,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -755,7 +752,6 @@ RectTransform:
   m_Children:
   - {fileID: 1695362350251319386}
   m_Father: {fileID: 1695362351176760377}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -793,7 +789,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362350101729019}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -869,7 +864,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362351176760377}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -948,7 +942,6 @@ RectTransform:
   - {fileID: 1695362349620201992}
   - {fileID: 1695362351153126547}
   m_Father: {fileID: 1695362349713964989}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -1038,7 +1031,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362351153126547}
-  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
@@ -1134,7 +1126,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1695362349620201992}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -1214,7 +1205,6 @@ RectTransform:
   - {fileID: 1695362350035700553}
   - {fileID: 1695362350820169310}
   m_Father: {fileID: 1695362350753891868}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -1305,7 +1295,6 @@ RectTransform:
   - {fileID: 1695362350677235770}
   - {fileID: 1695362350101729019}
   m_Father: {fileID: 1695362349271010697}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}

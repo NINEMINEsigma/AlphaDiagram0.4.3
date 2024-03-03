@@ -94,15 +94,23 @@ namespace AD.Experimental.GameEditor
 
         #region Mono
 
+        [Tooltip(" «∑Ò∆Ù”√ƒ¨»œ◊¢≤·"), SerializeField] private bool IsRegisterSystemOnGameEditorApp = true;
+
         private void Start()
         {
-            GameEditorApp.instance.RegisterSystem(this);
+            if (IsRegisterSystemOnGameEditorApp)
+                GameEditorApp.instance.RegisterSystem(this);
         }
+
+        public bool IsEnableDrag = true;
 
         public void LateUpdate()
         {
-            if (CoreCameraDragObjectEnable == CoreCameraDragObjectType.EditorGroup) CoreCameraDragObject();
-            else if (CoreCameraDragObjectEnable == CoreCameraDragObjectType.Collider) CoreCameraDragCollider();
+            if (IsEnableDrag)
+            {
+                if (CoreCameraDragObjectEnable == CoreCameraDragObjectType.EditorGroup) CoreCameraDragObject();
+                else if (CoreCameraDragObjectEnable == CoreCameraDragObjectType.Collider) CoreCameraDragCollider();
+            }
         }
 
         private void CoreCameraDragObject()
@@ -163,7 +171,9 @@ namespace AD.Experimental.GameEditor
 
         public void Init()
         {
-
+            IsEnableDrag = true;
+            Architecture.RegisterCommand<EnableEditorSystemForDragObject>();
+            Architecture.RegisterCommand<DisableEditorSystemForDragObject>();
         }
 
         #region IMainHoster
@@ -260,5 +270,21 @@ namespace AD.Experimental.GameEditor
 
         #endregion
 
+    }
+
+    public class EnableEditorSystemForDragObject : ADCommand
+    {
+        public override void OnExecute()
+        {
+            Architecture.GetSystem<EditorSystem>().IsEnableDrag = true;
+        }
+    }
+
+    public class DisableEditorSystemForDragObject : ADCommand
+    {
+        public override void OnExecute()
+        {
+            Architecture.GetSystem<EditorSystem>().IsEnableDrag = false;
+        }
     }
 }

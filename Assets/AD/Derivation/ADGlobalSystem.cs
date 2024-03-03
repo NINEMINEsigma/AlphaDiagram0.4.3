@@ -168,7 +168,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240224/2233";
+        public static string Version => "AD/0.4.3/20240303/1430";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
