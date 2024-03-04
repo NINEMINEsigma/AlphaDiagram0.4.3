@@ -266,6 +266,7 @@ MonoBehaviour:
     ProjectItemPosition: {x: 0, y: 0}
     text: 
     description: 
-  SubProjectItemPrefab: []
+  SubProjectItemPrefab:
+  - {fileID: 8662397913388901987}
   m_EditGroup: {fileID: 8662397913388901984}
   MyLineRenderer: {fileID: 773197069403168480}

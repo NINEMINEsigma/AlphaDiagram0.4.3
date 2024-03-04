@@ -98,8 +98,8 @@ namespace AD.UI
                 else buttonText = value;
             }
         }
-        public ADEvent clickEvent;
-        public ADEvent hoverEvent;
+        public ADEvent clickEvent = new();
+        public ADEvent hoverEvent = new();
         public AudioClip hoverSound;
         public AudioClip clickSound;
         [SerializeField] private UnityEngine.UI.Button _buttonVar;

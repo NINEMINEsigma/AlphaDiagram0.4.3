@@ -112,7 +112,7 @@ namespace AD.Experimental.SceneTrans
             }
         }
 
-        public void Replace(string key,string value)
+        public void Replace(string key, string value)
         {
             if (SceneOpenAnimation.ContainsKey(key)) SceneOpenAnimation[key] = value;
             if (SceneCloseAnimation.ContainsKey(key)) SceneCloseAnimation[key] = value;

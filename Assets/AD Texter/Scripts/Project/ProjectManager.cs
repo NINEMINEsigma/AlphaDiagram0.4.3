@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
+using AD.Experimental.Performance;
 using AD.Experimental.SceneTrans;
 using AD.Sample.Texter.Project;
 using AD.Utility;
@@ -16,6 +18,8 @@ namespace AD.Sample.Texter
         [HideInInspector] public Transform Root;
 
         public ADSerializableDictionary<string, EditGroup> Prefabs = new();
+
+        public ADSerializableDictionary<string, List<GameObject>> SubProjectItemPrefabs = new();
 
         public EditGroup ObtainInstance(string name)
         {
@@ -92,6 +96,7 @@ namespace AD.Sample.Texter
         public ProjectRoot ProjectRootMono;
         public CameraCore MainCameraCore;
         public TimeClocker ADGTimeC;
+        public MainSceneLoader MainSceneLoaderManager;
         [Header("Prefab")]
         public PrefabModel ProjectPrefabModel;
 
@@ -117,6 +122,8 @@ namespace AD.Sample.Texter
 
         public override void Init()
         {
+            Architecture.RegisterController(MainSceneLoaderManager);
+
             ProjectItemData.IDSet.Clear();
             loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
             loadingTask.Register();

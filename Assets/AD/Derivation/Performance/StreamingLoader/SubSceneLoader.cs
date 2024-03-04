@@ -15,12 +15,16 @@ namespace AD.Experimental.Performance
 
         public List<GameObject> Childs = new();
 
+        public bool IsNeedDestoryByScriptHelper = false;
+        public bool IsNeedDestoryAllWhenUnload = false;
+
         protected virtual void OnDestroy()
         {
-            foreach (var child in Childs)
-            {
-                GameObject.Destroy(child);
-            }
+            if (IsNeedDestoryByScriptHelper)
+                foreach (var child in Childs)
+                {
+                    GameObject.Destroy(child);
+                }
         }
 
         protected virtual IEnumerator HowLoading()
@@ -36,19 +40,17 @@ namespace AD.Experimental.Performance
 
         public virtual void Reload()
         {
-            foreach (var child in Childs)
-            {
-                GameObject.Destroy(child);
-            }
+            Unload();
             Load();
         }
 
         public virtual void Unload()
         {
-            foreach (var child in Childs)
-            {
-                GameObject.Destroy(child);
-            }
+            if (IsNeedDestoryAllWhenUnload)
+                foreach (var child in Childs)
+                {
+                    GameObject.Destroy(child);
+                }
         }
 
     }

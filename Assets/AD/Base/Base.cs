@@ -2476,6 +2476,47 @@ namespace AD.BASE
             component = components.Length > 0 ? components[0] : null;
             return component != null;
         }
+
+        public static T Fetch<T>(this T self, out T me) where T : class
+        {
+            return me = self;
+        }
+
+        public static T Fetch<T, P>(this T self, out P me) where T : class where P : class
+        {
+            me = self as P;
+            return self;
+        }
+
+        public static T Share<T>(this T self, out T shared)
+        {
+            return shared = self;
+        }
+
+        public static T SeekComponent<T>(this GameObject self) where T : class
+        {
+            foreach (var componentSingle in self.GetComponents<MonoBehaviour>())
+            {
+                if (componentSingle is T result)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
+
+        public static T SeekComponent<T>(this Component self) where T : class
+        {
+            foreach (var componentSingle in self.gameObject.GetComponents<MonoBehaviour>())
+            {
+                Debug.Log(componentSingle.GetType().FullName);
+                if (componentSingle is T result)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
     }
 
     #endregion

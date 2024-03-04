@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
+using AD.Experimental.Performance;
 using AD.Sample.Texter.Data;
 using AD.Sample.Texter.Internal;
 using AD.Sample.Texter.Project;
@@ -132,6 +133,12 @@ namespace AD.Sample.Texter.Project
                         inputD.text = T;
                     });
                 });
+
+                PropertiesLayout.Button("Open", "Open Sub Project Scene", () =>
+                {
+                    App.instance.CurrentProjectItemData = that.ProjectTextSourceData;
+                    App.instance.GetController<MainSceneLoader>().Load(nameof(ProjectTextField));
+                });
             }
         }
 
@@ -144,7 +151,7 @@ namespace AD.Sample.Texter.Project
 
         public int SerializeIndex { get; set; }
 
-        public List<GameObject> SubProjectItemPrefab = new();
+        public List<GameObject> SubProjectItemPrefab => App.instance.GetModel<PrefabModel>().SubProjectItemPrefabs[nameof(ProjectTextField)];
 
         private void Start()
         {
@@ -175,10 +182,10 @@ namespace AD.Sample.Texter.Project
                 [0] = new Dictionary<string, ADEvent>()
                 {
                     {"Delete",new(()=>
-                        { 
+                        {
                             GameObject.Destroy(gameObject);
                             GameEditorApp.instance.GetSystem<SinglePanelGenerator>().Current.BackPool();
-                        }) 
+                        })
                     }
                 }
             };
@@ -374,7 +381,7 @@ namespace AD.Sample.Texter.Project
                 }
             }
 
-            foreach (var item in Childs.GetSubList<ICanSerializeOnCustomEditor,IUpdateOnChange>())
+            foreach (var item in Childs.GetSubList<ICanSerializeOnCustomEditor, IUpdateOnChange>())
             {
                 item.OnChange();
             }

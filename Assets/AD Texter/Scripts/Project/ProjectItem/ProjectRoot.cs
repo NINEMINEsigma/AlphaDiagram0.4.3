@@ -55,7 +55,7 @@ namespace AD.Sample.Texter.Project
 
         public int SerializeIndex => 0;
 
-        [Header("Prefab")] public List<GameObject> SubProjectItemPrefab = new();
+        public List<GameObject> SubProjectItemPrefab => App.instance.GetModel<PrefabModel>().SubProjectItemPrefabs[nameof(ProjectRoot)];
 
         private void Start()
         {

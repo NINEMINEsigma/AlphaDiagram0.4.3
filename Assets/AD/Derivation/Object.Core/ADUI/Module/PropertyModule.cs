@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,7 +19,7 @@ namespace AD.UI
                 {
                     foreach (var child in _Childs)
                     {
-                        
+                        child.Value.transform.SetParent(transform);
                     }
                 }
                 _Childs = value;

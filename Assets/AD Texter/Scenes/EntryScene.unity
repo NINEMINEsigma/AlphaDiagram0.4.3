@@ -2953,6 +2953,8 @@ MonoBehaviour:
       OnReplace:
         m_PersistentCalls:
           m_Calls: []
+    IsAllSceneByPreAssets: 0
+    IsAllSceneByNewCreate: 1
     SubSceneLoaderPrefab: {fileID: 8931867144071729465, guid: 5564564056f9f8d46b64c933f58e6f86, type: 3}
 --- !u!4 &1552840344
 Transform:

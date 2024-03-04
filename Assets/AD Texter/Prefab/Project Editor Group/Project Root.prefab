@@ -71,6 +71,14 @@ PrefabInstance:
       propertyPath: SubProjectItemPrefab.Array.data[0]
       value: 
       objectReference: {fileID: 8662397913388901987, guid: c3710d0b141a73a46943cd35712dd5de, type: 3}
+    - target: {fileID: 4570055974429011784, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
+      propertyPath: SubProjectItemPrefab.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4570055974429011784, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
+      propertyPath: SubProjectItemPrefab.Array.data[0]
+      value: 
+      objectReference: {fileID: 8662397913388901987, guid: c3710d0b141a73a46943cd35712dd5de, type: 3}
     - target: {fileID: 5761814083186688693, guid: b4a35e76e2bb5fa4583e1e5d97eeef9f, type: 3}
       propertyPath: OnPointerExitEvent.InvokeArray.Array.size
       value: 6

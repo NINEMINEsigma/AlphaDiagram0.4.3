@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AD.BASE;
 using AD.Utility;
 using UnityEngine;
@@ -14,10 +15,12 @@ namespace AD.Experimental.Performance
     }
 
     [Serializable]
-    public class MainSceneLoadAssets: ISceneLoadAssets
+    public class MainSceneLoadAssets : ISceneLoadAssets
     {
         public ADSerializableDictionary<string, SubSceneLoader> SubBlocks = new();
         public Scene? MainCurrent;
+        public bool IsAllSceneByPreAssets = true;
+        public bool IsAllSceneByNewCreate = false;
 
         public SubSceneLoader SubSceneLoaderPrefab;
 
@@ -29,22 +32,43 @@ namespace AD.Experimental.Performance
 
         public virtual void Load(string sceneName)
         {
-            Scene scene = sceneName.CreateNewScene();
+            Scene scene;
+            SubSceneLoader subLoader = null;
+            try
+            {
+                if (IsAllSceneByNewCreate) throw new ADException();
+                sceneName.SceneConversion(LoadSceneMode.Additive);
+                scene = SceneManager.GetSceneByName(sceneName);
+
+                subLoader = scene.GetRootGameObjects().GetSubList(T =>
+                {
+                    var temp = T.GetComponents<SubSceneLoader>();
+                    return temp != null && temp.Length > 0;
+                }).First().GetComponents<SubSceneLoader>()[0];
+            }
+            catch
+            {
+                if (IsAllSceneByPreAssets) throw;
+                if (subLoader != null)
+                {
+                    GameObject.Destroy(subLoader.gameObject);
+                }
+                scene = sceneName.CreateNewScene();
+                subLoader = GameObject.Instantiate(SubSceneLoaderPrefab);
+                subLoader.gameObject.SetActive(true);
+                subLoader.name = sceneName + "(Root)";
+                subLoader.transform.position = Vector3.zero;
+            }
             if (SceneManager.SetActiveScene(scene))
             {
-                var game_object = GameObject.Instantiate(SubSceneLoaderPrefab);
-                game_object.gameObject.SetActive(true);
-                game_object.name = sceneName + "(Root)";
-                game_object.transform.position = Vector3.zero;
-                SubSceneLoader cat = game_object.GetComponent<SubSceneLoader>();
-                cat.Scene = scene;
-                cat.SceneIndex = SceneManager.sceneCount;
-                cat.SceneName = sceneName;
-                cat.MainLoadAssets = this;
-                cat.Load();
-                SubBlocks[sceneName] = cat;
+                subLoader.Scene = scene;
+                subLoader.SceneIndex = SceneManager.sceneCount;
+                subLoader.SceneName = sceneName;
+                subLoader.MainLoadAssets = this;
+                subLoader.Load();
+                SubBlocks[sceneName] = subLoader;
             }
-            else throw new ADException("Create Failed");
+            else throw new ADException("Load Failed");
             SceneManager.SetActiveScene(MainCurrent.GetValueOrDefault());
         }
 

@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using AD.BASE;
 using AD.Experimental.GameEditor;
+using AD.Experimental.Performance;
 using AD.Sample.Texter.Internal;
 using AD.Sample.Texter.Project;
+using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
@@ -105,8 +107,7 @@ namespace AD.Sample.Texter
                     {
                         PropertiesLayout.Button(entry.buttonText, entry.isModernButton, entry.message, () =>
                         {
-                            if (OnEvent != null)
-                                OnEvent.Invoke(entry.delegates.Invoke(_that));
+                            OnEvent?.Invoke(entry.delegates.Invoke(_that));
                         });
                     }
                 }
@@ -329,5 +330,26 @@ namespace AD.Sample.Texter
         {
             throw new System.NotImplementedException();
         }
+
+        public ProjectItemData CurrentProjectItemData;
+    }
+
+    public class SubSceneManager : SubSceneLoader
+    {
+        protected virtual void Start()
+        {
+            SetupProjectItemData(App.instance.CurrentProjectItemData);
+            BackSceneButton.AddListener(() => App.instance.GetController<MainSceneLoader>().Unload(this.Scene.name));
+        }
+
+        protected virtual void SetupProjectItemData(ProjectItemData data)
+        {
+
+        }
+
+        [Header("Main Assets")]
+        public Canvas mainCanvas;
+        public virtual IButton BackSceneButton { get; }
+        public Text mainTitle;
     }
 }
