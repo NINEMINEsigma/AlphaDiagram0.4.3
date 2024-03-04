@@ -40,6 +40,7 @@ namespace AD.Experimental.GameEditor
 
         public void RemoveOnTop(ISerializeHierarchyEditor editor)
         {
+            if (editor == null) return;
             if (TargetTopObjectEditors.Remove(editor))
             {
                 //RefreshPanel();

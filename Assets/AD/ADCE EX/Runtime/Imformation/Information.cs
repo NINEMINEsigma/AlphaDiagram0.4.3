@@ -287,13 +287,23 @@ namespace AD.Experimental.GameEditor
 
         public void SetLeft(string text)
         {
-            LeftText.SetText(text);
-            LeftText.source.color = Color.white;
+            try
+            {
+                LeftText.SetText(text);
+                LeftText.source.color = Color.white;
+            }
+            catch { }
+            finally { }
         }
 
         public void SetRight(string text)
         {
-            RightText.SetText(text);
+            try
+            {
+                RightText.SetText(text);
+            }
+            catch { }
+            finally { }
         }
 
         private TaskViewItem RegisterTaskListItem(TaskInfo task,int index)
