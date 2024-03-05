@@ -21,6 +21,7 @@ namespace AD.Sample.Texter.Scene
         protected override void SetupProjectItemData(ProjectItemData data)
         {
             this.data = ADGlobalSystem.FinalCheckWithThrow(data as ProjectTextData);
+            mainTitle.SetText(data.ProjectItemID);
             SetupText();
         }
 

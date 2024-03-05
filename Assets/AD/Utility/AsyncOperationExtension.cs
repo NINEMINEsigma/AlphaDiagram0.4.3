@@ -24,7 +24,7 @@ namespace AD.Utility
 
         public class DoneCompleteHelper
         {
-            private static List<DoneCompleteHelper> helpers = new();
+            private static readonly List<DoneCompleteHelper> helpers = new();
 
             readonly Action action;
 

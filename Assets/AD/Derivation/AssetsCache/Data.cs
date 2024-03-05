@@ -48,7 +48,7 @@ namespace AD.Experimental.Localization.Cache
             IdentifyID = key;
         }
 
-        [SerializeField] private string IdentifyID;
+        public string IdentifyID;
 
         public override bool Equals(object obj)
         {

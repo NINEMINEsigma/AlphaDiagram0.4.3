@@ -6,10 +6,10 @@
 			"text" : "",
 			"description" : "",
 			"ProjectItemID" : "New Object(1)",
-			"ParentItemID" : "New Object",
+			"ParentItemID" : "New Object(3)",
 			"ProjectItemPosition" : {
-				"x" : 21.6124229,
-				"y" : 3.62289929
+				"x" : 13.2972364,
+				"y" : 7.67170238
 			}
 		}
 	}

@@ -168,7 +168,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240305/1132";
+        public static string Version => "AD/0.4.3/20240305/1436";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -1072,10 +1072,10 @@ namespace AD
             return result;
         }
 
-        public static T FinalCheckCanntNull<T>(T result, string message = "you obtain a null object") where T : new()
+        public static T FinalCheckCanntNull<T>(T result, string message = "you obtain a null object") where T : class
         {
             if (result == null) AddError(message);
-            return new();
+            return result;
         }
 
         public static T FinalCheckWithThrow<T>(T result, string message = "you obtain a null object")

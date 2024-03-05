@@ -116,6 +116,13 @@ namespace AD.Sample.Texter
 
         public static class InternalUtility
         {
+            public static void SetParent(this IProjectItem item, IProjectItem parent, bool JustSetParent = false)
+            {
+                (item as ICanSerializeOnCustomEditor).SetParent(parent, JustSetParent);
+                if (parent != null)
+                    App.instance.AddMessage(item.MyEditGroup.name + " is set " + parent.MyEditGroup.name + " parent");
+            }
+
             public static GameObject InternalObtainGameObject(EditGroup target, string Key)
             {
                 return target.ViewLayer.GameObjects[Key];
@@ -305,13 +312,20 @@ namespace AD.Sample.Texter
         {
             OnGenerate.AddListener(T =>
             {
+                IProjectItemWhereNeedInitData item = null;
                 if (T is ProjectTextData data)
                 {
-                    var cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectTextField)].PrefabInstantiate<ProjectTextField, EditGroup>();
-                    cat.transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
-                    cat.ProjectTextSourceData = data;
-                    cat.name = cat.SourceData.ProjectItemID;
+                    ProjectTextField cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectTextField)].PrefabInstantiate<ProjectTextField, EditGroup>();
                     cat.IsSetupProjectTextSourceData = true;
+                    item = cat;
+                    data.MatchProjectItem = cat;
+                }
+
+                if (item != null)
+                {
+                    item.SourceData = T;
+                    item.MyEditGroup.name = item.SourceData.ProjectItemID;
+                    item.MyEditGroup.transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
                 }
             });
 

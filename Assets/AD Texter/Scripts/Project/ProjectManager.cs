@@ -99,6 +99,11 @@ namespace AD.Sample.Texter
         public MainSceneLoader MainSceneLoaderManager;
         [Header("Prefab")]
         public PrefabModel ProjectPrefabModel;
+#if UNITY_EDITOR
+        [Header("Debug")]
+        public List<ProjectItemData> s_Datas = new();
+#endif
+         
 
         private void Start()
         {
@@ -106,6 +111,9 @@ namespace AD.Sample.Texter
             App.instance.OnGenerate.AddListener(T => this.OnGenerate.Invoke(T));
             ADGlobalSystem.instance.IsAutoSaveArchitecturesDebugLog = true;
             ADGTimeC = ADGlobalSystem.instance.AutoSaveArchitecturesDebugLogTimeLimitCounter;
+#if UNITY_EDITOR
+            s_Datas = ProjectItemData.s_Datas;
+#endif
         }
 
         private void OnDestroy()
@@ -124,7 +132,6 @@ namespace AD.Sample.Texter
         {
             Architecture.RegisterController(MainSceneLoaderManager);
 
-            ProjectItemData.IDSet.Clear();
             loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
             loadingTask.Register();
             StartCoroutine(LoadEveryOne(loadingTask));

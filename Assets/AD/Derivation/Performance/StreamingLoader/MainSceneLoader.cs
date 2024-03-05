@@ -36,9 +36,10 @@ namespace AD.Experimental.Performance
             Load<SubSceneLoader>(sceneName);
         }
 
-        private IEnumerator InternalWaitForLoadEnd<T>(Scene scene, string sceneName) where  T:SubSceneLoader
+        private IEnumerator InternalWaitForLoadEnd<T>(string sceneName) where  T:SubSceneLoader
         {
             yield return null;
+            var scene = SceneManager.GetSceneByName(sceneName);
             SubSceneLoader subLoader = scene.Find(T => T.GetComponent<T>() != null)[0].GetComponent<T>();
             if (SceneManager.SetActiveScene(scene))
             {
@@ -62,7 +63,7 @@ namespace AD.Experimental.Performance
                 scene = SceneManager.GetSceneByName(sceneName);
                 sceneName.LoadSceneAsync(LoadSceneMode.Additive).MarkCompleted(() =>
                 {
-                    ADGlobalSystem.OpenCoroutine(InternalWaitForLoadEnd<T>(scene, sceneName));
+                    ADGlobalSystem.OpenCoroutine(InternalWaitForLoadEnd<T>(sceneName));
                 });
             }
             catch
@@ -73,12 +74,13 @@ namespace AD.Experimental.Performance
                     GameObject.Destroy(subLoader.gameObject);
                 }
                 scene = sceneName.CreateNewScene();
-                subLoader = GameObject.Instantiate(SubSceneLoaderPrefab);
-                subLoader.gameObject.SetActive(true);
-                subLoader.name = sceneName + "(Root)";
-                subLoader.transform.position = Vector3.zero;
                 if (SceneManager.SetActiveScene(scene))
                 {
+                    subLoader = GameObject.Instantiate(SubSceneLoaderPrefab);
+                    subLoader.gameObject.SetActive(true);
+                    subLoader.name = sceneName + "(Root)";
+                    subLoader.transform.position = Vector3.zero;
+
                     subLoader.Scene = scene;
                     subLoader.SceneIndex = SceneManager.sceneCount;
                     subLoader.SceneName = sceneName;

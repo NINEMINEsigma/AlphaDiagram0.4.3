@@ -165,7 +165,7 @@ namespace AD.Sample.Texter.Project
             if (IsSetupProjectTextSourceData)
             {
                 transform.localPosition = App.GetOriginPosition(ProjectTextSourceData.ProjectItemPosition);
-                this.SetParent(ProjectItemData.GetParent(ProjectTextSourceData.ParentItemID));
+                this.SetParent(ADGlobalSystem.FinalCheckWithThrow(ProjectItemData.GetParent(ProjectTextSourceData.ParentItemID)));
             }
             else
             {
@@ -196,25 +196,6 @@ namespace AD.Sample.Texter.Project
         {
             OnChange();
         }
-
-        /*
-          private void TryDestory()
-        {
-            GameEditorApp.instance
-                .GetSystem<GameEditorWindowGenerator>()
-                .ObtainElement(new(200, 60), out var window)
-                .SetTitle("Warning : Will Delete Child".Translate())
-                .GenerateButton("Yes".Translate(), new Vector2(200, 60))
-                .AddListener(() =>
-                {
-                    GameObject.Destroy(gameObject);
-                    GameEditorApp.instance.GetSystem<SinglePanelGenerator>().Current.BackPool();
-                    window.BackPool();
-                    GameEditorApp.instance.SendCommand<RefreshHierarchyPanel>();
-                    GameEditorApp.instance.SendCommand<RefreshPropertiesPanel>();
-                });
-        }
-        */
 
         private void OnDestroy()
         {

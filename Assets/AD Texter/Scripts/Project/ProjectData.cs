@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Sample.Texter.Data;
@@ -52,12 +53,13 @@ namespace AD.Sample.Texter
                         yield return new WaitForEndOfFrame();
                         timer.Update();
                     }
+
                     ProjectData_BaseMap bmap = Load(file);
                     string key = bmap.ProjectItemID;
                     bmap.ToObject(out ProjectItemData projcetdata);
                     this.Add(
-                        new AD.Experimental.Localization.Cache.CacheAssetsKey(key)
-                        , new ProjectItemDataCache(key, projcetdata, bmap));
+                        new AD.Experimental.Localization.Cache.CacheAssetsKey(key), 
+                        new ProjectItemDataCache(key, projcetdata, bmap));
                     projectItemDatas.Add(projcetdata);
                 }
                 for (int i = 0, e = projectItemDatas.Count; i < e; i++)
@@ -69,6 +71,7 @@ namespace AD.Sample.Texter
                         yield return new WaitForEndOfFrame();
                         timer.Update();
                     }
+
                     App.instance.OnGenerate.Invoke(projcetdata);
                 }
             }
@@ -166,22 +169,24 @@ namespace AD.Sample.Texter
     [Serializable]
     public class ProjectItemData : IBase<ProjectData_BaseMap>
     {
-        public const string ProjectRootID = "ProjectRoot";
+#if UNITY_EDITOR
+        public
+#else
+        
+#endif
+        static List<ProjectItemData> s_Datas = new();
 
-        public static Dictionary<string, IProjectItemWhereNeedInitData> IDSet = new();
+        public const string ProjectRootID = "ProjectRoot";
 
         public static IProjectItem GetParent(string key)
         {
-            if (key == null)
-            {
-                App.instance.AddMessage("null key when GetParent");
-                return App.instance.GetController<ProjectManager>().ProjectRootMono;
-            }
-            if (key.Equals(ProjectRootID)) return App.instance.GetController<ProjectManager>().ProjectRootMono;
-            return IDSet.TryGetValue(key, out var parent) ? parent : null;
+            if (key == ProjectRootID) return App.instance.GetController<ProjectManager>().ProjectRootMono;
+            var cat = s_Datas.FirstOrDefault(T => T.ProjectItemID == key);
+            if (cat == null) return null;
+            else return cat.MatchProjectItem;
         }
 
-        public ProjectItemData() : this(null) { }
+        public ProjectItemData() { s_Datas.Add(this); }
         public ProjectItemData(IProjectItemWhereNeedInitData matchProjectItem) : this(matchProjectItem, "New Object", ProjectRootID, Vector2.zero) { }
         protected ProjectItemData(IProjectItemWhereNeedInitData matchProjectItem, string projectItemID, string parentItemID, Vector2 projectItemPosition)
         {
@@ -189,10 +194,12 @@ namespace AD.Sample.Texter
             ProjectItemID = projectItemID;
             ParentItemID = parentItemID ?? ProjectItemData.ProjectRootID;
             ProjectItemPosition = projectItemPosition;
+            s_Datas.Add(this);
         }
         ~ProjectItemData()
         {
-            IDSet.Remove(ProjectItemID);
+            s_Datas.RemoveAll(null);
+            s_Datas.Remove(this);
         }
 
         private IProjectItemWhereNeedInitData _MatchProjectItem;
@@ -202,7 +209,6 @@ namespace AD.Sample.Texter
             set
             {
                 _MatchProjectItem = value;
-                Internal_Set_ProjectItemID(ProjectItemID);
             }
         }
         private string projectItemID;
@@ -217,38 +223,20 @@ namespace AD.Sample.Texter
 
         private void Internal_Set_ProjectItemID(string value)
         {
-            if (value == null)
+            if (string.IsNullOrEmpty(value))
             {
-                ADGlobalSystem.Error("ProjectItemID : value arg is null");
-                return;
+                ADGlobalSystem.ThrowLogicError("ProjectItemID : value arg is invalid");
             }
-            if (projectItemID == value)
+            var container = App.instance.GetController<ProjectManager>().CurrentProjectData;
+            if (!string.IsNullOrEmpty(projectItemID))
+                container.Remove(new(projectItemID));
+            string key = value;
+            int icounter = 1;
+            while (s_Datas.FirstOrDefault(T => T.ProjectItemID == key) != null)
             {
-                if(IDSet.ContainsKey(projectItemID))
-                {
-                    IDSet[projectItemID] = MatchProjectItem;
-                }
-                else
-                {
-                    IDSet.Add(projectItemID, MatchProjectItem);
-                }
+                key = value + $"({icounter++})";
             }
-            else
-            {
-                int counter = 1;
-                string newID = value;
-                while (IDSet.ContainsKey(newID))
-                {
-                    newID = value + $"({counter++})";
-                }
-                if (projectItemID != null)
-                {
-                    IDSet.Remove(projectItemID);
-                    App.instance.GetController<ProjectManager>().CurrentProjectData.Remove(new(projectItemID));
-                }
-                IDSet.Add(newID, this.MatchProjectItem);
-                projectItemID = newID;
-            }
+            projectItemID = key.ToString();
         }
 
         public string ParentItemID;
