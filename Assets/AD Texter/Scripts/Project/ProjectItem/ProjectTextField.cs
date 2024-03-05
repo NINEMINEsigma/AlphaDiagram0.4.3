@@ -6,6 +6,7 @@ using AD.Experimental.Performance;
 using AD.Sample.Texter.Data;
 using AD.Sample.Texter.Internal;
 using AD.Sample.Texter.Project;
+using AD.Sample.Texter.Scene;
 using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
@@ -137,7 +138,7 @@ namespace AD.Sample.Texter.Project
                 PropertiesLayout.Button("Open", "Open Sub Project Scene", () =>
                 {
                     App.instance.CurrentProjectItemData = that.ProjectTextSourceData;
-                    App.instance.GetController<MainSceneLoader>().Load(nameof(ProjectTextField));
+                    App.instance.GetController<MainSceneLoader>().Load<EasyTextManager>(nameof(ProjectTextField));
                 });
             }
         }

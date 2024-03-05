@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
@@ -32,19 +33,37 @@ namespace AD.Experimental.Performance
 
         public virtual void Load(string sceneName)
         {
+            Load<SubSceneLoader>(sceneName);
+        }
+
+        private IEnumerator InternalWaitForLoadEnd<T>(Scene scene, string sceneName) where  T:SubSceneLoader
+        {
+            yield return null;
+            SubSceneLoader subLoader = scene.Find(T => T.GetComponent<T>() != null)[0].GetComponent<T>();
+            if (SceneManager.SetActiveScene(scene))
+            {
+                subLoader.Scene = scene;
+                subLoader.SceneIndex = SceneManager.sceneCount;
+                subLoader.SceneName = sceneName;
+                subLoader.MainLoadAssets = this;
+                subLoader.Load();
+                SubBlocks[sceneName] = subLoader;
+            }
+            else throw new ADException("Load Failed");
+            SceneManager.SetActiveScene(MainCurrent.GetValueOrDefault());
+        }
+        public virtual void Load<T>(string sceneName) where T : SubSceneLoader
+        {
             Scene scene;
             SubSceneLoader subLoader = null;
             try
             {
                 if (IsAllSceneByNewCreate) throw new ADException();
-                sceneName.SceneConversion(LoadSceneMode.Additive);
                 scene = SceneManager.GetSceneByName(sceneName);
-
-                subLoader = scene.GetRootGameObjects().GetSubList(T =>
+                sceneName.LoadSceneAsync(LoadSceneMode.Additive).MarkCompleted(() =>
                 {
-                    var temp = T.GetComponents<SubSceneLoader>();
-                    return temp != null && temp.Length > 0;
-                }).First().GetComponents<SubSceneLoader>()[0];
+                    ADGlobalSystem.OpenCoroutine(InternalWaitForLoadEnd<T>(scene, sceneName));
+                });
             }
             catch
             {
@@ -58,18 +77,18 @@ namespace AD.Experimental.Performance
                 subLoader.gameObject.SetActive(true);
                 subLoader.name = sceneName + "(Root)";
                 subLoader.transform.position = Vector3.zero;
+                if (SceneManager.SetActiveScene(scene))
+                {
+                    subLoader.Scene = scene;
+                    subLoader.SceneIndex = SceneManager.sceneCount;
+                    subLoader.SceneName = sceneName;
+                    subLoader.MainLoadAssets = this;
+                    subLoader.Load();
+                    SubBlocks[sceneName] = subLoader;
+                }
+                else throw new ADException("Load Failed");
+                SceneManager.SetActiveScene(MainCurrent.GetValueOrDefault());
             }
-            if (SceneManager.SetActiveScene(scene))
-            {
-                subLoader.Scene = scene;
-                subLoader.SceneIndex = SceneManager.sceneCount;
-                subLoader.SceneName = sceneName;
-                subLoader.MainLoadAssets = this;
-                subLoader.Load();
-                SubBlocks[sceneName] = subLoader;
-            }
-            else throw new ADException("Load Failed");
-            SceneManager.SetActiveScene(MainCurrent.GetValueOrDefault());
         }
 
         public virtual AsyncOperation Unload(string sceneName)
@@ -106,6 +125,11 @@ namespace AD.Experimental.Performance
         public virtual void Load(string sceneName)
         {
             sceneLoadAssets.Load(sceneName);
+        }
+
+        public virtual void Load<T>(string sceneName) where T : SubSceneLoader
+        {
+            sceneLoadAssets.Load<T>(sceneName);
         }
 
         public virtual void Unload(string sceneName)
