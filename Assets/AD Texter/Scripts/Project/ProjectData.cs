@@ -47,12 +47,12 @@ namespace AD.Sample.Texter
                 for (int i = 0, e = fileList.Count; i < e; i++)
                 {
                     FileInfo file = fileList[i];
-                    if (timer.LastDalteSceond > 0.1f)
+                    /*if (timer.LastDalteSceond > 0.1f)
                     {
                         loadingTask.TaskValue = (float)i / (float)e + 0.3f;
                         yield return new WaitForEndOfFrame();
                         timer.Update();
-                    }
+                    }*/
 
                     ProjectData_BaseMap bmap = Load(file);
                     string key = bmap.ProjectItemID;
@@ -65,12 +65,12 @@ namespace AD.Sample.Texter
                 for (int i = 0, e = projectItemDatas.Count; i < e; i++)
                 {
                     ProjectItemData projcetdata = projectItemDatas[i];
-                    if (timer.LastDalteSceond > 0.1f)
+                    /*if (timer.LastDalteSceond > 0.1f)
                     {
                         loadingTask.TaskValue = (float)i / (float)e + 1.2f;
                         yield return new WaitForEndOfFrame();
                         timer.Update();
-                    }
+                    }*/
 
                     App.instance.OnGenerate.Invoke(projcetdata);
                 }

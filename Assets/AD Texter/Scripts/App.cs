@@ -255,18 +255,18 @@ namespace AD.Sample.Texter
     {
         public static GenerateTargetEntry[] Get(List<GameObject> sources, bool isModern)
         {
-            Type TargetCT = null;
-            return sources.GetSubList(
+            return sources.GetSubList<GenerateTargetEntry, Type, GameObject>(
                 T =>
                 {
+                    Type TargetCT = null;
                     var temp = T.GetComponents<IProjectItem>();
                     if (temp != null && temp.Length == 1)
                     {
                         TargetCT = temp[0].GetType();
-                        return true;
+                        return (true, TargetCT);
                     }
-                    else return false;
-                }, T =>
+                    else return (false, TargetCT);
+                }, (T, TargetCT) =>
                 {
                     return new GenerateTargetEntry(
                         _Parent =>
@@ -315,10 +315,17 @@ namespace AD.Sample.Texter
                 IProjectItemWhereNeedInitData item = null;
                 if (T is ProjectTextData data)
                 {
-                    ProjectTextField cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectTextField)].PrefabInstantiate<ProjectTextField, EditGroup>();
+                    var cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectTextField)].PrefabInstantiate<ProjectTextField, EditGroup>();
                     cat.IsSetupProjectTextSourceData = true;
                     item = cat;
                     data.MatchProjectItem = cat;
+                }
+                else if(T is ProjectScriptSlicerData slicerData)
+                {
+                    var cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectScriptSlicer)].PrefabInstantiate<ProjectScriptSlicer, EditGroup>();
+                    cat.IsSetupProjectScriptSlicingSourceData = true;
+                    item = cat;
+                    slicerData.MatchProjectItem = cat;
                 }
 
                 if (item != null)

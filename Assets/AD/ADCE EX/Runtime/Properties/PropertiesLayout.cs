@@ -240,6 +240,10 @@ namespace AD.Experimental.GameEditor
         {
             return Text(text, TextType.Label, text);
         }
+        public static Text Title(string text)
+        {
+            return Text(text, text);
+        }
         public static Text Title(string text, string message)
         {
             return Text(text, TextType.Title, message);

@@ -145,6 +145,15 @@ namespace AD.Utility
             return result;
         }
 
+        public static List<Result> GetSubList<Result,KeyArgs, T>(this IEnumerable<T> self, Func<T, (bool, KeyArgs)> predicate, Func<T, KeyArgs, Result> transformFunc)
+        {
+            List<Result> result = new();
+            foreach (var item in self)
+            {
+                if (predicate(item).Share(out var keyArgs).Item1) result.Add(transformFunc(item, keyArgs.Item2));
+            }
+            return result;
+        }
     }
 
     [System.Serializable]

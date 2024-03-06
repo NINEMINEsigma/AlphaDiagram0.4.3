@@ -10,7 +10,7 @@ using AD.Utility.Object;
 
 namespace AD.Sample.Texter.Project
 {
-    public class ProjectRoot : MonoBehaviour, IProjectItemRoot, ICatchCameraRayUpdate
+    public class ProjectRoot : MonoBehaviour, IProjectItemRoot, ICatchCameraRayUpdate, ISetupSingleMenuOnClickRight
     {
         public class ProjectRootBlock : ProjectItemBlock
         {
@@ -66,8 +66,22 @@ namespace AD.Sample.Texter.Project
                 new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
             };
             GetComponent<EditGroup>().OnEnter.AddListener(EnterMe);
+            OnMenu = new()
+            {
+                [0] = new Dictionary<string, ADEvent>()
+                {
+                    {"Clear",new(()=>
+                        {
+                            GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(new List<ISerializeHierarchyEditor>(){ this.MatchHierarchyEditor});
+                            GameEditorApp.instance.GetSystem<SinglePanelGenerator>().Current.BackPool();
+                        })
+                    }
+                }
+            };
             App.instance.AddMessage("Project Root Setup");
         }
+        public Dictionary<int, Dictionary<string, ADEvent>> OnMenu { get; set; }
+        public string OnMenuTitle => "Root Menu";
 
         public void SetupChild(IProjectItem child)
         {
@@ -162,7 +176,7 @@ namespace AD.Sample.Texter.Project
             List<ISerializeHierarchyEditor> newList = new() { this.MatchHierarchyEditor };
             foreach (ISerializeHierarchyEditor sEditor in GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors)
             {
-                if (IsAbleDisplayedOnHierarchyAtTheSameTime(sEditor.MatchTarget.GetType()))
+                if (sEditor.MatchTarget.GetType() == typeof(ProjectRoot) || IsAbleDisplayedOnHierarchyAtTheSameTime(sEditor.MatchTarget.GetType()))
                     newList.Add(sEditor);
             }
             GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
