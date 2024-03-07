@@ -4,7 +4,8 @@ Shader "AD/2D/Sprite-Unlit-Default"
     Properties
     {
         // Main Texture To Show Appearances
-        [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
+        //[PerRendererData] 
+        _MainTex ("Sprite Texture", 2D) = "white" {}
         // Main Color To Draw On View
         _Color ("Tint", Color) = (1,1,1,1)
 

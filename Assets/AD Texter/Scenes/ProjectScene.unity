@@ -686,7 +686,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1002687280392057815, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -455.95428
+      value: -455.95435
       objectReference: {fileID: 0}
     - target: {fileID: 1995526601676542757, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_IsActive
@@ -758,7 +758,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4538837733359995695, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00054097176
+      value: -0.00006508827
       objectReference: {fileID: 0}
     - target: {fileID: 6317214944257746823, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_text
@@ -875,7 +875,7 @@ PrefabInstance:
     - target: {fileID: 7953931864537186812, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: StaticItem.Array.data[0].Callbacks.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1696605981247371494}
     - target: {fileID: 7953931864537186812, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: StaticItem.Array.data[1].Callbacks.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
@@ -1737,27 +1737,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SourcePairs:
-    Data:
-    - Key: _OffsetX
-      Value:
-        materials:
-        - {fileID: 2100000, guid: fa6da667846a71742a05ea1a80dd39b3, type: 2}
-        valueType: 0
-        shiftType: 0
-        controlType: 0
-        speed: 0.5
-    OnAdd:
-      m_PersistentCalls:
-        m_Calls: []
-    OnTryAdd:
-      m_PersistentCalls:
-        m_Calls: []
-    OnRemove:
-      m_PersistentCalls:
-        m_Calls: []
-    OnReplace:
-      m_PersistentCalls:
-        m_Calls: []
+  - key: 
+    value:
+      materials: []
+      valueType: 0
+      shiftType: 0
+      controlType: 0
+      speed: 1
+      initialPhase: 0
+  - key: 
+    value:
+      materials: []
+      valueType: 0
+      shiftType: 0
+      controlType: 0
+      speed: 1
+      initialPhase: 0
+  - key: 
+    value:
+      materials: []
+      valueType: 0
+      shiftType: 0
+      controlType: 0
+      speed: 1
+      initialPhase: 0
+  - key: 
+    value:
+      materials: []
+      valueType: 0
+      shiftType: 0
+      controlType: 0
+      speed: 1
+      initialPhase: 0
+  - key: 
+    value:
+      materials: []
+      valueType: 0
+      shiftType: 0
+      controlType: 0
+      speed: 1
+      initialPhase: 0
   IsExecuteAlways: 0
 --- !u!1 &2057135011
 GameObject:

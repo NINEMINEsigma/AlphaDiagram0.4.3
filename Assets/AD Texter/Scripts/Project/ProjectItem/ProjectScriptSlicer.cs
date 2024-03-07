@@ -169,7 +169,7 @@ namespace AD.Sample.Texter.Project
                 }
                 PropertiesLayout.EndHorizontal();
                 PropertiesLayout.ModernUIInputField(entry.Command, "执行到该处时发送的指令");
-                PropertiesLayout.Button("-", "删除", () =>
+                PropertiesLayout.Button("删除", "删除", () =>
                 {
                     that.ProjectScriptSlicingSourceData.Items.Remove(entry);
                     GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();
@@ -190,7 +190,7 @@ namespace AD.Sample.Texter.Project
                     PropertiesLayout.InputField(entry.OptionName, "选项文本");
                 }
                 PropertiesLayout.EndHorizontal();
-                PropertiesLayout.Button("-", "删除", () =>
+                PropertiesLayout.Button("删除", "删除", () =>
                 {
                     that.ProjectScriptSlicingSourceData.Options.Remove(entry);
                     GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();

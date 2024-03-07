@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AD.BASE;
 using UnityEngine;
 
@@ -56,19 +57,27 @@ namespace AD.Utility.Object
             public ShiftType shiftType = ShiftType.Add;
             public ControlType controlType = ControlType.Time;
             public float speed = 1;
+            public float initialPhase = 0;
 
             public void Update(string name)
             {
                 if (materials == null || materials.Length == 0 || controlType == ControlType.Script) return;
                 foreach (var current in materials)
                 {
-                    if (valueType == ValueType.Float) current.SetFloat(name, (float)(speed * Time.time));
-                    else current.SetInt(name, (int)(speed * Time.time));
+                    if (valueType == ValueType.Float) current.SetFloat(name, (float)(((shiftType == ShiftType.Add) ? speed : -speed) * Time.time + initialPhase));
+                    else current.SetInt(name, (int)(((shiftType == ShiftType.Add) ? speed : -speed) * Time.time + initialPhase));
                 }
             }
         }
 
-        public ADSerializableDictionary<string, SourceEntry> SourcePairs = new();
+        [Serializable]
+        public class SourcePair
+        {
+            public string key;
+            public SourceEntry value;
+        }
+
+        public List<SourcePair> SourcePairs = new();
         public bool IsExecuteAlways = false;
 
         private void Update()
@@ -76,10 +85,10 @@ namespace AD.Utility.Object
             if (Application.isEditor && !Application.isPlaying && IsExecuteAlways == false) return;
             foreach (var current in SourcePairs)
             {
-                if (string.IsNullOrEmpty(current.Key)) continue;
+                if (string.IsNullOrEmpty(current.key)) continue;
                 try
                 {
-                    current.Value.Update(current.Key);
+                    current.value.Update(current.key);
                 }
                 catch { }
             }
