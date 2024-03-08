@@ -1221,6 +1221,13 @@ namespace AD
             return null;
         }
 
+        /// <summary>
+        /// A broadcast is sent to the object registered with the register, 
+        /// <para>and all return values are collected</para>
+        /// </summary>
+        /// <param name="key">Target Method Name</param>
+        /// <param name="args">Parameters used for broadcasting</param>
+        /// <returns>all collected return values</returns>
         public HashSet<object> SendMessage(string key, params object[] args)
         {
             if (IsJumpScene || AppQuitting) return null;
