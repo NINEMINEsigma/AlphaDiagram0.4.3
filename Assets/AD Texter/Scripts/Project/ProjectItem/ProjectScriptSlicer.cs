@@ -121,10 +121,18 @@ namespace AD.Sample.Texter.Project
                     that.ProjectScriptSlicingSourceData.Items.Add(new()
                     {
                         Name = that.ProjectScriptSlicingSourceData.Items.Count > 1 ? that.ProjectScriptSlicingSourceData.Items[^2].Name : "新的角色",
-                        Words = "(你想说什么呢)"
+                        Words = "(语句)"
                     });
                     GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();
                 });
+                if (that.ProjectScriptSlicingSourceData.Items != null)
+                {
+                    foreach (var item in that.ProjectScriptSlicingSourceData.Items)
+                    {
+                        SingleLine(item);
+                    }
+                }
+
                 PropertiesLayout.Title("选项");
                 PropertiesLayout.ModernUIButton("添加新的选项", "添加新的选项", () =>
                 {
@@ -136,11 +144,9 @@ namespace AD.Sample.Texter.Project
                     });
                     GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();
                 });
-
-
-                if (that.ProjectScriptSlicingSourceData.Items != null)
+                if (that.ProjectScriptSlicingSourceData.Options != null)
                 {
-                    foreach (var item in that.ProjectScriptSlicingSourceData.Items)
+                    foreach (var item in that.ProjectScriptSlicingSourceData.Options)
                     {
                         SingleLine(item);
                     }
@@ -158,17 +164,17 @@ namespace AD.Sample.Texter.Project
                 PropertiesLayout.BeginHorizontal();
                 {
                     PropertiesLayout.Label("角色名");
-                    PropertiesLayout.InputField(entry.Name, "角色名");
+                    PropertiesLayout.InputField(entry.Name, "角色名").AddListener(T => entry.Name = T);
                 }
                 PropertiesLayout.EndHorizontal();
-                PropertiesLayout.ModernUIInputField(entry.Words, "当前对象说的话");
                 PropertiesLayout.BeginHorizontal();
                 {
                     PropertiesLayout.Label("声音");
-                    PropertiesLayout.InputField(entry.Name, "引用的声音资源名称");
+                    PropertiesLayout.InputField(entry.SoundAssets, "引用的声音资源名称").AddListener(T => entry.SoundAssets = T);
                 }
                 PropertiesLayout.EndHorizontal();
-                PropertiesLayout.ModernUIInputField(entry.Command, "执行到该处时发送的指令");
+                PropertiesLayout.ModernUIInputField(entry.Words, "当前对象说的话").AddListener(T => entry.Words = T);
+                PropertiesLayout.InputField(entry.Command, "执行到该处时发送的指令").AddListener(T => entry.Command = T);
                 PropertiesLayout.Button("删除", "删除", () =>
                 {
                     that.ProjectScriptSlicingSourceData.Items.Remove(entry);

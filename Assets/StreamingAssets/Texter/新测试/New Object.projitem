@@ -1,0 +1,36 @@
+{
+	"projitem" : {
+		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
+		"value" : {
+			"__type" : "AD.Sample.Texter.Data.ProjectScriptSlicer_BaseMap,Assembly-CSharp",
+			"Items" : [
+				{
+					"Name" : "新的角色",
+					"Words" : "(语句)",
+					"SoundAssets" : "No Voice",
+					"Command" : ""
+				},{
+					"Name" : "13213",
+					"Words" : "++++",
+					"SoundAssets" : "0023",
+					"Command" : ""
+				}
+			],
+			"Options" : [
+				{
+					"TargetScriptSceneID" : "未知的目标",
+					"OptionName" : "(选项)"
+				},{
+					"TargetScriptSceneID" : "000",
+					"OptionName" : "123"
+				}
+			],
+			"ProjectItemID" : "New Object",
+			"ParentItemID" : "ProjectRoot",
+			"ProjectItemPosition" : {
+				"x" : 5,
+				"y" : 0
+			}
+		}
+	}
+}

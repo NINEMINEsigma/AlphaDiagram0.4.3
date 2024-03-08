@@ -9,7 +9,7 @@ namespace AD.Sample.Texter.Scene
     {
         public InputField CharacterName, AudioAssets;
         public ModernUIInputField InputText;
-        public ModernUIButton PreviewButton;
+        public ModernUIButton PreviewButton,DeleteButton;
 
         public ScriptItemEntry mEntry;
 
@@ -36,6 +36,7 @@ namespace AD.Sample.Texter.Scene
                 entry.Words = T;
             });
             PreviewButton.AddListener(()=>ScriptSlicerManager.PreviewOneEntry(entry));
+            DeleteButton.AddListener(() => ScriptSlicerManager.Remove(this));
         }
 
 

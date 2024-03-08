@@ -10,7 +10,7 @@ namespace AD.Sample.Texter.Scene
         [Header("Assets")]
         public Button mButton;
         public override IButton BackSceneButton => mButton;
-        public ListView DataListView;
+        public ListView DataListView,OptionListView;
         public ListViewItem ConsoleItem, ScriptSlicerListViewItemPrefab, OptionsItemPrefab;
         [Header("Data")]
         public ProjectScriptSlicerData data;
@@ -34,6 +34,13 @@ namespace AD.Sample.Texter.Scene
                     ScriptSlicerListViewItem lv = DataListView.GenerateItem() as ScriptSlicerListViewItem;
                     lv.SetupScriptSlicerTarget(item);
                 }
+            OptionListView.SetPrefab(OptionsItemPrefab);
+            if ((data as ProjectScriptSlicerData).Options!= null)
+                foreach (SceneEndingSelectOption item in (data as ProjectScriptSlicerData).Options)
+                {
+                    ScriptSlicerOptionItem lv = OptionListView.GenerateItem() as ScriptSlicerOptionItem;
+                    lv.SetupScriptSlicerTarget(item);
+                }
         }
 
         private void InternalPreviewOneEntry(ScriptItemEntry entry)
@@ -47,8 +54,11 @@ namespace AD.Sample.Texter.Scene
 
         private void InternalRemove(ScriptSlicerListViewItem entry)
         {
-            data.Items.Remove(entry.mEntry);
-            DataListView.Remove(entry.gameObject);
+            if (data.Items != null && data.Items.Count > 0)
+            {
+                data.Items.Remove(entry.mEntry);
+                DataListView.Remove(entry.gameObject);
+            }
         }
         public static void Remove(ScriptSlicerListViewItem entry)
         {
@@ -56,8 +66,11 @@ namespace AD.Sample.Texter.Scene
         }
         public void RemoveLast()
         {
-            data.Items.RemoveAt(data.Items.Count - 1);
-            DataListView.Remove(DataListView.Childs.Count - 1);
+            if (data.Items != null && data.Items.Count > 0)
+            {
+                data.Items.RemoveAt(data.Items.Count - 1);
+                DataListView.Remove(DataListView.Childs.Count - 1);
+            }
         }
 
         public ScriptItemEntry NewAddOne = new();
@@ -89,6 +102,37 @@ namespace AD.Sample.Texter.Scene
         public void AddAtLast()
         {
             InternalAdd();
+        }
+
+        public SceneEndingSelectOption NewAddOption = new();
+        public void SetNewOptionID(string T)
+        {
+            NewAddOption.TargetScriptSceneID = T;
+        }    
+        public void SetNewOptionName(string T)
+        {
+            NewAddOption.OptionName = T;
+        }
+
+        public void AddNewOption()
+        {
+            var temp = new SceneEndingSelectOption()
+            {
+                TargetScriptSceneID = NewAddOption.TargetScriptSceneID,
+                OptionName = NewAddOption.OptionName
+            };
+            data.Options ??= new();
+            data.Options.Add(temp);
+            ScriptSlicerOptionItem lv = OptionListView.GenerateItem() as ScriptSlicerOptionItem;
+            lv.SetupScriptSlicerTarget(temp);
+        }
+        public void RemoveLastOption()
+        {
+            if (data.Options != null && data.Options.Count > 0)
+            {
+                data.Options.RemoveAt(data.Options.Count - 1);
+                OptionListView.Remove(OptionListView.Childs.Count - 1);
+            }
         }
     }
 }

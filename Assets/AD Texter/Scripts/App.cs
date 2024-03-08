@@ -308,6 +308,11 @@ namespace AD.Sample.Texter
             newChild.SetParent(_Parent);
         }
 
+        private T InternalGetPrefabInstance<T>() where T : Component, IProjectItem
+        {
+            return App.instance.GetModel<PrefabModel>().Prefabs[nameof(T)].PrefabInstantiate<T, EditGroup>();
+        }
+
         public override void Init()
         {
             OnGenerate.AddListener(T =>
@@ -315,14 +320,14 @@ namespace AD.Sample.Texter
                 IProjectItemWhereNeedInitData item = null;
                 if (T is ProjectTextData data)
                 {
-                    var cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectTextField)].PrefabInstantiate<ProjectTextField, EditGroup>();
+                    var cat = InternalGetPrefabInstance<ProjectTextField>();
                     cat.IsSetupProjectTextSourceData = true;
                     item = cat;
                     data.MatchProjectItem = cat;
                 }
                 else if(T is ProjectScriptSlicerData slicerData)
                 {
-                    var cat = App.instance.GetModel<PrefabModel>().Prefabs[nameof(ProjectScriptSlicer)].PrefabInstantiate<ProjectScriptSlicer, EditGroup>();
+                    var cat = InternalGetPrefabInstance<ProjectScriptSlicer>();
                     cat.IsSetupProjectScriptSlicingSourceData = true;
                     item = cat;
                     slicerData.MatchProjectItem = cat;
@@ -359,8 +364,8 @@ namespace AD.Sample.Texter
     {
         protected virtual void Start()
         {
-            SetupProjectItemData(App.instance.CurrentProjectItemData);
             BackSceneButton.AddListener(() => App.instance.GetController<MainSceneLoader>().Unload(this.Scene.name));
+            SetupProjectItemData(App.instance.CurrentProjectItemData);
         }
 
         protected virtual void SetupProjectItemData(ProjectItemData data)
