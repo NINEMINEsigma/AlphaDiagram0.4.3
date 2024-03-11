@@ -26,6 +26,7 @@ namespace AD.Experimental.GameEditor
 
         public override ListViewItem Init()
         {
+            SwitchLock(false);
             InitToggle();
             ClearRectHightLevel();
             foreach (var obj in Lines)
@@ -47,9 +48,11 @@ namespace AD.Experimental.GameEditor
             Lock_Tilie_Toggle.SetTitle("[ P R O P E R T Y ]");
         }
 
+        [SerializeField] private GameObject Mask;
         private void SwitchLock(bool boolen)
         {
             IsLock = boolen;
+            Mask.SetActive(boolen);
         }
 
         public void ClearRectHightLevel()

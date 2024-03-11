@@ -27,6 +27,9 @@ namespace AD.UI
         public float minValue = 0;
         public float maxValue = 100;
         public ADEvent<float> OnValueChange = new();
+        public ADEvent<float> OnEndChange = new();
+        public ADEvent<float> OnTransValueChange = new();
+        public ADEvent<float> OnEndTransChange = new();
 
         public float value => (maxValue - minValue) * currentPercent + minValue;
         public float Value => (maxValue - minValue) * currentPercent + minValue;
@@ -87,15 +90,48 @@ namespace AD.UI
             textValue.text = GetValue().ToString("F2");
         }
 
+        private bool IsUpdateAndInvoke = true;
         public void LateUpdate()
         {
             if (IsLockByScript) loadingBar.fillAmount = Mathf.Clamp(currentPercent, 0, 1);
             else currentPercent = loadingBar.fillAmount;
 
-            if (currentPercent == lastPercent) return;
+            if (currentPercent == lastPercent)
+            {
+                if (!IsUpdateAndInvoke)
+                {
+                    IsUpdateAndInvoke = true;
+                    OnEndChange.Invoke(currentPercent);
+                    OnEndTransChange.Invoke(Value);
+                }
+                return;
+            }
 
+            IsUpdateAndInvoke = false;
             lastPercent = currentPercent;
             OnValueChange.Invoke(currentPercent);
+            OnTransValueChange.Invoke(Value);
+
+            textPercent.text = currentPercent.ToString("F2") + (IsPercent ? "%" : "");
+            textValue.text = GetValue().ToString("F2");
+        }
+
+        public void UpdateWithInvoke()
+        {
+            if (IsLockByScript) loadingBar.fillAmount = Mathf.Clamp(currentPercent, 0, 1);
+            else currentPercent = loadingBar.fillAmount;
+
+            if (currentPercent == lastPercent)
+            {
+                if (!IsUpdateAndInvoke)
+                {
+                    IsUpdateAndInvoke = true;
+                }
+                return;
+            }
+
+            IsUpdateAndInvoke = false;
+            lastPercent = currentPercent;
 
             textPercent.text = currentPercent.ToString("F2") + (IsPercent ? "%" : "");
             textValue.text = GetValue().ToString("F2");

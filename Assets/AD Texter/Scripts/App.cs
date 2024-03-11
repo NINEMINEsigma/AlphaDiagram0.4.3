@@ -310,7 +310,7 @@ namespace AD.Sample.Texter
 
         private T InternalGetPrefabInstance<T>() where T : Component, IProjectItem
         {
-            return App.instance.GetModel<PrefabModel>().Prefabs[nameof(T)].PrefabInstantiate<T, EditGroup>();
+            return App.instance.GetModel<PrefabModel>().Prefabs[typeof(T).Name].PrefabInstantiate<T, EditGroup>();
         }
 
         public override void Init()

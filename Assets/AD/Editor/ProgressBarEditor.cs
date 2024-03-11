@@ -10,6 +10,9 @@ public class ProgressBarEditor : ADUIEditor
     SerializedProperty minValue;
     SerializedProperty maxValue;
     SerializedProperty OnValueChange;
+    SerializedProperty OnEndChange;
+    SerializedProperty OnTransValueChange;
+    SerializedProperty OnEndTransChange;
     SerializedProperty loadingBar;
     SerializedProperty textPercent;
     SerializedProperty textValue;
@@ -27,6 +30,9 @@ public class ProgressBarEditor : ADUIEditor
         minValue = serializedObject.FindProperty("minValue");
         maxValue = serializedObject.FindProperty("maxValue");
         OnValueChange = serializedObject.FindProperty(nameof(OnValueChange));
+        OnEndChange = serializedObject.FindProperty(nameof(OnEndChange));
+        OnTransValueChange = serializedObject.FindProperty(nameof(OnTransValueChange));
+        OnEndTransChange = serializedObject.FindProperty(nameof(OnEndTransChange));
         loadingBar = serializedObject.FindProperty("loadingBar");
         textPercent = serializedObject.FindProperty("textPercent");
         textValue = serializedObject.FindProperty("textValue");
@@ -70,6 +76,9 @@ public class ProgressBarEditor : ADUIEditor
         GUILayout.EndHorizontal();
 
         EditorGUILayout.PropertyField(OnValueChange);
+        EditorGUILayout.PropertyField(OnEndChange);
+        EditorGUILayout.PropertyField(OnTransValueChange);
+        EditorGUILayout.PropertyField(OnEndTransChange);
     }
 
     public override void OnResourcesGUI()

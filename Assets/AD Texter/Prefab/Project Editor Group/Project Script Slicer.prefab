@@ -59,6 +59,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1239805370655458853, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
+      propertyPath: IsHaveTitleTip
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1239805370655458854, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: m_Name
       value: Project Script Slicer
@@ -125,7 +129,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2760737108549967153, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: m_text
-      value: "\u5267\u672C\u4E00\u5E55"
+      value: "\u5267\u4E2D\u4E00\u77A5"
       objectReference: {fileID: 0}
     - target: {fileID: 2760737108549967153, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: m_fontSize
@@ -166,7 +170,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 14681492f59bff844b7fffb1b7b616d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsSetupProjectTextSourceData: 0
+  IsSetupProjectScriptSlicingSourceData: 0
   ProjectScriptSlicingSourceData:
     ParentItemID: 
     ProjectItemPosition: {x: 0, y: 0}

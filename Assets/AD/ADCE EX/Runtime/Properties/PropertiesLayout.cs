@@ -499,7 +499,10 @@ namespace AD.Experimental.GameEditor
             Type TargetEnum = typeof(T);
             if (!TargetEnum.IsEnum) throw new ADException("No Enum");
             var ops = TargetEnum.GetEnumNames();
-            if (!TargetEnum.IsEnumDefined(initEnumValue)) throw new ADException("Not Defined On This Enum");
+            foreach (var single in initEnumValue)
+            {
+                if (!TargetEnum.IsEnumDefined(single)) throw new ADException("Not Defined On This Enum");
+            }
             List<string> iniops = new();
             foreach (var op in initEnumValue)
             {
