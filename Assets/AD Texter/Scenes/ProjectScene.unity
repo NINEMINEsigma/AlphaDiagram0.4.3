@@ -375,8 +375,8 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
-  m_Antialiasing: 0
+  m_RenderPostProcessing: 1
+  m_Antialiasing: 2
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
@@ -686,7 +686,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1002687280392057815, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -455.95435
+      value: -455.9544
       objectReference: {fileID: 0}
     - target: {fileID: 1995526601676542757, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_IsActive
@@ -696,13 +696,17 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: -19.999756
       objectReference: {fileID: 0}
+    - target: {fileID: 2888216806302045032, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
+      propertyPath: m_MovementType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 2888216806696624494, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2888216806696624494, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00033569336
+      value: -0.00015258789
       objectReference: {fileID: 0}
     - target: {fileID: 2888216806912311975, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchorMax.x
@@ -734,7 +738,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2888216808005515532, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000289917
+      value: -0.000030517578
+      objectReference: {fileID: 0}
+    - target: {fileID: 2888216808148323082, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
+      propertyPath: m_MovementType
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4413707458550065241, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_IsActive
@@ -758,7 +766,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4538837733359995695, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.0002810955
+      value: 0.0003015995
       objectReference: {fileID: 0}
     - target: {fileID: 6317214944257746823, guid: cdbeab13eb7585a499681d507e0c0c64, type: 3}
       propertyPath: m_text

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Sample.Texter.Data;
@@ -16,6 +17,7 @@ namespace AD.Sample.Texter
     {
         public static string ProjectItemDataExtension => "projitem";
         public static string ProjectItemDataPointExtension = "." + ProjectItemDataExtension;
+        public const string OfflineExtension = "offline";
 
         public DataAssets DataAssetsForm;
 
@@ -58,7 +60,7 @@ namespace AD.Sample.Texter
                     string key = bmap.ProjectItemID;
                     bmap.ToObject(out ProjectItemData projcetdata);
                     this.Add(
-                        new AD.Experimental.Localization.Cache.CacheAssetsKey(key), 
+                        new AD.Experimental.Localization.Cache.CacheAssetsKey(key),
                         new ProjectItemDataCache(key, projcetdata, bmap));
                     projectItemDatas.Add(projcetdata);
                 }
@@ -104,6 +106,35 @@ namespace AD.Sample.Texter
             }
 
             savingTask.TaskPercent = 1.00f;
+        }
+
+        public byte[] BuildOffline(string path)
+        {
+            ADFile file = new(path, true, false, false, true);
+            List<byte[]> OfflineFile = new();
+            foreach (Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> item in this)
+            {
+                OfflineFile.Add(item.MatchElementBM.Get().BuildOffline());
+            }
+            file.ReplaceAllData(ADFile.ToBytes(OfflineFile));
+            file.SaveFileData();
+            return file.FileData;
+        }
+
+        public void BuildFromOffline(byte[] data)
+        {
+            List<byte[]> OfflineFile = ADFile.FromBytes(data) as List<byte[]>;
+            List<ProjectData_BaseMap> result = new();
+            foreach (var item in OfflineFile)
+            {
+                result.Add(ProjectData_BaseMap.ReadOffline(item).GetReal());
+            }
+            this.Clear();
+            foreach (var item in result)
+            {
+                item.ToObject(out ProjectItemData itemData);
+                this.Add(new(item.ProjectItemID), new(item.ProjectItemID, itemData, item));
+            }
         }
     }
 
@@ -294,6 +325,20 @@ namespace AD.Sample.Texter
             public string ProjectItemID;
             public string ParentItemID;
             public Vector2 ProjectItemPosition;
+
+            public virtual byte[] BuildOffline()
+            {
+                return ADFile.ToBytes(this);
+            }
+            public static ProjectData_BaseMap ReadOffline(byte[] data)
+            {
+                return ADFile.FromBytes(data) as ProjectData_BaseMap;
+            }
+
+            public virtual ProjectData_BaseMap GetReal()
+            {
+                return this;
+            }
 
             #region NotSupport
 

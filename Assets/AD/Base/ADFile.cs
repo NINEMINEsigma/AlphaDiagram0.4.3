@@ -378,14 +378,7 @@ namespace AD.BASE
                     using MemoryStream ms = new();
                     new BinaryFormatter().Serialize(ms, obj);
                     FileData = ms.GetBuffer();
-                    if (IsKeepFileControl)
-                    {
-                        FileStream.Write(FileData, 0, FileData.Length);
-                    }
-                    else
-                    {
-                        File.WriteAllBytes(FilePath, FileData);
-                    }
+                    SaveFileData();
                     return true;
                 }
                 else
@@ -426,14 +419,7 @@ namespace AD.BASE
                 new BinaryFormatter().Serialize(ms, obj);
                 this.FileData = ms.GetBuffer();
                 FileData = ms.GetBuffer();
-                if (IsKeepFileControl)
-                {
-                    FileStream.Write(FileData, 0, FileData.Length);
-                }
-                else
-                {
-                    File.WriteAllBytes(FilePath, FileData);
-                }
+                SaveFileData();
                 return true;
             }
             catch (Exception ex)
@@ -473,6 +459,58 @@ namespace AD.BASE
         {
             this.Close();
             this.FileData = null;
+        }
+
+        public void Append(byte[] appendition)
+        {
+            byte[] newData = new byte[appendition.Length + FileData.Length];
+            Array.Copy(FileData, 0, newData, 0, FileData.Length);
+            Array.Copy(appendition, 0, newData, FileData.Length, appendition.Length);
+            FileData = newData;
+        }
+
+        public void ReplaceAllData(byte[] data)
+        {
+            FileData = data;
+        }
+
+        public static byte[] ToBytes(object obj)
+        {
+            using MemoryStream ms = new();
+            new BinaryFormatter().Serialize(ms, obj);
+            return ms.GetBuffer();
+        }
+
+        public static object FromBytes(byte[] bytes)
+        {
+            using MemoryStream ms = new();
+            ms.Read(bytes, 0, bytes.Length);
+            return new BinaryFormatter().Deserialize(ms);
+        }
+
+        public bool SaveFileData()
+        {
+            if (DebugMyself())
+            {
+                return false;
+            }
+            try
+            {
+                if (IsKeepFileControl)
+                {
+                    FileStream.Write(FileData, 0, FileData.Length);
+                }
+                else
+                {
+                    File.WriteAllBytes(FilePath, FileData);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+                return false;
+            }
+            return true;
         }
     }
 }

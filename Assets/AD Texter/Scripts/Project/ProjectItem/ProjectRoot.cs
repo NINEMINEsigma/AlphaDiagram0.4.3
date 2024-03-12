@@ -46,6 +46,14 @@ namespace AD.Sample.Texter.Project
                     });
                 });
                 PropertiesLayout.Button("Save", "Save Project Assets", () => data.Save());
+                PropertiesLayout.ModernUIButton("Build Offline File", "", () =>
+                {
+                    App.instance.GetController<ProjectManager>().CreateOfflineFile();
+                });
+                PropertiesLayout.ModernUIButton("Build From Offline", "", () =>
+                {
+                    FileC.SelectFileOnSystem("")
+                });
             }
         }
 

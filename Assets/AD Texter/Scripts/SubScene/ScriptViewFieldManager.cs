@@ -57,6 +57,7 @@ namespace AD.Sample.Texter.Scene
                 m_AudioS.LoadOnUrl(audioPath, false);
             }
             mainTitle.SetText(target.ProjectScriptSlicingSourceData.ProjectItemID);
+            m_CurrentProcess.Set(0, TargetData.Items.Count);
             DoMakeup();
         }
 

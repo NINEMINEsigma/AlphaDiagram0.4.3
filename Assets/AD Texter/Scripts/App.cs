@@ -295,8 +295,10 @@ namespace AD.Sample.Texter
         public static IEnumerator WaitForInit(IProjectItemWhereNeedInitData item)
         {
             yield return null;
-            yield return null;
-            yield return null;
+            while (item == null || item.MyEditGroup == null)
+            {
+                yield return null;
+            }
             item.Init();
         }
 

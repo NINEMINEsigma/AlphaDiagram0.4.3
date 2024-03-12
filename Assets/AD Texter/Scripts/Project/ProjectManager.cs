@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Experimental.Performance;
@@ -49,6 +50,7 @@ namespace AD.Sample.Texter
 
     public class ProjectManager : ADController
     {
+
         public class ProjectLoadEntry : ADModel
         {
             public DataAssets Current;
@@ -220,6 +222,31 @@ namespace AD.Sample.Texter
                 }
             }
             else LastFocusTarget = target;
+        }
+
+        //XXX
+
+        public void LoadFromOfflineFile(string path)
+        {
+            ADFile file = new(path, false, true, false, true);
+            if (file)
+            {
+                CurrentProjectData.BuildFromOffline(file.FileData);
+            }
+            else throw file.ErrorException;
+        }
+
+        public void CreateOfflineFile(string path)
+        {
+            CurrentProjectData.BuildOffline(path);
+        }
+
+        public void CreateOfflineFile()
+        {
+            CreateOfflineFile(Path.Combine(LoadingManager.FilePath, CurrentProjectData.DataAssetsForm.AssetsName, CurrentProjectData.DataAssetsForm.AssetsName+"."));
+            App.instance.GetController<MainSceneLoader>().UnloadAll();
+            ADGlobalSystem.instance.TargetSceneName = SceneExtension.GetCurrent().name;
+            ADGlobalSystem.instance.OnEnd();
         }
     }
 }

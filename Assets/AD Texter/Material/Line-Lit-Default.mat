@@ -40,7 +40,7 @@ Material:
     m_Floats:
     - _BaseColorLevel: 0.5
     - _EnableExternalAlpha: 0
-    - _OffsetX: 46.161137
+    - _OffsetX: 237.83102
     - _OffsetY: 0
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
