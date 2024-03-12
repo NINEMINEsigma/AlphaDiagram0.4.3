@@ -176,6 +176,7 @@ MonoBehaviour:
     ProjectItemPosition: {x: 0, y: 0}
     Items: []
     Options: []
+    BackgroundImage: 
   m_EditGroup: {fileID: 2917561818892094746}
   MyLineRenderer: {fileID: 9140302690031084557}
 --- !u!114 &2917561818892094746 stripped
@@ -209,6 +210,10 @@ PrefabInstance:
       propertyPath: m_Positions.Array.size
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 2779992963650627174, guid: 0a3ff1862d47907458f99f32d559837e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 1682e0af92116e747adb2a2e4e933cea, type: 2}
     - target: {fileID: 2779992963650627174, guid: 0a3ff1862d47907458f99f32d559837e, type: 3}
       propertyPath: m_Positions.Array.data[0].x
       value: 0

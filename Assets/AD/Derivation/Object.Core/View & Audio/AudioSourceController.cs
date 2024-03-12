@@ -338,6 +338,19 @@ namespace AD.UI
             Refresh();
             if (curPlaying) Play();
         }
+        public void SetPair(string name)
+        {
+            for (int i = 0, e = SourcePairs.Count; i < e; i++)
+            {
+                SourcePair item = SourcePairs[i];
+                if (item.Name == name)
+                {
+                    Stop();
+                    SetPair(i);
+                    return;
+                }
+            }
+        }
 
         public void Play()
         {
@@ -370,6 +383,12 @@ namespace AD.UI
         public void PlayOrPause()
         {
             IsPlay = !IsPlay;
+        }
+
+        public void Play(string key)
+        {
+            SetPair(key);
+            Play();
         }
 
         public void Refresh()

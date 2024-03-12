@@ -33,24 +33,36 @@ namespace AD.UI
         public List<ADUI> MyADUIs = new();
         [Header("Assets")]
         public Text MainText;
+        public Button ZoomButton;
+        public Button TwoSpeedButton;
+        public Button AutoButton;
         public string text;
         public ADEvent OnNext = new();
+        public float duration = 2;
         [Header("Setting")]
         public bool IsZoom = true;
         public bool IsTwoSpeed = false;
         public bool IsAuto = false;
+        public int CharPerSecond = 5;
+
+        public bool IsStop = false;
 
         private bool IsEnd = true;
         public void EndImmediately()
         {
-            if(IsZoom&&!IsEnd)
+            if (IsStop) return;
+            if (IsAuto)
             {
-                IsEnd = true;
+                IsEnd = false;
+                AutoButton.IsClick = false;
+                return;
             }
-            else
+            if (IsEnd)
             {
-                DoImmediatelyNext();
+                SendingText();
+                return;
             }
+            IsEnd = true;
         }
         private void DoImmediatelyNext()
         {
@@ -71,13 +83,14 @@ namespace AD.UI
         }
 
         private Coroutine OnCoroutine;
-        public void SendingText(float duration)
+        public void SendingText()
         {
+            if (IsStop) return;
             IsEnd = false;
             if (OnCoroutine != null) StopCoroutine(OnCoroutine);
-            OnCoroutine = StartCoroutine(DoSendingText(duration));
+            OnCoroutine = StartCoroutine(DoSendingText());
         }
-        private IEnumerator DoSendingText(float duration)
+        private IEnumerator DoSendingText()
         {
             float current = duration;
             if (IsZoom)
@@ -88,16 +101,40 @@ namespace AD.UI
                     yield return null;
                     current -= Time.deltaTime * (IsTwoSpeed ? 2 : 1);
                 }
+                MainText.SetText(text);
             }
             else
-                yield return new WaitForSeconds(duration);
-            MainText.SetText(text);
-            if (!IsEnd)
+            {
+                MainText.SetText(text);
+                while (current > 0 && !IsEnd)
+                {
+                    yield return null;
+                    current -= Time.deltaTime * (IsTwoSpeed ? 2 : 1);
+                }
+            }
+            if(!IsEnd)
             {
                 OnNext.Invoke();
             }
             IsEnd = true;
             OnCoroutine = null;
+        }
+
+        private float update_auto_counter = 0;
+        private void Update()
+        {
+            if (IsAuto && IsEnd && !IsStop)
+            {
+                if (update_auto_counter < duration && IsEnd)
+                {
+                    update_auto_counter += Time.deltaTime * (IsTwoSpeed ? 2 : 1);
+                }
+                else if (IsEnd)
+                {
+                    update_auto_counter = 0;
+                    SendingText();
+                }
+            }
         }
 
         public void InitEmpty()
@@ -118,6 +155,10 @@ namespace AD.UI
         public void SetText(string text)
         {
             this.text = text;
+        }
+        public void SetDurationn(float value)
+        {
+            duration = value;
         }
 
         private void OnDestroy()
@@ -140,6 +181,17 @@ namespace AD.UI
                     MyUIs.Add(child.gameObject);
                 }
             }
+            ZoomButton.AddListener(() => SetZoom(true), AD.PressType.ThisFrameReleased);
+            ZoomButton.AddListener(() => SetZoom(false), AD.PressType.ThisFramePressed);
+            ZoomButton.IsClick = !IsZoom;
+            TwoSpeedButton.AddListener(() => SetTwoSpeed(true), AD.PressType.ThisFrameReleased);
+            TwoSpeedButton.AddListener(() => SetTwoSpeed(false), AD.PressType.ThisFramePressed);
+            TwoSpeedButton.IsClick = !IsTwoSpeed;
+            AutoButton.AddListener(() => SetAuto(false), AD.PressType.ThisFrameReleased);
+            AutoButton.AddListener(() => SetAuto(true), AD.PressType.ThisFramePressed);
+            AutoButton.IsClick = IsAuto;
+            if (!IsStop)
+                SendingText();
         }
     }
 }

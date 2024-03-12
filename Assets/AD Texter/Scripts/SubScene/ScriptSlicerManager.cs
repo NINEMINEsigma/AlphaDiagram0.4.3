@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using AD.Experimental.Performance;
+using AD.Sample.Texter.Project;
 using AD.UI;
 using UnityEngine;
 
@@ -45,7 +47,8 @@ namespace AD.Sample.Texter.Scene
 
         private void InternalPreviewOneEntry(ScriptItemEntry entry)
         {
-
+            App.instance.CurrentProjectItemData = data;
+            App.instance.GetController<MainSceneLoader>().Load<ScriptViewFieldManager>("ScriptViewField");
         }
         public static void PreviewOneEntry(ScriptItemEntry entry)
         {

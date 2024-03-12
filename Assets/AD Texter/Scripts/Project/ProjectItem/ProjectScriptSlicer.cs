@@ -36,11 +36,14 @@ namespace AD.Sample.Texter
     {
         public List<ScriptItemEntry> Items;
         public List<SceneEndingSelectOption> Options;
+        public string BackgroundImage = NoBackgroundImage;
+        public const string NoBackgroundImage = "No BackgroundImage";
 
-        public ProjectScriptSlicerData(ProjectScriptSlicer projectItem, List<ScriptItemEntry> items, List<SceneEndingSelectOption> options) : base(projectItem)
+        public ProjectScriptSlicerData(ProjectScriptSlicer projectItem, List<ScriptItemEntry> items, List<SceneEndingSelectOption> options, string backgroundImage) : base(projectItem)
         {
             Items = items;
             Options = options;
+            BackgroundImage = backgroundImage;
         }
 
         public override bool FromMap(ProjectData_BaseMap from)
@@ -48,6 +51,8 @@ namespace AD.Sample.Texter
             if (from is ProjectScriptSlicer_BaseMap data)
             {
                 data.Items = Items;
+                data.Options = Options;
+                data.BackgroundImage = BackgroundImage;
                 return base.FromMap(from);
             }
             else return false;
@@ -55,7 +60,7 @@ namespace AD.Sample.Texter
 
         public override void ToMap(out ProjectData_BaseMap BM)
         {
-            BM = new ProjectScriptSlicer_BaseMap(Items,Options);
+            BM = new ProjectScriptSlicer_BaseMap(Items, Options, BackgroundImage);
             BM.FromObject(this);
         }
     }
@@ -68,11 +73,13 @@ namespace AD.Sample.Texter
         {
             public List<ScriptItemEntry> Items;
             public List<SceneEndingSelectOption> Options;
+            public string BackgroundImage;
 
-            public ProjectScriptSlicer_BaseMap(List<ScriptItemEntry> items, List<SceneEndingSelectOption> options)
+            public ProjectScriptSlicer_BaseMap(List<ScriptItemEntry> items, List<SceneEndingSelectOption> options, string backgroundImage)
             {
                 Items = items;
                 Options = options;
+                BackgroundImage = backgroundImage;
             }
 
             public override bool FromObject(ProjectItemData from)
@@ -80,6 +87,8 @@ namespace AD.Sample.Texter
                 if (from is ProjectScriptSlicerData data)
                 {
                     data.Items = Items;
+                    data.Options = Options;
+                    data.BackgroundImage = BackgroundImage;
                     return base.FromObject(from);
                 }
                 else return false;
@@ -87,7 +96,7 @@ namespace AD.Sample.Texter
 
             public override void ToObject(out ProjectItemData obj)
             {
-                obj = new ProjectScriptSlicerData(null, Items,Options);
+                obj = new ProjectScriptSlicerData(null, Items, Options, BackgroundImage);
                 obj.FromMap(this);
             }
         }
@@ -113,6 +122,18 @@ namespace AD.Sample.Texter.Project
                 this.MatchItem.SetTitle("Script Slicer");
 
                 DisplayProjectID(data);
+
+                PropertiesLayout.Title("背景");
+                PropertiesLayout
+                    .InputField(that.ProjectScriptSlicingSourceData.BackgroundImage, "背景图片路径")
+                    .AddListener(T => that.ProjectScriptSlicingSourceData.BackgroundImage = T);
+                PropertiesLayout.ModernUIButton("背景", "寻找背景图片", () =>
+                {
+                    FileC.SelectFileOnSystem(T =>
+                    {
+                        that.ProjectScriptSlicingSourceData.BackgroundImage = T;
+                    }, "图片", "", "jpg", "png");
+                });
 
                 PropertiesLayout.Title("语句");
                 PropertiesLayout.ModernUIButton("添加新的语句", "添加新的语句", () =>
@@ -230,7 +251,7 @@ namespace AD.Sample.Texter.Project
             }
             else
             {
-                ProjectScriptSlicingSourceData = new(this, new(), null);
+                ProjectScriptSlicingSourceData = new(this, new(), null, "");
             }
             MatchHierarchyEditor = new HierarchyBlock<ProjectScriptSlicer>(this, () => this.SourceData.ProjectItemID);
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
