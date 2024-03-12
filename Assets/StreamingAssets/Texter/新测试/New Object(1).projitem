@@ -25,8 +25,8 @@
 					"OptionName" : "123"
 				}
 			],
-			"BackgroundImage" : null,
-			"ProjectItemID" : "New Object",
+			"BackgroundImage" : "F:\\AlphaDiagram0.4.3\\Assets\\StreamingAssets\\Texter\\新测试\\test.jpg",
+			"ProjectItemID" : "New Object(1)",
 			"ParentItemID" : "ProjectRoot",
 			"ProjectItemPosition" : {
 				"x" : 5,

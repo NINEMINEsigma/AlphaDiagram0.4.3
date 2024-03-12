@@ -20,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AD Texter/Scenes/Project SubScene/ProjectScriptSlicer.unity
     guid: a9c9bc85648f67041acb49fca6c77622
+  - enabled: 1
+    path: Assets/AD Texter/Scenes/Project SubScene/ScriptViewField.unity
+    guid: 9a68e9e23a6ded04abf0641e80adf29d
   m_configObjects: {}
