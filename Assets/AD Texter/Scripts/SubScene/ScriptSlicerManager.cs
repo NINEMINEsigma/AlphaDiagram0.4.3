@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using AD.BASE;
 using AD.Experimental.Performance;
 using AD.Sample.Texter.Project;
@@ -17,8 +18,8 @@ namespace AD.Sample.Texter.Scene
         public ListViewItem ConsoleItem, ScriptSlicerListViewItemPrefab, OptionsItemPrefab;
         public InputField CharIF, SoundIF;
         public Button AdditionalButton;
-        public InputField BackgroundIF;
-        public Button SelectBackground;
+        public InputField BackgroundIF, BackgroundAudioIF;
+        public Button SelectBackground, SelectBackgroundAudio;
         public ViewController BackPreview;
         [Header("Data")]
         public ProjectScriptSlicerData data;
@@ -50,7 +51,7 @@ namespace AD.Sample.Texter.Scene
                     lv.SetupScriptSlicerTarget(item);
                 }
 
-            if(this.data.Items.Count>0)
+            if (this.data.Items.Count > 0)
             {
                 CharIF.SetText(this.data.Items[^1].Name);
                 CharIF.AddListener(SetNewOneName);
@@ -58,12 +59,19 @@ namespace AD.Sample.Texter.Scene
                 SoundIF.AddListener(SetNewOneSoundAssets);
             }
             AdditionalButton.AddListener(AddAtLast);
-            if (this.data.BackgroundImage!= ProjectScriptSlicerData.NoBackgroundImage)
+
+            if (this.data.BackgroundImage != ProjectScriptSlicerData.NoBackgroundImage)
             {
                 BackgroundIF.SetText(this.data.BackgroundImage);
-                BackPreview.LoadOnUrl(this.data.BackgroundImage);   
+                BackPreview.LoadOnUrl(this.data.BackgroundImage);
             }
             SelectBackground.AddListener(SetBackgroundOnWin);
+
+            if (this.data.BackgroundAudio != ProjectScriptSlicerData.NoBackgroundAudio)
+            {
+                BackgroundAudioIF.SetText(this.data.BackgroundAudio);
+            }
+            SelectBackgroundAudio.AddListener(SetBackgroundAudioOnWin);
         }
 
         private void InternalPreviewOneEntry(ScriptItemEntry entry)
@@ -168,6 +176,16 @@ namespace AD.Sample.Texter.Scene
             data.BackgroundImage = path;
             BackgroundIF.SetText(path);
             BackPreview.LoadOnUrl(path, true);
+        }
+
+        public void SetBackgroundAudioOnWin()
+        {
+            FileC.SelectFileOnSystem(SetBackgroundAudio, "±≥æ∞“Ù¿÷", "mp3,ogg,wav", "mp3", "ogg", "wav");
+        }
+        public void SetBackgroundAudio(string path)
+        {
+            data.BackgroundAudio = path;
+            BackgroundAudioIF.SetText(path);
         }
     }
 }

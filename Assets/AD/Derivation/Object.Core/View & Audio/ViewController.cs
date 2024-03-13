@@ -163,7 +163,7 @@ namespace AD.UI
         float _zoom = 1f;
 
         [SerializeField]
-        UnityEngine.Gradient _effectGradient = new Gradient() 
+        UnityEngine.Gradient _effectGradient = new Gradient()
         { colorKeys = new GradientColorKey[] { new GradientColorKey(Color.white, 1), new GradientColorKey(Color.white, 1) } };
 
         public Blend BlendMode
@@ -372,6 +372,11 @@ namespace AD.UI
             else canTransformSprite.TransformSprite(CurrentImage, ViewImage);
             return this;
         }
+        public ViewController SetPair(string key)
+        {
+            if (SourcePairs.FindIndex(T => T.Name == key).Share(out var result) != -1) SetPair(result);
+            return this;
+        }
 
         public ViewController SetAlpha(float alpha)
         {
@@ -510,7 +515,7 @@ namespace AD.UI
                     if (isCurrent && SourcePairs.Count > 0)
                         CurrentImage = sprite;
                     else
-                        SourcePairs.Add(new ImagePair() { SpriteName = path, SpriteSource = sprite });
+                        SourcePairs.Add(new ImagePair() { SpriteName = path, Name = path, SpriteSource = sprite });
                     Refresh();
                 }
                 else
@@ -531,7 +536,7 @@ namespace AD.UI
                     if (isCurrent && SourcePairs.Count > 0)
                         CurrentImage = sprite;
                     else
-                        SourcePairs.Add(new ImagePair() { SpriteName = path, SpriteSource = sprite });
+                        SourcePairs.Add(new ImagePair() { SpriteName = path, Name = path, SpriteSource = sprite });
                     Refresh();
                 }
                 else
@@ -552,7 +557,7 @@ namespace AD.UI
                 if (isCurrent && SourcePairs.Count > 0)
                     CurrentImage = sprite;
                 else
-                    SourcePairs.Add(new ImagePair() { SpriteName = path, SpriteSource = sprite });
+                    SourcePairs.Add(new ImagePair() { SpriteName = path, Name = path, SpriteSource = sprite });
                 Refresh();
             }
             else
@@ -575,7 +580,7 @@ namespace AD.UI
             if (isCurrent && SourcePairs.Count > 0)
                 CurrentImage = sprite;
             else
-                SourcePairs.Add(new ImagePair() { SpriteName = path, SpriteSource = sprite });
+                SourcePairs.Add(new ImagePair() { SpriteName = path, Name = path, SpriteSource = sprite });
         }
 
         #endregion

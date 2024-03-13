@@ -12,7 +12,7 @@ namespace AD.UI
 {
     public interface ICanDrawLine
     {
-        void DrawLine(LineRenderer renderer,AudioSourceController source);
+        void DrawLine(LineRenderer renderer, AudioSourceController source);
     }
 
     [Serializable]
@@ -26,7 +26,7 @@ namespace AD.UI
         }
         public string Name = "New Pair";
         public string CilpName = "New Clip";
-         
+
         public ICanDrawLine LineDrawer = null;
 
         public bool IsLoaded
@@ -43,7 +43,7 @@ namespace AD.UI
     [Serializable]
     [RequireComponent(typeof(AudioSource))]
     [AddComponentMenu("UI/AD/AudioSourceController", 100)]
-    public sealed class AudioSourceController : MonoBehaviour,ICanPrepareToOtherScene
+    public sealed class AudioSourceController : MonoBehaviour, ICanPrepareToOtherScene
     {
         #region Attribute
 
@@ -57,7 +57,7 @@ namespace AD.UI
         public List<SourcePair> SourcePairs = new List<SourcePair>();
         private int CurrentPairIndex = 0;
         private float CurrentClock = 0;
-        private float delay = 0; 
+        private float delay = 0;
         private bool IsDelayToStart = false;
         private bool IsNowPlaying = false;
 
@@ -139,10 +139,10 @@ namespace AD.UI
         #region Function
 
         private void Awake()
-        { 
-            Source = GetComponent<AudioSource>(); 
+        {
+            Source = GetComponent<AudioSource>();
 
-            GetSampleCount(); 
+            GetSampleCount();
         }
 
         private void Start()
@@ -308,11 +308,11 @@ namespace AD.UI
             bool curPlaying = Source.isPlaying;
             Stop();
             Refresh();
-            if (curPlaying) Play(); 
+            if (curPlaying) Play();
         }
         public void PreviousPair()
         {
-            if (SourcePairs.Count == 0) return  ;
+            if (SourcePairs.Count == 0) return;
             if (CurrentPairIndex > 0) CurrentPairIndex--;
             else CurrentPairIndex = SourcePairs.Count - 1;
             bool curPlaying = Source.isPlaying;
@@ -322,7 +322,7 @@ namespace AD.UI
         }
         public void RandomPair()
         {
-            if (SourcePairs.Count == 0) return ;
+            if (SourcePairs.Count == 0) return;
             CurrentPairIndex = UnityEngine.Random.Range(0, SourcePairs.Count);
             bool curPlaying = Source.isPlaying;
             Stop();
@@ -485,7 +485,7 @@ namespace AD.UI
             transform.parent = null;
             DontDestroyOnLoad(gameObject);
             StartCoroutine(ClockOnJump());
-        } 
+        }
 
         private IEnumerator ClockOnJump()
         {
@@ -714,20 +714,20 @@ namespace AD.UI
 
         #region Resource
 
-        public void LoadOnResource(string source, bool isCurrent = true)
+        public void LoadOnResource(string source, AudioType audioType, bool isCurrent = true)
         {
             string finalPath = Application.dataPath + "/Resources/" + source;
-            StartCoroutine(LoadAudio(finalPath, isCurrent));
+            StartCoroutine(LoadAudio(finalPath, audioType, isCurrent));
         }
 
-        public void LoadOnUrl(string url, bool isCurrent = true)
+        public void LoadOnUrl(string url, AudioType audioType, bool isCurrent = true)
         {
-            StartCoroutine(LoadAudio(url, isCurrent));
+            StartCoroutine(LoadAudio(url, audioType, isCurrent));
         }
 
-        public IEnumerator LoadAudio(string path, bool isCurrent)
+        public IEnumerator LoadAudio(string path, AudioType audioType, bool isCurrent)
         {
-            UnityWebRequest request = UnityWebRequest.Get(path);
+            UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(path, audioType);
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
@@ -736,7 +736,7 @@ namespace AD.UI
                 if (isCurrent && SourcePairs.Count > 0)
                     CurrentClip = audioClip;
                 else
-                    SourcePairs.Add(new SourcePair() { CilpName = path, Clip = audioClip });
+                    SourcePairs.Add(new SourcePair() { CilpName = path, Name = path, Clip = audioClip });
                 Refresh();
             }
             else
@@ -864,6 +864,17 @@ namespace AD.UI
         public void InitializeContext()
         {
             throw new NotImplementedException();
+        }
+
+        public static AudioType GetAudioType(string path)
+        {
+            return Path.GetExtension(path) switch
+            {
+                "wav" => AudioType.WAV,
+                "mp3" => AudioType.MPEG,
+                "ogg" => AudioType.OGGVORBIS,
+                _ => AudioType.UNKNOWN
+            };
         }
     }
 

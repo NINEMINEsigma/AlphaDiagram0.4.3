@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace AD.Sample.Texter.Scene
 {
@@ -30,11 +31,11 @@ namespace AD.Sample.Texter.Scene
 
         Dictionary<GameObject, ADGlobalSystem.CoroutineInfo> infos = new();
 
-        private IEnumerator Moving(GameObject target,float end)
+        private IEnumerator Moving(GameObject target, float end)
         {
             float start = target.transform.localPosition.x;
             float counter = 1;
-            while (counter>0)
+            while (counter > 0)
             {
                 target.transform.localPosition = new Vector3(Mathf.Lerp(end, start, counter), target.transform.localPosition.y, target.transform.localPosition.z);
                 yield return null;
@@ -54,12 +55,14 @@ namespace AD.Sample.Texter.Scene
         [Header("ScriptViewFieldManager Assets")]
         public DialogBox m_DialogBox;
         public AudioSourceController m_AudioS;
+        public AudioSourceController m_BackgroundAudioS;
         public ViewController m_Background;
         public ModernUIFillBar m_CurrentProcess;
         public Button m_Back;
         public override IButton BackSceneButton => m_Back;
         public Button m_Setting;
         public int CurrentIndex = 0;
+        public Transform CharaterParentTransform;
         public ADSerializableDictionary<string, AudioClip> AudioAssets = new();
         public ADSerializableDictionary<string, GameObject> CharacterInstances = new();
 
@@ -78,6 +81,8 @@ namespace AD.Sample.Texter.Scene
 
         protected override void OnDestroy()
         {
+            if (ADGlobalSystem.instance == null) return;
+            SceneManager.SetActiveScene(MainLoadAssets.As<MainSceneLoadAssets>().MainCurrent.GetValueOrDefault());
             base.OnDestroy();
             AlgorithmExtension.UnRegisterAlgorithm<DefaultCharacterMoving>();
         }
@@ -85,13 +90,24 @@ namespace AD.Sample.Texter.Scene
         protected override void SetupProjectItemData(ProjectItemData data)
         {
             if (data.MatchProjectItem is ProjectScriptSlicer projectScriptSlicer)
-                SetupScript(projectScriptSlicer, 0);
+            {
+                ADGlobalSystem.OpenCoroutine(() =>
+                {
+                    for (int i = 0,e= SceneManager.sceneCount; i < e; i++)
+                    {
+                        var current = SceneManager.GetSceneAt(i);
+                        if (current.name == SceneName) return !(current.isLoaded && !string.IsNullOrEmpty(SceneName));
+                    }
+                    return true;
+                }, () => SetupScript(projectScriptSlicer, 0));
+            }
             else
                 throw new ADException("data.MatchProjectItem isn't any support type");
         }
 
         public void SetupScript(ProjectScriptSlicer target, int index)
         {
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(SceneName));
             TargetSSItem = target;
             CurrentIndex = index;
             TargetData = target.ProjectScriptSlicingSourceData;
@@ -101,12 +117,18 @@ namespace AD.Sample.Texter.Scene
                 string imagePath = TargetData.BackgroundImage;
                 m_Background.SyncLoadOnUrl(imagePath, true);
             }
+            if (TargetData.BackgroundAudio != ProjectScriptSlicerData.NoBackgroundAudio)
+            {
+                string audioPath = TargetData.BackgroundAudio;
+                m_BackgroundAudioS.LoadOnUrl(audioPath, AudioSourceController.GetAudioType(audioPath), true);
+                ADGlobalSystem.OpenCoroutine(() => !(m_BackgroundAudioS.SourcePairs.Count > 0 && m_BackgroundAudioS.CurrentSourcePair.IsLoaded), m_BackgroundAudioS.Play);
+            }
             foreach (var item in TargetData.Items)
             {
                 if (item.SoundAssets == ScriptItemEntry.NoVoice) continue;
                 //string audioPath = Path.Combine(LoadingManager.FilePath, App.instance.GetModel<DataAssets>().AssetsName + LoadingManager.PointExtension, item.SoundAssets);
                 string audioPath = item.SoundAssets;
-                m_AudioS.LoadOnUrl(audioPath, false);
+                m_AudioS.LoadOnUrl(audioPath, AudioSourceController.GetAudioType(audioPath), false);
             }
             mainTitle.SetText(target.ProjectScriptSlicingSourceData.ProjectItemID);
             m_CurrentProcess.Set(0, TargetData.Items.Count);
@@ -115,6 +137,8 @@ namespace AD.Sample.Texter.Scene
             foreach (var item in characterGameObject)
             {
                 CharacterInstances.Add(item.name, item);
+                item.transform.SetParent(CharaterParentTransform, false);
+                item.GetComponent<ViewController>().ViewImage.type = UnityEngine.UI.Image.Type.Simple;
             }
         }
 
@@ -147,6 +171,12 @@ namespace AD.Sample.Texter.Scene
             }
         }
 
+        public void PlayCurrentVoice()
+        {
+            m_AudioS.Stop();
+            m_AudioS.Play();
+        }
+
         private void DoMakeupCurrent(ScriptItemEntry currentData)
         {
             m_DialogBox.SetText(currentData.Words);
@@ -154,19 +184,21 @@ namespace AD.Sample.Texter.Scene
             {
                 //string audioPath = Path.Combine(LoadingManager.FilePath, App.instance.GetModel<DataAssets>().AssetsName + LoadingManager.PointExtension, currentData.SoundAssets);
                 string audioPath = currentData.SoundAssets;
+                m_AudioS.Stop();
                 m_AudioS.Play(audioPath);
             }
-            for (int i = 0,e=currentData.CharacterXPositionList.Count; i <e ; i++)
+            for (int i = 0, e = currentData.CharacterNameList.Count; i < e; i++)
             {
-                if(CharacterInstances.TryGetValue(currentData.CharacterNameList[i],out var ins))
+                if (CharacterInstances.TryGetValue(currentData.CharacterNameList[i], out var ins))
                 {
                     //data , index , GameObject
-                    AlgorithmExtension.GetAlgorithm("ScriptCharacterMoving").Invoke(currentData,i,ins);
+                    AlgorithmExtension.GetAlgorithm("ScriptCharacterMoving").Invoke(currentData, i, ins);
+                    ins.GetComponent<ViewController>().SetPair(currentData.CharacterImageKeyList[i]);
                 }
                 else
                 {
-                    App.instance.AddMessage($"Character {currentData.CharacterNameList[i]} not find");
-                    ADGlobalSystem.AddWarning("Character not find");
+                    //App.instance.AddMessage($"Character {currentData.CharacterNameList[i]} not find");
+                    Debug.LogWarning("Character not find");
                 }
             }
         }

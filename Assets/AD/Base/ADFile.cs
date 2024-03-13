@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using Unity.VisualScripting;
+using System.Collections.Generic;
 
 namespace AD.BASE
 {
@@ -513,6 +514,60 @@ namespace AD.BASE
             }
             return true;
         }
+    }
+
+    [Serializable]
+    public class OfflineFile
+    {
+        public List<byte[]> MainMapDatas = new();
+        public Dictionary<string, byte[]> SourceAssetsDatas = new();
+
+        public void Add(ICanMakeOffline target)
+        {
+            MainMapDatas.Add(ADFile.ToBytes(target));
+            foreach (var path in target.GetFilePaths())
+            {
+                if (!SourceAssetsDatas.ContainsKey(path))
+                {
+                    try
+                    {
+                        SourceAssetsDatas.Add(path, File.ReadAllBytes(path));
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
+                }
+            }
+        }
+
+        public void Add(object target)
+        {
+            if (target is ICanMakeOffline mO) Add(mO);
+            else
+            {
+                MainMapDatas.Add(ADFile.ToBytes(target));
+            }
+        }
+
+        public void Build(string path)
+        {
+            ADFile file = new(path, true, false, false, true);
+            file.ReplaceAllData(ADFile.ToBytes(this));
+            file.Dispose();
+        }
+
+        public static OfflineFile BuildFrom(string path)
+        {
+            return ADFile.FromBytes(File.ReadAllBytes(path)) as OfflineFile;
+        }
+    }
+
+    public interface ICanMakeOffline
+    {
+        public string[] GetFilePaths();
+
+        public void ReplacePath(Dictionary<string, string> sourceAssetsDatas);
     }
 }
 

@@ -42,7 +42,9 @@ namespace AD.Sample.Texter
         public List<ScriptItemEntry> Items;
         public List<SceneEndingSelectOption> Options;
         public string BackgroundImage = NoBackgroundImage;
+        public string BackgroundAudio = NoBackgroundAudio;
         public const string NoBackgroundImage = "No BackgroundImage";
+        public const string NoBackgroundAudio = "No BackgroundAudio";
 
         public List<string> GetAllCharacter()
         {
@@ -74,11 +76,16 @@ namespace AD.Sample.Texter
             return result;
         }
 
-        public ProjectScriptSlicerData(ProjectScriptSlicer projectItem, List<ScriptItemEntry> items, List<SceneEndingSelectOption> options, string backgroundImage) : base(projectItem)
+        public ProjectScriptSlicerData(ProjectScriptSlicer projectItem,
+                                       List<ScriptItemEntry> items,
+                                       List<SceneEndingSelectOption> options,
+                                       string backgroundImage,
+                                       string backgroundAudio ) : base(projectItem)
         {
             Items = items;
             Options = options;
             BackgroundImage = backgroundImage;
+            BackgroundAudio = backgroundAudio;
         }
 
         public override bool FromMap(ProjectData_BaseMap from)
@@ -88,6 +95,7 @@ namespace AD.Sample.Texter
                 data.Items = Items;
                 data.Options = Options;
                 data.BackgroundImage = BackgroundImage;
+                data.BackgroundAudio = BackgroundAudio;
                 return base.FromMap(from);
             }
             else return false;
@@ -95,7 +103,7 @@ namespace AD.Sample.Texter
 
         public override void ToMap(out ProjectData_BaseMap BM)
         {
-            BM = new ProjectScriptSlicer_BaseMap(Items, Options, BackgroundImage);
+            BM = new ProjectScriptSlicer_BaseMap(Items, Options, BackgroundImage, BackgroundAudio);
             BM.FromObject(this);
         }
     }
@@ -109,12 +117,17 @@ namespace AD.Sample.Texter
             public List<ScriptItemEntry> Items;
             public List<SceneEndingSelectOption> Options;
             public string BackgroundImage;
+            public string BackgroundAudio;
 
-            public ProjectScriptSlicer_BaseMap(List<ScriptItemEntry> items, List<SceneEndingSelectOption> options, string backgroundImage)
+            public ProjectScriptSlicer_BaseMap(List<ScriptItemEntry> items,
+                                               List<SceneEndingSelectOption> options,
+                                               string backgroundImage,
+                                               string backgroundAudio)
             {
                 Items = items;
                 Options = options;
                 BackgroundImage = backgroundImage;
+                this.BackgroundAudio = backgroundAudio;
             }
 
             public override bool FromObject(ProjectItemData from)
@@ -124,6 +137,7 @@ namespace AD.Sample.Texter
                     data.Items = Items;
                     data.Options = Options;
                     data.BackgroundImage = BackgroundImage;
+                    data.BackgroundAudio = BackgroundAudio;
                     return base.FromObject(from);
                 }
                 else return false;
@@ -131,7 +145,7 @@ namespace AD.Sample.Texter
 
             public override void ToObject(out ProjectItemData obj)
             {
-                obj = new ProjectScriptSlicerData(null, Items, Options, BackgroundImage);
+                obj = new ProjectScriptSlicerData(null, Items, Options, BackgroundImage, BackgroundAudio);
                 obj.FromMap(this);
             }
         }
@@ -170,6 +184,19 @@ namespace AD.Sample.Texter.Project
                         that.ProjectScriptSlicingSourceData.BackgroundImage = T;
                         imgInputField.SetText(T);
                     }, "图片", "", "jpg", "png");
+                });
+                PropertiesLayout.Title("背景音乐");
+                PropertiesLayout
+                    .InputField(that.ProjectScriptSlicingSourceData.BackgroundAudio, "背景音乐路径")
+                    .Share(out var audInputField)
+                    .AddListener(T => that.ProjectScriptSlicingSourceData.BackgroundAudio = T);
+                PropertiesLayout.ModernUIButton("背景音乐", "寻找背景音乐", () =>
+                {
+                    FileC.SelectFileOnSystem(T =>
+                    {
+                        that.ProjectScriptSlicingSourceData.BackgroundAudio = T;
+                        audInputField.SetText(T);
+                    }, "音乐", "ogg,mp3,wav", "ogg", "mp3", "wav");
                 });
 
                 PropertiesLayout.Title("语句");
@@ -210,7 +237,7 @@ namespace AD.Sample.Texter.Project
                     }
                 }
 
-                PropertiesLayout.Button("Open", "Open Sub Project Scene", () =>
+                PropertiesLayout.Button("编辑", "打开一个专属的页面进行编辑", () =>
                 {
                     App.instance.CurrentProjectItemData = that.ProjectScriptSlicingSourceData;
                     App.instance.GetController<MainSceneLoader>().Load<ScriptSlicerManager>(nameof(ProjectScriptSlicer));
@@ -290,7 +317,7 @@ namespace AD.Sample.Texter.Project
             }
             else
             {
-                ProjectScriptSlicingSourceData = new(this, new(), null, "");
+                ProjectScriptSlicingSourceData = new(this, new(), null, ProjectScriptSlicerData.NoBackgroundImage, ProjectScriptSlicerData.NoBackgroundAudio);
             }
             MatchHierarchyEditor = new HierarchyBlock<ProjectScriptSlicer>(this, () => this.SourceData.ProjectItemID);
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()

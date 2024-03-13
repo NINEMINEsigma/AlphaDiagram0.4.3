@@ -367,7 +367,7 @@ namespace AD.Utility
 
     #endregion
 
-    public class ArithmeticExtension
+    public static class ArithmeticExtension
     {
         public static ArithmeticInfo Parse(string expression)
         {

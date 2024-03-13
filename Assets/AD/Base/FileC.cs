@@ -207,6 +207,11 @@ namespace AD.BASE
 
         private static Dictionary<string, List<FileInfo>> Files = new();
 
+        public static void ClearAllFiles()
+        {
+            Files.Clear();
+        }
+
         public static bool TryGetFiles(string group, out List<FileInfo> fileInfos)
         {
             return Files.TryGetValue(group, out fileInfos);

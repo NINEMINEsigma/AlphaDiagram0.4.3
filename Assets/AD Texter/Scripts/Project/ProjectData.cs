@@ -89,7 +89,10 @@ namespace AD.Sample.Texter
             TimeClocker timer = TimeExtension.GetTimer();
 
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
-            FileC.ReCreateDirectroryOfFile(Path.Combine(fileListPath, "Empty.empty"));
+            foreach (var file in FileC.FindAll(fileListPath, ProjectItemDataExtension))
+            {
+                file.Delete();
+            }
 
             this.datas.RemoveNullValues();
 
@@ -125,6 +128,7 @@ namespace AD.Sample.Texter
         public void BuildFromOffline(byte[] data)
         {
             List<byte[]> OfflineFile = ADFile.FromBytes(data) as List<byte[]>;
+            Dictionary<string, byte[]> SourceAssetsFiles = new();
             List<ProjectData_BaseMap> result = new();
             foreach (var item in OfflineFile)
             {
@@ -323,6 +327,8 @@ namespace AD.Sample.Texter
         [Serializable]
         public class ProjectData_BaseMap : IBaseMap<ProjectItemData>
         {
+            public static Dictionary<string, string> RegisterOfflineSourceFile;
+
             public string ProjectItemID;
             public string ParentItemID;
             public float ProjectItemPositionX;

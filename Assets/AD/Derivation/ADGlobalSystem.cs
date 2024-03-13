@@ -171,7 +171,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240313/1402";
+        public static string Version => "AD/0.4.3/20240313/2047";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -1284,6 +1284,21 @@ namespace AD
         {
             if (IsJumpScene || AppQuitting) return null;
             return new CoroutineInfo(instance.StartCoroutine(coroutiner));
+        }
+
+        public static CoroutineInfo OpenCoroutine(Func<bool> predicate,Action action)
+        {
+            if (IsJumpScene || AppQuitting) return null;
+            return new CoroutineInfo(instance.StartCoroutine(WaitForPredicate(predicate,action)));
+        }
+
+        private static IEnumerator WaitForPredicate(Func<bool> predicate, Action action)
+        {
+            while (predicate.Invoke())
+            {
+                yield return null;
+            }
+            action.Invoke();
         }
 
         public class CoroutineInfo

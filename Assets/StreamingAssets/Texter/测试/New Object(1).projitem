@@ -8,21 +8,49 @@
 					"Name" : "角色1",
 					"Words" : "第一句话",
 					"SoundAssets" : "No Voice",
-					"Command" : ""
+					"Command" : "",
+					"CharacterNameList" : [
+						"角色1"
+					],
+					"CharacterXPositionList" : [
+						20
+					],
+					"CharacterImageKeyList" : [
+						"E:\\AlphaDiagram0.4.3\\Assets\\Image & Resources\\希铜v3差分\/希铜v3原始.png"
+					]
 				},{
 					"Name" : "角色2",
 					"Words" : "下一句话",
 					"SoundAssets" : "No Voice",
-					"Command" : ""
+					"Command" : "",
+					"CharacterNameList" : [
+						
+					],
+					"CharacterXPositionList" : [
+						
+					],
+					"CharacterImageKeyList" : [
+						
+					]
 				},{
 					"Name" : "角色1",
 					"Words" : "结束",
 					"SoundAssets" : "No Voice",
-					"Command" : ""
+					"Command" : "",
+					"CharacterNameList" : [
+						
+					],
+					"CharacterXPositionList" : [
+						
+					],
+					"CharacterImageKeyList" : [
+						
+					]
 				}
 			],
 			"Options" : null,
 			"BackgroundImage" : "E:\\AlphaDiagram0.4.3\\Assets\\Image & Resources\\EntryBackground.jpg",
+			"BackgroundAudio" : "C:\\Users\\000\\Music\\glassmoon - 紫陽花.ogg",
 			"ProjectItemID" : "New Object(1)",
 			"ParentItemID" : "ProjectRoot",
 			"ProjectItemPositionX" : 5,
