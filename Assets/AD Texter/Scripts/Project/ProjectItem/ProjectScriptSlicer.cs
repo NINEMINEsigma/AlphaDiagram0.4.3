@@ -15,13 +15,18 @@ using UnityEngine;
 namespace AD.Sample.Texter
 {
     [Serializable]
-    public class ScriptItemEntry
+    public class ScriptItemEntry:IProperty_Value_get<List<string>>
     {
         public string Name = "";
         public string Words = "";
         public const string NoVoice = "No Voice";
         public string SoundAssets = NoVoice;
         public string Command = "";
+        public List<string> CharacterNameList = new();
+        public List<float> CharacterXPositionList = new();
+        public List<string> CharacterImageKeyList = new();
+
+        public List<string> Value => CharacterNameList;
     }
 
     [Serializable]
@@ -38,6 +43,36 @@ namespace AD.Sample.Texter
         public List<SceneEndingSelectOption> Options;
         public string BackgroundImage = NoBackgroundImage;
         public const string NoBackgroundImage = "No BackgroundImage";
+
+        public List<string> GetAllCharacter()
+        {
+            return Items.GetSubListAfterLinkingWithoutSameValue<ScriptItemEntry, string>();
+        }
+
+        public GameObject ObtainCharacter(string characterName,GameObject Prefab)
+        {
+            var result = Prefab.PrefabInstantiate().GetComponent<ViewController>();
+            foreach (var item in Items)
+            {
+                int index = item.CharacterNameList.IndexOf(characterName);
+                if(index != -1)
+                {
+                    result.LoadOnUrl(item.CharacterImageKeyList[index],false);
+                }
+            }
+            return result.gameObject;
+        }
+
+        public List<GameObject> ObtainAllCharacter(GameObject Prefab)
+        {
+            List<GameObject> result = new List<GameObject>();
+            foreach (var name in GetAllCharacter())
+            {
+                result.Add(ObtainCharacter(name, Prefab).Share(out var cur));
+                cur.name = name;
+            }
+            return result;
+        }
 
         public ProjectScriptSlicerData(ProjectScriptSlicer projectItem, List<ScriptItemEntry> items, List<SceneEndingSelectOption> options, string backgroundImage) : base(projectItem)
         {
@@ -126,12 +161,14 @@ namespace AD.Sample.Texter.Project
                 PropertiesLayout.Title("背景");
                 PropertiesLayout
                     .InputField(that.ProjectScriptSlicingSourceData.BackgroundImage, "背景图片路径")
+                    .Share(out var imgInputField)
                     .AddListener(T => that.ProjectScriptSlicingSourceData.BackgroundImage = T);
                 PropertiesLayout.ModernUIButton("背景", "寻找背景图片", () =>
                 {
                     FileC.SelectFileOnSystem(T =>
                     {
                         that.ProjectScriptSlicingSourceData.BackgroundImage = T;
+                        imgInputField.SetText(T);
                     }, "图片", "", "jpg", "png");
                 });
 
@@ -194,7 +231,9 @@ namespace AD.Sample.Texter.Project
                     PropertiesLayout.InputField(entry.SoundAssets, "引用的声音资源名称").AddListener(T => entry.SoundAssets = T);
                 }
                 PropertiesLayout.EndHorizontal();
-                PropertiesLayout.ModernUIInputField(entry.Words, "当前对象说的话").AddListener(T => entry.Words = T);
+                PropertiesLayout.Label("语句", "语句");
+                PropertiesLayout.InputField(entry.Words, "当前对象说的话").AddListener(T => entry.Words = T);
+                PropertiesLayout.Label("指令", "指令");
                 PropertiesLayout.InputField(entry.Command, "执行到该处时发送的指令").AddListener(T => entry.Command = T);
                 PropertiesLayout.Button("删除", "删除", () =>
                 {

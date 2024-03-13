@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Experimental.Performance;
@@ -231,9 +232,30 @@ namespace AD.Sample.Texter
             ADFile file = new(path, false, true, false, true);
             if (file)
             {
-                CurrentProjectData.BuildFromOffline(file.FileData);
+                StartCoroutine(EndWaitLoadFromOfflineFile(file));
             }
-            else throw file.ErrorException;
+            else Debug.LogException(file.ErrorException);
+        }
+
+        private IEnumerator EndWaitLoadFromOfflineFile(ADFile file)
+        {
+            CurrentProjectData.BuildFromOffline(file.FileData);
+            if (loadingTask != null)
+            {
+                loadingTask.UnRegister();
+                loadingTask = null;
+            }
+            if (savingTask != null)
+            {
+                savingTask.UnRegister();
+                savingTask = null;
+            }
+            savingTask = new TaskInfo("Project Saving", 0, 0, new Vector2(0, 1f), false);
+            savingTask.Register();
+            yield return CurrentProjectData.Save(savingTask);
+            App.instance.GetController<MainSceneLoader>().UnloadAll();
+            ADGlobalSystem.instance.TargetSceneName = SceneExtension.GetCurrent().name;
+            ADGlobalSystem.instance.OnEnd();
         }
 
         public void CreateOfflineFile(string path)
@@ -241,12 +263,30 @@ namespace AD.Sample.Texter
             CurrentProjectData.BuildOffline(path);
         }
 
-        public void CreateOfflineFile()
+        private IEnumerator EndWaitCreateOfflineFile()
         {
-            CreateOfflineFile(Path.Combine(LoadingManager.FilePath, CurrentProjectData.DataAssetsForm.AssetsName, CurrentProjectData.DataAssetsForm.AssetsName+"."));
+            if (loadingTask != null)
+            {
+                loadingTask.UnRegister();
+                loadingTask = null;
+            }
+            if (savingTask != null)
+            {
+                savingTask.UnRegister();
+                savingTask = null;
+            }
+            savingTask = new TaskInfo("Project Saving", 0, 0, new Vector2(0, 1f), false);
+            savingTask.Register();
+            yield return CurrentProjectData.Save(savingTask);
+            CreateOfflineFile(Path.Combine(LoadingManager.FilePath, "Temp", CurrentProjectData.DataAssetsForm.AssetsName + "." + ProjectData.OfflineExtension));
             App.instance.GetController<MainSceneLoader>().UnloadAll();
             ADGlobalSystem.instance.TargetSceneName = SceneExtension.GetCurrent().name;
             ADGlobalSystem.instance.OnEnd();
+        }
+
+        public void CreateOfflineFile()
+        {
+            StartCoroutine(EndWaitCreateOfflineFile());
         }
     }
 }

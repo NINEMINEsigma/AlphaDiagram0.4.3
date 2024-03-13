@@ -134,13 +134,29 @@ PrefabInstance:
       propertyPath: m_Back
       value: 
       objectReference: {fileID: 1497302057}
+    - target: {fileID: 325383969759575330, guid: c4b148c0cce882247be54810f949119e, type: 3}
+      propertyPath: IsInt
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 325383969916320241, guid: c4b148c0cce882247be54810f949119e, type: 3}
+      propertyPath: IsInt
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 325383969916320241, guid: c4b148c0cce882247be54810f949119e, type: 3}
+      propertyPath: currentPercent
+      value: 0.157
+      objectReference: {fileID: 0}
+    - target: {fileID: 325383970645381130, guid: c4b148c0cce882247be54810f949119e, type: 3}
+      propertyPath: IsInt
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 711242111443732315, guid: c4b148c0cce882247be54810f949119e, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1809.5071
+      value: 1598.3767
       objectReference: {fileID: 0}
     - target: {fileID: 711242111443732315, guid: c4b148c0cce882247be54810f949119e, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 1809.5071
+      value: 1598.3767
       objectReference: {fileID: 0}
     - target: {fileID: 937735418927989076, guid: c4b148c0cce882247be54810f949119e, type: 3}
       propertyPath: m_Name
@@ -233,6 +249,14 @@ PrefabInstance:
     - target: {fileID: 937735418927989080, guid: c4b148c0cce882247be54810f949119e, type: 3}
       propertyPath: m_SortingOrder
       value: 7032
+      objectReference: {fileID: 0}
+    - target: {fileID: 1179166757534430651, guid: c4b148c0cce882247be54810f949119e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1179166758415801408, guid: c4b148c0cce882247be54810f949119e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c4b148c0cce882247be54810f949119e, type: 3}

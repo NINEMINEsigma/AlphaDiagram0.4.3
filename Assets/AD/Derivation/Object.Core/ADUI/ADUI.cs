@@ -189,7 +189,7 @@ namespace AD.UI
 
         public void SetupByNumericManager(string numericManagerName)
         {
-            if (!string.IsNullOrEmpty(numericManagerName) && numericManagerName.StartsWith("Default"))
+            if (!string.IsNullOrEmpty(numericManagerName) && !numericManagerName.StartsWith("Default"))
                 HowSetupByNumericManager();
         }
         protected virtual void HowSetupByNumericManager()

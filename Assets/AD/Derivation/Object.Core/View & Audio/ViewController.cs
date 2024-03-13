@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Policy;
 using AD.BASE;
 using AD.Utility;
 using Unity.VisualScripting;
@@ -485,13 +486,58 @@ namespace AD.UI
 
         public void LoadOnResource(string source, bool isCurrent = true)
         {
+            if (string.IsNullOrEmpty(source)) return;
             string finalPath = Application.dataPath + "/Resources/" + source;
-            StartCoroutine(LoadTexture2D(finalPath, isCurrent));
+            ADGlobalSystem.OpenCoroutine(LoadTexture2D(finalPath, isCurrent));
         }
 
         public void LoadOnUrl(string url, bool isCurrent = true)
         {
-            StartCoroutine(LoadTexture2D(url, isCurrent));
+            if (string.IsNullOrEmpty(url)) return;
+            ADGlobalSystem.OpenCoroutine(LoadTexture2D(url, isCurrent));
+        }
+
+        public void SyncLoadOnResource(string source, bool isCurrent = true)
+        {
+            string path = Application.dataPath + "/Resources/" + source;
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(path);
+            request.SendWebRequest().MarkCompleted(() =>
+            {
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    var texture = DownloadHandlerTexture.GetContent(request);
+                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                    if (isCurrent && SourcePairs.Count > 0)
+                        CurrentImage = sprite;
+                    else
+                        SourcePairs.Add(new ImagePair() { SpriteName = path, SpriteSource = sprite });
+                    Refresh();
+                }
+                else
+                    Debug.LogError("Failed To Load " + request.result.ToString());
+            });
+        }
+
+        public void SyncLoadOnUrl(string url, bool isCurrent = true)
+        {
+            string path = url;
+            UnityWebRequest request = UnityWebRequestTexture.GetTexture(path);
+            request.SendWebRequest().MarkCompleted(() =>
+            {
+                if (request.result == UnityWebRequest.Result.Success)
+                {
+                    var texture = DownloadHandlerTexture.GetContent(request);
+                    Sprite sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                    if (isCurrent && SourcePairs.Count > 0)
+                        CurrentImage = sprite;
+                    else
+                        SourcePairs.Add(new ImagePair() { SpriteName = path, SpriteSource = sprite });
+                    Refresh();
+                }
+                else
+                    Debug.LogError("Failed To Load " + request.result.ToString());
+            });
+
         }
 
         public IEnumerator LoadTexture2D(string path, bool isCurrent)

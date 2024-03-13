@@ -2,15 +2,31 @@
 	"projitem" : {
 		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
 		"value" : {
-			"__type" : "AD.Sample.Texter.Data.ProjectTextData_BaseMap,Assembly-CSharp",
-			"text" : "",
-			"description" : "",
+			"__type" : "AD.Sample.Texter.Data.ProjectScriptSlicer_BaseMap,Assembly-CSharp",
+			"Items" : [
+				{
+					"Name" : "角色1",
+					"Words" : "第一句话",
+					"SoundAssets" : "No Voice",
+					"Command" : ""
+				},{
+					"Name" : "角色2",
+					"Words" : "下一句话",
+					"SoundAssets" : "No Voice",
+					"Command" : ""
+				},{
+					"Name" : "角色1",
+					"Words" : "结束",
+					"SoundAssets" : "No Voice",
+					"Command" : ""
+				}
+			],
+			"Options" : null,
+			"BackgroundImage" : "E:\\AlphaDiagram0.4.3\\Assets\\Image & Resources\\EntryBackground.jpg",
 			"ProjectItemID" : "New Object(1)",
-			"ParentItemID" : "New Object(3)",
-			"ProjectItemPosition" : {
-				"x" : 13.2972364,
-				"y" : 7.67170238
-			}
+			"ParentItemID" : "ProjectRoot",
+			"ProjectItemPositionX" : 5,
+			"ProjectItemPositionY" : 0
 		}
 	}
 }

@@ -663,7 +663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.size
@@ -671,6 +671,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
@@ -682,11 +686,19 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2113631321}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 2113631321}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 274803769}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
@@ -698,6 +710,10 @@ PrefabInstance:
       value: OnEnd
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SaveNumericManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
       value: SetADGlobalSystemTargetScene
       objectReference: {fileID: 0}
@@ -706,11 +722,19 @@ PrefabInstance:
       value: AD.ADGlobalSystem, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: AD.ADGlobalSystem, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: hoverEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: AD.UI.ModernUIButton, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
       propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
+      propertyPath: clickEvent.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 79093104384552664, guid: 829a52609d2b90c459f4cd9cbf354120, type: 3}
@@ -1290,5 +1314,9 @@ PrefabInstance:
       propertyPath: m_Material
       value: 
       objectReference: {fileID: 2100000, guid: 1f8a3caf61408cc4b8edca62c1fe376b, type: 2}
+    - target: {fileID: 7144612046235013099, guid: 794ce11a01529b34e8ea1ee85f799ec6, type: 3}
+      propertyPath: m_Text
+      value: 
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 794ce11a01529b34e8ea1ee85f799ec6, type: 3}

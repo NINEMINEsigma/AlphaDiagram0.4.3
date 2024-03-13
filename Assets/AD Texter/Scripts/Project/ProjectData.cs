@@ -110,6 +110,7 @@ namespace AD.Sample.Texter
 
         public byte[] BuildOffline(string path)
         {
+            FileC.TryCreateDirectroryOfFile(path);
             ADFile file = new(path, true, false, false, true);
             List<byte[]> OfflineFile = new();
             foreach (Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> item in this)
@@ -301,7 +302,7 @@ namespace AD.Sample.Texter
         {
             this.ProjectItemID = from.ProjectItemID;
             this.ParentItemID = from.ParentItemID ?? ProjectItemData.ProjectRootID;
-            this.ProjectItemPosition = from.ProjectItemPosition;
+            this.ProjectItemPosition = new(from.ProjectItemPositionX, from.ProjectItemPositionY);
             return true;
         }
 
@@ -324,7 +325,8 @@ namespace AD.Sample.Texter
         {
             public string ProjectItemID;
             public string ParentItemID;
-            public Vector2 ProjectItemPosition;
+            public float ProjectItemPositionX;
+            public float ProjectItemPositionY;
 
             public virtual byte[] BuildOffline()
             {
@@ -394,7 +396,8 @@ namespace AD.Sample.Texter
             {
                 this.ProjectItemID = from.ProjectItemID;
                 this.ParentItemID = from.ParentItemID ?? ProjectItemData.ProjectRootID;
-                this.ProjectItemPosition = from.ProjectItemPosition;
+                this.ProjectItemPositionX = from.ProjectItemPosition.x;
+                this.ProjectItemPositionY = from.ProjectItemPosition.y;
                 return true;
             }
 

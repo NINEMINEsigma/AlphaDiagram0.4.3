@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AD.BASE;
 using AD.Experimental.Performance;
 using AD.Sample.Texter.Project;
 using AD.UI;
@@ -12,8 +13,13 @@ namespace AD.Sample.Texter.Scene
         [Header("Assets")]
         public Button mButton;
         public override IButton BackSceneButton => mButton;
-        public ListView DataListView,OptionListView;
+        public ListView DataListView, OptionListView;
         public ListViewItem ConsoleItem, ScriptSlicerListViewItemPrefab, OptionsItemPrefab;
+        public InputField CharIF, SoundIF;
+        public Button AdditionalButton;
+        public InputField BackgroundIF;
+        public Button SelectBackground;
+        public ViewController BackPreview;
         [Header("Data")]
         public ProjectScriptSlicerData data;
 
@@ -37,12 +43,27 @@ namespace AD.Sample.Texter.Scene
                     lv.SetupScriptSlicerTarget(item);
                 }
             OptionListView.SetPrefab(OptionsItemPrefab);
-            if ((data as ProjectScriptSlicerData).Options!= null)
+            if ((data as ProjectScriptSlicerData).Options != null)
                 foreach (SceneEndingSelectOption item in (data as ProjectScriptSlicerData).Options)
                 {
                     ScriptSlicerOptionItem lv = OptionListView.GenerateItem() as ScriptSlicerOptionItem;
                     lv.SetupScriptSlicerTarget(item);
                 }
+
+            if(this.data.Items.Count>0)
+            {
+                CharIF.SetText(this.data.Items[^1].Name);
+                CharIF.AddListener(SetNewOneName);
+                SoundIF.SetText(this.data.Items[^1].SoundAssets);
+                SoundIF.AddListener(SetNewOneSoundAssets);
+            }
+            AdditionalButton.AddListener(AddAtLast);
+            if (this.data.BackgroundImage!= ProjectScriptSlicerData.NoBackgroundImage)
+            {
+                BackgroundIF.SetText(this.data.BackgroundImage);
+                BackPreview.LoadOnUrl(this.data.BackgroundImage);   
+            }
+            SelectBackground.AddListener(SetBackgroundOnWin);
         }
 
         private void InternalPreviewOneEntry(ScriptItemEntry entry)
@@ -111,7 +132,7 @@ namespace AD.Sample.Texter.Scene
         public void SetNewOptionID(string T)
         {
             NewAddOption.TargetScriptSceneID = T;
-        }    
+        }
         public void SetNewOptionName(string T)
         {
             NewAddOption.OptionName = T;
@@ -136,6 +157,17 @@ namespace AD.Sample.Texter.Scene
                 data.Options.RemoveAt(data.Options.Count - 1);
                 OptionListView.Remove(OptionListView.Childs.Count - 1);
             }
+        }
+
+        public void SetBackgroundOnWin()
+        {
+            FileC.SelectFileOnSystem(SetBackground, "±³¾°", "png,jpg", "png", "jpg");
+        }
+        public void SetBackground(string path)
+        {
+            data.BackgroundImage = path;
+            BackgroundIF.SetText(path);
+            BackPreview.LoadOnUrl(path, true);
         }
     }
 }

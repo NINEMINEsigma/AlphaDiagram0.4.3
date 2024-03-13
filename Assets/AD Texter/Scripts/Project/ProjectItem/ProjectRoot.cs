@@ -52,7 +52,11 @@ namespace AD.Sample.Texter.Project
                 });
                 PropertiesLayout.ModernUIButton("Build From Offline", "", () =>
                 {
-                    FileC.SelectFileOnSystem("")
+                    FileC.SelectFileOnSystem(T =>
+                    {
+                        App.instance.GetController<ProjectManager>().LoadFromOfflineFile(T);
+                    }, "¶ÀÁ¢ÎÄ¼þ", ProjectData.OfflineExtension, ProjectData.OfflineExtension);
+
                 });
             }
         }

@@ -1,0 +1,17 @@
+{
+	"projitem" : {
+		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
+		"value" : {
+			"__type" : "AD.Sample.Texter.Data.ProjectScriptSlicer_BaseMap,Assembly-CSharp",
+			"Items" : [
+				
+			],
+			"Options" : null,
+			"BackgroundImage" : "",
+			"ProjectItemID" : "New Object(1)",
+			"ParentItemID" : "ProjectRoot",
+			"ProjectItemPositionX" : 5,
+			"ProjectItemPositionY" : 0
+		}
+	}
+}

@@ -75,6 +75,33 @@ namespace AD.Utility
             return result;
         }
 
+        public static List<Result> GetSubListAfterLinking<T,Result>(this List<T> self) where T:IProperty_Value_get<List<Result>>
+        {
+            List<Result> result = new();
+            foreach (var single in self)
+            {
+                foreach (var item in single.Value)
+                {
+                    result.Add(item);
+                }
+            }
+            return result;
+        }
+
+        public static List<Result> GetSubListAfterLinkingWithoutSameValue<T, Result>(this List<T> self) where T : IProperty_Value_get<List<Result>>
+        {
+            List<Result> result = new();
+            foreach (var single in self)
+            {
+                foreach (var item in single.Value)
+                {
+                    if (!result.Contains(item))
+                        result.Add(item);
+                }
+            }
+            return result;
+        }
+
         public static List<Result> GetSubList<Result, T>(this IEnumerable<T> self, Func<T, bool> predicate, Func<T, Result> transformFunc)
         {
             List<Result> result = new();

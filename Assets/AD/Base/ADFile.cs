@@ -10,7 +10,7 @@ namespace AD.BASE
     [Serializable]
     public sealed class ADFile : IDisposable
     {
-        public static implicit operator bool(ADFile file) => file.ErrorException != null && !file.IsEmpty;
+        public static implicit operator bool(ADFile file) => file.ErrorException == null;
 
         public string FilePath { get; private set; } = "";
         public DateTime Timestamp { get; private set; } = DateTime.UtcNow;
@@ -484,7 +484,8 @@ namespace AD.BASE
         public static object FromBytes(byte[] bytes)
         {
             using MemoryStream ms = new();
-            ms.Read(bytes, 0, bytes.Length);
+            ms.Write(bytes, 0, bytes.Length);
+            ms.Position = 0;
             return new BinaryFormatter().Deserialize(ms);
         }
 
