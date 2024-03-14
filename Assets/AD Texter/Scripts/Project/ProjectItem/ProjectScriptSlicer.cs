@@ -10,6 +10,7 @@ using AD.Sample.Texter.Scene;
 using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace AD.Sample.Texter
@@ -112,7 +113,7 @@ namespace AD.Sample.Texter
     {
         [EaseSave3]
         [Serializable]
-        public class ProjectScriptSlicer_BaseMap : ProjectData_BaseMap
+        public class ProjectScriptSlicer_BaseMap : ProjectData_BaseMap, ICanMakeOffline
         {
             public List<ScriptItemEntry> Items;
             public List<SceneEndingSelectOption> Options;
@@ -141,6 +142,43 @@ namespace AD.Sample.Texter
                     return base.FromObject(from);
                 }
                 else return false;
+            }
+
+            public string[] GetFilePaths()
+            {
+                List<string> paths = new()
+                {
+                    this.BackgroundImage,
+                    this.BackgroundAudio
+                };
+                paths.AddRange(Items.GetSubList<List<string>, ScriptItemEntry>(T =>
+                {
+                    return T.CharacterImageKeyList.Count > 0;
+                }, T =>
+                {
+                    return T.CharacterImageKeyList;
+                }).UnPackage());
+                paths.AddRange(Items.GetSubList(T => T.SoundAssets != ScriptItemEntry.NoVoice, T => T.SoundAssets));
+
+                return paths.ToArray();
+            }
+
+            public void ReplacePath(Dictionary<string, string> sourceAssetsDatas)
+            {
+                if (sourceAssetsDatas.TryGetValue(this.BackgroundImage, out string reBackgroundImage))
+                    this.BackgroundImage = reBackgroundImage;
+                if (sourceAssetsDatas.TryGetValue(this.BackgroundAudio, out string reBackgroundAudio))
+                    this.BackgroundAudio = reBackgroundAudio;
+                foreach (var item in Items)
+                {
+                    for (int i = 0,e= item.CharacterImageKeyList.Count; i <e; i++)
+                    {
+                        if (sourceAssetsDatas.TryGetValue(item.CharacterImageKeyList[i], out string temp))
+                            item.CharacterImageKeyList[i] = temp;
+                    }
+                    if (sourceAssetsDatas.TryGetValue(item.SoundAssets, out string sa))
+                        item.SoundAssets = sa;
+                }
             }
 
             public override void ToObject(out ProjectItemData obj)
@@ -183,7 +221,7 @@ namespace AD.Sample.Texter.Project
                     {
                         that.ProjectScriptSlicingSourceData.BackgroundImage = T;
                         imgInputField.SetText(T);
-                    }, "图片", "", "jpg", "png");
+                    }, "图片", "jpg *png", "jpg", "png");
                 });
                 PropertiesLayout.Title("背景音乐");
                 PropertiesLayout
@@ -196,7 +234,7 @@ namespace AD.Sample.Texter.Project
                     {
                         that.ProjectScriptSlicingSourceData.BackgroundAudio = T;
                         audInputField.SetText(T);
-                    }, "音乐", "ogg,mp3,wav", "ogg", "mp3", "wav");
+                    }, "音乐", "ogg *mp3 *wav", "ogg", "mp3", "wav");
                 });
 
                 PropertiesLayout.Title("语句");

@@ -112,6 +112,16 @@ namespace AD.Utility
             return result;
         }
 
+        public static List<T> UnPackage<T>(this List<List<T>> self)
+        {
+            List<T> result = new();
+            foreach (var item in self)
+            {
+                result.AddRange(item);
+            }
+            return result;
+        }
+
         public static T[] SubArray<T>(this T[] self, int start, int end)
         {
             T[] result = new T[end - start];

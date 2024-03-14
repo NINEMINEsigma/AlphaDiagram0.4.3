@@ -51,6 +51,7 @@
 			"Options" : null,
 			"BackgroundImage" : "E:\\AlphaDiagram0.4.3\\Assets\\Image & Resources\\EntryBackground.jpg",
 			"BackgroundAudio" : "C:\\Users\\000\\Music\\glassmoon - 紫陽花.ogg",
+			"RegisterOfflineSourceFile" : null,
 			"ProjectItemID" : "New Object(1)",
 			"ParentItemID" : "ProjectRoot",
 			"ProjectItemPositionX" : 5,

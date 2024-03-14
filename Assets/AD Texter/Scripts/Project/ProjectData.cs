@@ -89,10 +89,12 @@ namespace AD.Sample.Texter
             TimeClocker timer = TimeExtension.GetTimer();
 
             string fileListPath = Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName);
-            foreach (var file in FileC.FindAll(fileListPath, ProjectItemDataExtension))
-            {
-                file.Delete();
-            }
+            var oriFiles = FileC.FindAll(fileListPath, ProjectItemDataExtension);
+            if (oriFiles != null)
+                foreach (var file in oriFiles)
+                {
+                    file.Delete();
+                }
 
             this.datas.RemoveNullValues();
 
@@ -114,25 +116,33 @@ namespace AD.Sample.Texter
         public byte[] BuildOffline(string path)
         {
             FileC.TryCreateDirectroryOfFile(path);
+            OfflineFile offlineFile = new();
             ADFile file = new(path, true, false, false, true);
-            List<byte[]> OfflineFile = new();
+
             foreach (Experimental.Localization.Cache.ICanCacheData<ProjectItemData, ProjectData_BaseMap> item in this)
             {
-                OfflineFile.Add(item.MatchElementBM.Get().BuildOffline());
+                offlineFile.Add((object)item.MatchElementBM.Get());
             }
-            file.ReplaceAllData(ADFile.ToBytes(OfflineFile));
+
+            file.ReplaceAllData(ADFile.ToBytes(offlineFile));
             file.SaveFileData();
             return file.FileData;
         }
 
         public void BuildFromOffline(byte[] data)
         {
-            List<byte[]> OfflineFile = ADFile.FromBytes(data) as List<byte[]>;
-            Dictionary<string, byte[]> SourceAssetsFiles = new();
+            OfflineFile offlineFile = ADFile.FromBytes(data) as OfflineFile;
+            offlineFile.ReleaseFile(Path.Combine(LoadingManager.FilePath, DataAssetsForm.AssetsName));
+
             List<ProjectData_BaseMap> result = new();
-            foreach (var item in OfflineFile)
+            foreach (var item in offlineFile.MainMapDatas)
             {
-                result.Add(ProjectData_BaseMap.ReadOffline(item).GetReal());
+                var temp = ProjectData_BaseMap.ReadOffline(item);
+                if(temp is ICanMakeOffline offline)
+                {
+                    offline.ReplacePath(offlineFile.PathRelayers);
+                }
+                result.Add(temp);
             }
             this.Clear();
             foreach (var item in result)
@@ -341,11 +351,6 @@ namespace AD.Sample.Texter
             public static ProjectData_BaseMap ReadOffline(byte[] data)
             {
                 return ADFile.FromBytes(data) as ProjectData_BaseMap;
-            }
-
-            public virtual ProjectData_BaseMap GetReal()
-            {
-                return this;
             }
 
             #region NotSupport

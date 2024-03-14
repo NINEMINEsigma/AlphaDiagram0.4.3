@@ -93,7 +93,7 @@ namespace AD.Sample.Texter.Scene
             {
                 ADGlobalSystem.OpenCoroutine(() =>
                 {
-                    for (int i = 0,e= SceneManager.sceneCount; i < e; i++)
+                    for (int i = 0, e = SceneManager.sceneCount; i < e; i++)
                     {
                         var current = SceneManager.GetSceneAt(i);
                         if (current.name == SceneName) return !(current.isLoaded && !string.IsNullOrEmpty(SceneName));

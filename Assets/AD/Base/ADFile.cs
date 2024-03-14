@@ -521,6 +521,7 @@ namespace AD.BASE
     {
         public List<byte[]> MainMapDatas = new();
         public Dictionary<string, byte[]> SourceAssetsDatas = new();
+        public Dictionary<string, string> PathRelayers = new();
 
         public void Add(ICanMakeOffline target)
         {
@@ -560,6 +561,29 @@ namespace AD.BASE
         public static OfflineFile BuildFrom(string path)
         {
             return ADFile.FromBytes(File.ReadAllBytes(path)) as OfflineFile;
+        }
+
+        public void ReleaseFile(string directory)
+        {
+            foreach (var asset in SourceAssetsDatas)
+            {
+                string fileName = Path.GetFileName(asset.Key);
+                ADFile file = new(Path.Combine(directory, fileName), true, false, false, true);
+                file.ReplaceAllData(SourceAssetsDatas[asset.Key]);
+                file.SaveFileData();
+                file.Dispose();
+                PathRelayers.Add(asset.Key, file.FilePath);
+            }
+        }
+
+        /// <summary>
+        /// Used After <see cref="ReleaseFile(string)"/>
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <returns></returns>
+        public string GetNewPath(string origin)
+        {
+            return PathRelayers.TryGetValue(origin, out var path) ? path : null;
         }
     }
 
