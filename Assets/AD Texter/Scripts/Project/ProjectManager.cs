@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Experimental.Performance;
