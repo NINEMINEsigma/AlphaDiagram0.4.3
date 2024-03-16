@@ -1,4 +1,5 @@
 ﻿using UnityEditor;
+using UnityEditor.Experimental.AD;
 
 public class EditorMenu
 {
@@ -14,5 +15,12 @@ public class EditorMenu
     {
         var window = (EditorNotificationToolsWindow)EditorWindow.GetWindow(typeof(EditorNotificationToolsWindow), false, "EditorNotification Tools");
         window.Show();
+    }
+
+    [MenuItem("Window/AD Master", priority = 1031)]
+    private static void ShowADMasterWindow()
+    {
+        EditorWindowHelper.OpenEditor<ADMaster>().OffsetPosition = UnityEngine.Vector2.zero;
+
     }
 }

@@ -4,18 +4,23 @@ using AD;
 
 namespace TTT
 {
-
+    //[ExecuteAlways]
     public class TestController : MonoBehaviour
     {
-        public Vector3 vec;
+        public MeshFilter meshFilter;
+
+        public MeshExtension.VertexEntry[] vertices;
+
+        public MeshExtension.MeshData meshData;
 
         private void Start()
         {
-            var finger = ADGlobalSystem.RegisterFinger();
-            finger.OnTouch.AddListener(T =>
-            {
-                vec = T.position;
-            });
+            meshData=meshFilter.InitMesh(vertices);
+        }
+
+        private void OnValidate()
+        {
+            meshData=meshFilter.InitMesh(vertices);
         }
     }
 }

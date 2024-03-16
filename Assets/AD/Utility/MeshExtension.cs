@@ -20,23 +20,25 @@ namespace AD.Utility
             public BuildNormalType Type = BuildNormalType.Default;
         }
 
+        [Serializable]
         public struct MeshData
         {
             public Vector3[] vertices;
             public int[] triangles;
+            public Vector2[] uvs;
         }
 
-        public static void RebuildMesh(this MeshFilter mesh, IEnumerable<VertexEntry> SourcePairs)
+        public static MeshData RebuildMesh(this MeshFilter mesh, IEnumerable<VertexEntry> SourcePairs)
         {
-            InitMesh(mesh, mesh.sharedMesh, SourcePairs);
+            return InitMesh(mesh, mesh.sharedMesh, SourcePairs);
         }
 
-        public static void InitMesh(this MeshFilter meshFilter, IEnumerable<VertexEntry> SourcePairs)
+        public static MeshData InitMesh(this MeshFilter meshFilter, IEnumerable<VertexEntry> SourcePairs)
         {
-            InitMesh(meshFilter, new Mesh(), SourcePairs);
+            return InitMesh(meshFilter, new Mesh(), SourcePairs);
         }
 
-        public static void InitMesh(this MeshFilter meshFilter, Mesh mesh, IEnumerable<VertexEntry> SourcePairs)
+        public static MeshData InitMesh(this MeshFilter meshFilter, Mesh mesh, IEnumerable<VertexEntry> SourcePairs)
         {
             mesh.Clear();
             if (meshFilter.sharedMesh != mesh)
@@ -44,11 +46,14 @@ namespace AD.Utility
 #if UNITY_2022
             var data = ToVertices(SourcePairs, Vector3.zero);
 #else
-            var data = ToVertices(SourcePairs, meshFilter.transform.position);
+            var data = ToVertices(SourcePairs, Vector3.zero);
 #endif
 
             meshFilter.sharedMesh.vertices = data.vertices;
             meshFilter.sharedMesh.triangles = data.triangles;
+            meshFilter.sharedMesh.uv = data.uvs;
+
+            return data;
         }
 
         public static MeshData ToVertices(this IEnumerable<VertexEntry> source, Vector3 zeroPos)
@@ -56,7 +61,14 @@ namespace AD.Utility
             MeshData meshData = new MeshData();
             List<Vector3> vertices = new();
             List<int> triangles = new();
+            List<Vector2> uvs = new();
             int i = 0;
+            int e = 0;
+
+            foreach (var item in source)
+            {
+                e++;
+            }
 
             foreach (var current in source)
             {
@@ -72,6 +84,9 @@ namespace AD.Utility
                     vertices.Add(current.Position + zeroPos - NormalVec);
                     vertices.Add(current.Position + zeroPos + NormalVec);
                 }
+                float hight = i / (float)e * 2;
+                uvs.Add(new Vector2(0, hight));
+                uvs.Add(new Vector2(1, hight));
                 if (i > 0)
                 {
                     int index0 = 2 * i - 2, index1 = 2 * i - 1, index2 = 2 * i, index3 = 1 + 2 * i;
@@ -87,6 +102,7 @@ namespace AD.Utility
 
             meshData.vertices = vertices.ToArray();
             meshData.triangles = triangles.ToArray();
+            meshData.uvs = uvs.ToArray();
 
             return meshData;
         }
