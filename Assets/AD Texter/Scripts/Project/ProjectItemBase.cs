@@ -12,6 +12,8 @@ namespace AD.Sample.Texter
         bool SaveData(out List<IProjectItem> badSaveItems);
         bool SaveProjectSourceData();
 
+        void ReDrawLine();
+
         EditGroup MyEditGroup { get; }
     }
 

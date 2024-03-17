@@ -32,6 +32,7 @@ namespace AD.Experimental.LLM
         /// 缓存对话
         /// </summary>
         [SerializeField] public List<SendData> m_DataList = new List<SendData>();
+        [Header("Assets")]
         /// <summary>
         /// 计算方法调用的时间
         /// </summary>

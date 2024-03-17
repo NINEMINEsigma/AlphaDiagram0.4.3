@@ -329,15 +329,12 @@ namespace AD.Sample.Texter.Project
 
         private void EnterMe()
         {
-            if (GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.Contains(this.MatchHierarchyEditor)) return;
+            InternalUtility.InternalDefault_EnterMe(this);
+        }
 
-            List<ISerializeHierarchyEditor> newList = new() { this.MatchHierarchyEditor };
-            foreach (ISerializeHierarchyEditor sEditor in GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors)
-            {
-                if (IsAbleDisplayedOnHierarchyAtTheSameTime(sEditor.MatchTarget.GetType()))
-                    newList.Add(sEditor);
-            }
-            GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
+        public void ReDrawLine()
+        {
+            InternalUtility.InternalDefault_ReDrawLine(this, MyLineRenderer, PointCount, PointCountM, this.ParentTarget as IProjectItem);
         }
 
         public void OnChange()
@@ -348,24 +345,12 @@ namespace AD.Sample.Texter.Project
             }
             else
             {
-                MyLineRenderer.positionCount = PointCount + 1;
-                Vector3 start = InternalUtility.OutPoint(this.ParentTarget.As<IProjectItem>().MyEditGroup), end = InternalUtility.InPoint(this.MyEditGroup, 0);
-                Vector3[] positions = new[]
-                {
-                    start,
-                    start+new Vector3(0, -0.1f,-1.5f),
-                    end+new Vector3(-1.5f,-0.1f,0),
-                    end
-                };
-                for (int i = 0; i <= PointCount; i++)
-                {
-                    MyLineRenderer.SetPosition(i, InternalUtility.CalculateCubicBezierPoint(i * PointCountM, positions[0], positions[1], positions[2], positions[3]));
-                }
+                ReDrawLine();
             }
 
             foreach (var item in Childs.GetSubList<ICanSerializeOnCustomEditor, IUpdateOnChange>())
             {
-                item.OnChange();
+                item.As<IProjectItem>().ReDrawLine();
             }
         }
 

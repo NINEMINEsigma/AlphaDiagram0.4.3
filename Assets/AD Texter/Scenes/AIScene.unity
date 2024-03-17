@@ -388,7 +388,7 @@ GameObject:
   - component: {fileID: 800906067}
   - component: {fileID: 800906068}
   m_Layer: 0
-  m_Name: LLMSysten
+  m_Name: LLMSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -418,19 +418,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 800906066}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 501b55fc073dcde47b5bb381919aa9a1, type: 3}
+  m_Script: {fileID: 11500000, guid: 1aa3d2d2f47fd0d4992df9e14d614b07, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   url: 
-  Prompt: "\u4F60\u73B0\u5728\u662F\u4E00\u4E2AAI\u52A9\u624B"
+  Prompt: "\u4F60\u662F\u4E00\u4E2A\u5199\u4F5C\u52A9\u624B"
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
-  m_Type: 0
-  m_InvokeMethod: invoke
-  m_Key: 4136cc14510ad356d7908354b9f9d90e.eVkNePRDtwSBuZlx
-  m_ApiKey: 
-  m_SecretKey: 
+  m_XunfeiSettings:
+    m_AppID: 1555396e
+    m_APIKey: 5ed9018f67a8c1a2ee5cede10cc405d5
+    m_APISecret: ODUyNDBlNjllNTE4OTQzNzQ1YzVhNWY0
+  m_SparkModel: 3
 --- !u!1 &992829473
 GameObject:
   m_ObjectHideFlags: 0

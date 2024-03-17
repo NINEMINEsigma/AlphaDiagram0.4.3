@@ -1,0 +1,13 @@
+{
+	"projitem" : {
+		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
+		"value" : {
+			"__type" : "AD.Sample.Texter.Data.LLMCore_BaseMap,Assembly-CSharp",
+			"RegisterOfflineSourceFile" : null,
+			"ProjectItemID" : "New Object",
+			"ParentItemID" : "ProjectRoot",
+			"ProjectItemPositionX" : 8.431615,
+			"ProjectItemPositionY" : -1.35985184
+		}
+	}
+}

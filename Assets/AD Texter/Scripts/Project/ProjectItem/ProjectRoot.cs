@@ -183,22 +183,20 @@ namespace AD.Sample.Texter.Project
 
         private void EnterMe()
         {
-            if (GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.Contains(this.MatchHierarchyEditor)) return;
+            if (!GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors.Contains(this.MatchHierarchyEditor))
+                GameEditorApp.instance.GetController<Hierarchy>().AddOnTop(this.MatchHierarchyEditor);
+        }
 
-            List<ISerializeHierarchyEditor> newList = new() { this.MatchHierarchyEditor };
-            foreach (ISerializeHierarchyEditor sEditor in GameEditorApp.instance.GetController<Hierarchy>().TargetTopObjectEditors)
-            {
-                if (sEditor.MatchTarget.GetType() == typeof(ProjectRoot) || IsAbleDisplayedOnHierarchyAtTheSameTime(sEditor.MatchTarget.GetType()))
-                    newList.Add(sEditor);
-            }
-            GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
+        public void ReDrawLine()
+        {
+
         }
 
         public void OnRayCatching()
         {
             foreach (var item in Childs.GetSubList<ICanSerializeOnCustomEditor, IUpdateOnChange>())
             {
-                item.OnChange();
+                item.As<IProjectItem>().ReDrawLine();
             }
         }
     }

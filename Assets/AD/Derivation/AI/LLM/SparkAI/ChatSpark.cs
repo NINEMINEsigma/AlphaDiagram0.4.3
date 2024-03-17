@@ -43,7 +43,7 @@ namespace AD.Experimental.LLM
         /// 选择星火大模型版本
         /// </summary>
         [Header("选择星火大模型版本")]
-        [SerializeField] private ModelType m_SparkModel = ModelType.星火大模型V15;
+        [SerializeField] private ModelType m_SparkModel = ModelType.ModelV15;
 
         #endregion
 
@@ -56,13 +56,21 @@ namespace AD.Experimental.LLM
         /// </summary>
         private void OnInit()
         {
-            if (m_SparkModel == ModelType.星火大模型V15)
+            switch (m_SparkModel)
             {
-                url = "https://spark-api.xf-yun.com/v1.1/chat";
-                return;
+                case ModelType.ModelV15:
+                    url = "https://spark-api.xf-yun.com/v1.1/chat";
+                    break;
+                case ModelType.ModelV20:
+                    url = "https://spark-api.xf-yun.com/v2.1/chat";
+                    break;
+                case ModelType.ModelV30:
+                    url = "https://spark-api.xf-yun.com/v3.1/chat";
+                    break;
+                case ModelType.ModelV35:
+                    url = "https://spark-api.xf-yun.com/v3.5/chat";
+                    break;
             }
-
-            url = "https://spark-api.xf-yun.com/v2.1/chat";
         }
 
         /// <summary>
@@ -87,7 +95,6 @@ namespace AD.Experimental.LLM
             RequestData requestData = new RequestData();
             requestData.header.app_id = m_XunfeiSettings.m_AppID;
 
-            //判断v1.5还是v2
             requestData.parameter.chat.domain = GetDomain();
 
             //添加对话列表
@@ -112,17 +119,18 @@ namespace AD.Experimental.LLM
         }
 
         /// <summary>
-        /// 指定访问的领域
-        /// general指向V1.5版本
-        /// generalv2指向V2版本
-        /// </summary>
+        /// 指定访问的域
         /// <returns></returns>
         private string GetDomain()
         {
-            if (m_SparkModel == ModelType.星火大模型V15)
-                return "general";
-
-            return "generalv2";
+            return m_SparkModel switch
+            {
+                ModelType.ModelV15 => "general",
+                ModelType.ModelV20 => "generalv2",
+                ModelType.ModelV30 => "generalv3",
+                ModelType.ModelV35 => "generalv3.5",
+                _ => "generalv3.5"
+            };
         }
 
         #region 获取鉴权Url
@@ -342,8 +350,10 @@ namespace AD.Experimental.LLM
 
         private enum ModelType
         {
-            星火大模型V15,
-            星火大模型V20
+            ModelV15,
+            ModelV20,
+            ModelV30,
+            ModelV35
         }
 
         #endregion
