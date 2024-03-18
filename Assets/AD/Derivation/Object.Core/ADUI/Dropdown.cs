@@ -68,6 +68,11 @@ namespace AD.UI
             return dropDown;
         }
 
+        public void SetTitle(string title)
+        {
+            source.captionText.text = title;
+        }
+
         public void AddListener(UnityAction<string> action)
         {
             OnSelect.AddListener(action);
@@ -83,7 +88,7 @@ namespace AD.UI
 
         public ADEvent<string> OnSelect = new();
         [SerializeField] private List<string> options = new();
-        public string CurrentSelectOption { get; private set; }
+        public string CurrentSelectOption { get => source.captionText.text; private set => source.captionText.text = value; }
         public void AddOption(params string[] texts)
         {
             options.AddRange(texts);

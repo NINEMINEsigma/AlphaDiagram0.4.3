@@ -279,6 +279,8 @@ namespace AD.Sample.Texter
                 }
                 GameEditorApp.instance.GetController<Hierarchy>().ReplaceTop(newList);
             }
+
+            ///
         }
     }
 
@@ -348,36 +350,45 @@ namespace AD.Sample.Texter
 
         public override void Init()
         {
-            OnGenerate.AddListener(T =>
-            {
-                IProjectItemWhereNeedInitData item = null;
-                if (T is ProjectTextData data)
-                {
-                    var cat = InternalGetPrefabInstance<ProjectTextField>();
-                    cat.IsSetupProjectTextSourceData = true;
-                    item = cat;
-                    data.MatchProjectItem = cat;
-                }
-                else if(T is ProjectScriptSlicerData slicerData)
-                {
-                    var cat = InternalGetPrefabInstance<ProjectScriptSlicer>();
-                    cat.IsSetupProjectScriptSlicingSourceData = true;
-                    item = cat;
-                    slicerData.MatchProjectItem = cat;
-                }
-
-                if (item != null)
-                {
-                    item.SourceData = T;
-                    item.MyEditGroup.name = item.SourceData.ProjectItemID;
-                    item.MyEditGroup.transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
-                }
-            });
+            OnGenerate.AddListener(InjectGenerate);
 
             GameEditorApp.instance.RegisterCommand<RefreshHierarchyPanel>();
             GameEditorApp.instance.RegisterCommand<RefreshPropertiesPanel>();
             this.RegisterCommand<RefreshHierarchyPanel>();
             this.RegisterCommand<RefreshPropertiesPanel>();
+        }
+
+        private void InjectGenerate(ProjectItemData T)
+        {
+            IProjectItemWhereNeedInitData item = null;
+            if (T is ProjectTextData data)
+            {
+                var cat = InternalGetPrefabInstance<ProjectTextField>();
+                cat.IsSetupProjectTextSourceData = true;
+                item = cat;
+                data.MatchProjectItem = cat;
+            }
+            else if (T is ProjectScriptSlicerData slicerData)
+            {
+                var cat = InternalGetPrefabInstance<ProjectScriptSlicer>();
+                cat.IsSetupProjectScriptSlicingSourceData = true;
+                item = cat;
+                slicerData.MatchProjectItem = cat;
+            }
+            else if(T is LLMCoreData LLMCoreData)
+            {
+                var cat = InternalGetPrefabInstance<LLMCore>();
+                cat.IsSetupProjectLLMSourceData = true;
+                item = cat;
+                LLMCoreData.MatchProjectItem = cat;
+            }
+
+            if (item != null)
+            {
+                item.SourceData = T;
+                item.MyEditGroup.name = item.SourceData.ProjectItemID;
+                item.MyEditGroup.transform.SetParent(instance.GetController<ProjectManager>().ProjectTransformRoot, false);
+            }
         }
 
         public override bool FromMap(IBaseMap from)

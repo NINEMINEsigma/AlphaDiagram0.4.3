@@ -12,31 +12,33 @@ namespace AD.Experimental.LLM
         /// <summary>
         /// api地址
         /// </summary>
-        [SerializeField] protected string url;
+        public string url;
         /// <summary>
         /// 提示词，与消息一起发送
         /// </summary>
         [Header("发送的提示词设定")]
         public string Prompt = string.Empty;
+        [Header("是否使用默认的提示词模式")]
+        public bool IsUseDefaultPromptFormat = true;
         /// <summary>
         /// 语言
         /// </summary
         [Header("设置回复的语言")]
-        [SerializeField] protected string lan = "中文";
+        public string lan = "中文";
         /// <summary>
         /// 上下文保留条数
         /// </summary>
         [Header("上下文保留条数")]
-        [SerializeField] protected int m_HistoryKeepCount = 15;
+        public int m_HistoryKeepCount = 15;
         /// <summary>
         /// 缓存对话
         /// </summary>
-        [SerializeField] public List<SendData> m_DataList = new List<SendData>();
+        public List<SendData> m_DataList = new();
         [Header("Assets")]
         /// <summary>
         /// 计算方法调用的时间
         /// </summary>
-        [SerializeField] protected Stopwatch stopwatch = new Stopwatch();
+        public Stopwatch stopwatch = new();
 
         /// <summary>
         /// 发送消息
@@ -46,9 +48,10 @@ namespace AD.Experimental.LLM
             //上下文条数设置
             CheckHistory();
             //提示词处理
-            string message = "当前为角色的人物设定：" + Prompt +
+            string message =
+                IsUseDefaultPromptFormat ? ("当前为角色的人物设定：" + Prompt +
                 " 回答的语言：" + lan +
-                " 接下来是我的提问：" + _msg;
+                " 接下来是我的提问：" + _msg) : _msg;
 
             //缓存发送的信息列表
             m_DataList.Add(new SendData("user", message));
@@ -92,5 +95,20 @@ namespace AD.Experimental.LLM
 
         }
 
+        public virtual VariantSetting GetSetting()
+        {
+            return null;
+        }
+
+        public virtual void InitVariant(VariantSetting setting)
+        {
+
+        }
+
+        [Serializable]
+        public class VariantSetting
+        {
+            
+        }
     }
 }

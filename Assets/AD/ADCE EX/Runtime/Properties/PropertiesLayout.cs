@@ -288,6 +288,7 @@ namespace AD.Experimental.GameEditor
         public static Dropdown Dropdown(string label, string[] options, string initSelect, string message, UnityAction<string> action)
         {
             Dropdown cat = GUIField(label, "Dropdown(UI)", message).As<Dropdown>();
+            cat.ClearOptions();
             cat.AddOption(options);
             cat.AddListener(action);
             cat.Select(initSelect);
@@ -296,6 +297,7 @@ namespace AD.Experimental.GameEditor
         public static Dropdown Dropdown(string[] options, string initSelect, string message, UnityAction<string> action)
         {
             Dropdown cat = GUIField("Dropdown(UI)", message).As<Dropdown>();
+            cat.ClearOptions();
             cat.AddOption(options);
             cat.AddListener(action);
             cat.Select(initSelect);
@@ -304,6 +306,7 @@ namespace AD.Experimental.GameEditor
         public static ModernUIDropdown ModernUIDropdown(string label, string[] options, string[] initSelects, string message, UnityAction<string> action)
         {
             ModernUIDropdown cat = GUIField(label, "Dropdown(ModernUI)", message).As<ModernUIDropdown>();
+            cat.ClearOptions();
             cat.AddOption(options);
             cat.AddListener(action);
             cat.maxSelect = initSelects.Length;
@@ -316,6 +319,7 @@ namespace AD.Experimental.GameEditor
         public static ModernUIDropdown ModernUIDropdown(string[] options, string[] initSelects, string message, UnityAction<string> action)
         {
             ModernUIDropdown cat = GUIField("Dropdown(ModernUI)", message).As<ModernUIDropdown>();
+            cat.ClearOptions();
             cat.AddOption(options);
             cat.AddListener(action);
             cat.maxSelect = initSelects.Length;
@@ -529,8 +533,8 @@ namespace AD.Experimental.GameEditor
             var input = InputField(initValue.ToString(), label, message);
             input.AddListener(T =>
             {
-                if (float.TryParse(T, out var value))
-                    action.Invoke(value);
+                if (ArithmeticExtension.TryParse(T,out var value))
+                    action.Invoke(value.ReadValue());
                 else
                 {
                     input.SetTextWithoutNotify("0");
@@ -547,8 +551,8 @@ namespace AD.Experimental.GameEditor
             var input = InputField(initValue.ToString(), label, message);
             input.AddListener(T =>
             {
-                if (int.TryParse(T, out var value))
-                    action.Invoke(value);
+                if (ArithmeticExtension.TryParse(T, out var value))
+                    action.Invoke((int)value.ReadValue());
                 else
                 {
                     input.SetTextWithoutNotify("0");

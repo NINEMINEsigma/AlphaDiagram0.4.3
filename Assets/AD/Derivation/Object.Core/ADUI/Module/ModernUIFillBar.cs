@@ -52,6 +52,11 @@ namespace AD.UI
             Context.OnDragEvent = InitializeContextSingleEvent(Context.OnDragEvent, OnDrag);
         }
 
+        public void SetValue(float t)
+        {
+            SetPerecent((t - minValue) / (maxValue - minValue));
+        }
+
         public void SetPerecent(float t)
         {
             if (IsLockByScript) currentPercent = Mathf.Clamp(t, 0, 1);

@@ -46,6 +46,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: http://127.0.0.1:8000/v1/chat/completions
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -97,6 +98,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: 
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -148,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: https://api.openai.com/v1/completions
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -207,6 +210,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: 
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -261,6 +265,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -311,6 +316,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: http://localhost:8000
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -360,6 +366,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: 
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -414,6 +421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   url: https://api.openai.com/v1/chat/completions
   Prompt: 
+  IsUseDefaultPromptFormat: 1
   lan: "\u4E2D\u6587"
   m_HistoryKeepCount: 15
   m_DataList: []
@@ -477,7 +485,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1239805370655458854, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: m_Name
-      value: LLM Core
+      value: LLMCore
       objectReference: {fileID: 0}
     - target: {fileID: 1239805370786680764, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: GameObjects.Data.Array.size
@@ -501,7 +509,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1239805370786680764, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: GameObjects.Data.Array.data[10].Key
-      value: Knowledge Baidu
+      value: Chat Knowledge Baidu
       objectReference: {fileID: 0}
     - target: {fileID: 1239805370786680764, guid: b79991fe014a69642bf7895cf81a3202, type: 3}
       propertyPath: GameObjects.Data.Array.data[11].Key
@@ -705,6 +713,7 @@ MonoBehaviour:
     ProjectItemPosition: {x: 0, y: 0}
   m_EditGroup: {fileID: 6164667846557010934}
   MyLineRenderer: {fileID: 8005262062184629788}
+  m_MatchLLM: {fileID: 0}
 --- !u!114 &6164667846557010934 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1239805370655458853, guid: b79991fe014a69642bf7895cf81a3202, type: 3}

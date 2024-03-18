@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AD.BASE;
 using AD.Experimental.GameEditor;
+using AD.Experimental.LLM;
 using AD.Experimental.Performance;
 using AD.Sample.Texter.Data;
 using AD.Sample.Texter.Internal;
@@ -11,21 +13,47 @@ using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
+using static AD.Experimental.LLM.LLM;
 
 namespace AD.Sample.Texter
 {
     [Serializable]
     public class LLMCoreData : ProjectItemData
     {
+        public string url;
+        public string lan;
+        public string Prompt;
+        public bool IsUseDefaultPromptFormat;
+        public int HistoryKeepCount;
+        public List<SendData> m_DataList = new();
+        public Dictionary<string, VariantSetting> VariantSettingPairs = new();
 
-        public LLMCoreData(LLMCore projectItem) : base(projectItem)
+        public LLMCoreData(LLMCore projectItem,
+                           string url,
+                           string lan,
+                           string prompt,
+                           bool isUseDefaultPromptFormat,
+                           int historyKeepCount,
+                           Dictionary<string, VariantSetting> variantSettingPairs) : base(projectItem)
         {
+            this.url = url;
+            this.lan = lan;
+            this.Prompt = prompt;
+            this.IsUseDefaultPromptFormat = isUseDefaultPromptFormat;
+            this.HistoryKeepCount = historyKeepCount;
+            this.VariantSettingPairs = variantSettingPairs;
         }
 
         public override bool FromMap(ProjectData_BaseMap from)
         {
             if (from is LLMCore_BaseMap data)
             {
+                this.url = data.url;
+                this.lan = data.lan;
+                this.Prompt = data.Prompt;
+                this.IsUseDefaultPromptFormat = data.IsUseDefaultPromptFormat;
+                this.HistoryKeepCount = data.HistoryKeepCount;
+                this.VariantSettingPairs = data.VariantSettingPairs;
                 return base.FromMap(from);
             }
             else return false;
@@ -33,7 +61,7 @@ namespace AD.Sample.Texter
 
         public override void ToMap(out ProjectData_BaseMap BM)
         {
-            BM = new LLMCore_BaseMap();
+            BM = new LLMCore_BaseMap(url, lan, Prompt, IsUseDefaultPromptFormat, HistoryKeepCount, VariantSettingPairs);
             BM.FromObject(this);
         }
     }
@@ -44,14 +72,39 @@ namespace AD.Sample.Texter
         [Serializable]
         public class LLMCore_BaseMap : ProjectData_BaseMap
         {
-            public LLMCore_BaseMap()
+            public string url;
+            public string lan;
+            public string Prompt;
+            public bool IsUseDefaultPromptFormat;
+            public int HistoryKeepCount;
+            public List<SendData> m_DataList = new();
+            public Dictionary<string, VariantSetting> VariantSettingPairs = new();
+
+            public LLMCore_BaseMap(string url,
+                                   string lan,
+                                   string prompt,
+                                   bool isUseDefaultPromptFormat,
+                                   int historyKeepCount,
+                                   Dictionary<string, VariantSetting> variantSettingPairs)
             {
+                this.url = url;
+                this.lan = lan;
+                this.Prompt = prompt;
+                this.IsUseDefaultPromptFormat = isUseDefaultPromptFormat;
+                this.HistoryKeepCount = historyKeepCount;
+                this.VariantSettingPairs = variantSettingPairs;
             }
 
             public override bool FromObject(ProjectItemData from)
             {
                 if (from is LLMCoreData data)
                 {
+                    this.url = data.url;
+                    this.lan = data.lan;
+                    this.Prompt = data.Prompt;
+                    this.IsUseDefaultPromptFormat = data.IsUseDefaultPromptFormat;
+                    this.HistoryKeepCount = data.HistoryKeepCount;
+                    this.VariantSettingPairs = data.VariantSettingPairs;
                     return base.FromObject(from);
                 }
                 else return false;
@@ -59,7 +112,7 @@ namespace AD.Sample.Texter
 
             public override void ToObject(out ProjectItemData obj)
             {
-                obj = new LLMCoreData(null);
+                obj = new LLMCoreData(null, url, lan, Prompt, IsUseDefaultPromptFormat, HistoryKeepCount, VariantSettingPairs);
                 obj.FromMap(this);
             }
         }
@@ -86,6 +139,85 @@ namespace AD.Sample.Texter.Project
 
                 DisplayProjectID(data);
 
+                PropertiesLayout.Title("目标大模型配置");
+                PropertiesLayout.Label("API URL");
+                PropertiesLayout.InputField(that.MatchLLM.url, "api url").AddListener(T => that.MatchLLM.url = T);
+                PropertiesLayout.Label("Language Label");
+                PropertiesLayout.InputField(that.MatchLLM.lan, "lan").AddListener(T => that.MatchLLM.lan = T);
+                PropertiesLayout.Label("Prompt");
+                PropertiesLayout.InputField(that.MatchLLM.Prompt, "Prompt words").AddListener(T => that.MatchLLM.Prompt = T);
+
+                PropertiesLayout.ModernUISwitch("Prompt Mode", that.MatchLLM.IsUseDefaultPromptFormat, "Is Use Default Prompt Format", T => that.MatchLLM.IsUseDefaultPromptFormat = T);
+
+                PropertiesLayout.Label("Context Max", "Max History Context, Memoray");
+                PropertiesLayout.InputField(that.MatchLLM.m_HistoryKeepCount.ToString(), "Context Max", "Context Max(Max History Context)").Share(out var CMaxInput)
+                    .AddListener(T =>
+                {
+                    if (ArithmeticExtension.TryParse(T, out var result))
+                    {
+                        that.MatchLLM.m_HistoryKeepCount = (int)result.ReadValue();
+                    }
+                    else CMaxInput.SetTextWithoutNotify(that.MatchLLM.m_HistoryKeepCount.ToString());
+                });
+
+                PropertiesLayout.Label("Select LLM");
+                PropertiesLayout.Dropdown(GetALLMatchLLM(that.MyEditGroup).GetSubList<string, LLM>(T => T != null, T => T.gameObject.name).ToArray()
+                   , that.MatchLLMMonoName, "The Current Working LLM", T => { }).Share(out var SeLLM).SetTitle(that.MatchLLMMonoName);
+                SeLLM.AddListener(T =>
+                    {
+                        var cat = GetMatchLLM(that.MyEditGroup, T);
+                        if (cat != null)
+                        {
+                            that.m_MatchLLM = cat;
+                            SeLLM.SetTitle(that.MatchLLMMonoName);
+                            GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();
+                        }
+                    });
+            }
+        }
+
+        public class LLMCoreVariantBlock: ProjectItemBlock
+        {
+            public LLMCoreVariantBlock(LLMCore target) : base(target)
+            {
+                that = target;
+            }
+
+            public LLMCore that;
+
+            protected override void HowSerialize()
+            {
+                var data = that.ProjectLLMSourceData;
+                this.MatchItem.SetTitle("LLM Setting");
+
+                if (that.m_MatchLLM.GetType() == typeof(ChatSpark))
+                {
+                    SerializeChatSpark();
+                }
+            }
+
+            private void SerializeChatSpark()
+            {
+                ChatSpark chat = that.m_MatchLLM as ChatSpark;
+                PropertiesLayout.Label("API Key");
+                PropertiesLayout.InputField(chat.m_XunfeiSettings.m_APIKey, "api key").AddListener(T => chat.m_XunfeiSettings.m_APIKey = T);
+                PropertiesLayout.Label("API Secret");
+                PropertiesLayout.InputField(chat.m_XunfeiSettings.m_APISecret, "api Secret").AddListener(T => chat.m_XunfeiSettings.m_APISecret = T);
+                PropertiesLayout.Label("API AppID");
+                PropertiesLayout.InputField(chat.m_XunfeiSettings.m_AppID, "api AppID").AddListener(T => chat.m_XunfeiSettings.m_AppID = T);
+                PropertiesLayout.Enum<ChatSpark.ModelType>("Model Level", (int)chat.m_SparkModel, "Model Level 1.0 - 3.5", T =>
+                {
+                    Debug.Log(T);
+                    chat.m_SparkModel = T switch
+                    {
+                        "ModelV15" => ChatSpark.ModelType.ModelV15,
+                        "ModelV20" => ChatSpark.ModelType.ModelV20,
+                        "ModelV30" => ChatSpark.ModelType.ModelV30,
+                        "ModelV35" => ChatSpark.ModelType.ModelV35,
+                        _ => ChatSpark.ModelType.ModelV35
+                    };
+                    //Enum.TryParse<ChatSpark.ModelType>(T, out var result) ? result : ChatSpark.ModelType.ModelV30;
+                }).SetTitle(chat.m_SparkModel.ToString());
             }
         }
 
@@ -112,15 +244,21 @@ namespace AD.Sample.Texter.Project
             {
                 transform.localPosition = App.GetOriginPosition(ProjectLLMSourceData.ProjectItemPosition);
                 this.SetParent(ADGlobalSystem.FinalCheckWithThrow(ProjectItemData.GetParent(ProjectLLMSourceData.ParentItemID)));
+                foreach (var single in GetALLMatchLLM(MyEditGroup))
+                {
+                    if (ProjectLLMSourceData.VariantSettingPairs.TryGetValue(single.name, out var setting))
+                        single.InitVariant(setting);
+                }
             }
             else
             {
-                ProjectLLMSourceData = new(this);
+                ProjectLLMSourceData = new(this, "", "中文", "", true, 15, new());
             }
             MatchHierarchyEditor = new HierarchyBlock<LLMCore>(this, () => this.SourceData.ProjectItemID);
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
             {
                 new LLMCoreBlock(this),
+                new LLMCoreVariantBlock(this),
                 new ProjectItemGeneraterBlock(this,App.Get(SubProjectItemPrefab,false),new(SetupChild))
             };
             App.instance.AddMessage($"Project Item(LLM Core) {ProjectLLMSourceData.ProjectItemID} Setup");
@@ -201,6 +339,12 @@ namespace AD.Sample.Texter.Project
         {
             try
             {
+                this.ProjectLLMSourceData.VariantSettingPairs.Clear();
+                foreach (var single in GetALLMatchLLM(MyEditGroup))
+                {
+                    this.ProjectLLMSourceData.VariantSettingPairs.Add(single.name, single.GetSetting());
+                }
+
                 var currentData = App.instance.GetController<ProjectManager>().CurrentProjectData;
                 ProjectLLMSourceData.ProjectItemPosition = new Vector2(transform.position.x, transform.position.z);
                 if (currentData.TryGetValue(new(ProjectItemBindKey), out ProjectItemDataCache data))
@@ -318,5 +462,33 @@ namespace AD.Sample.Texter.Project
         {
             OnChange();
         }
+
+        public static LLM GetMatchLLM(EditGroup editGroup)
+        {
+            return ADGlobalSystem.FinalCheckCanntNull(editGroup.ViewLayer.GameObjects.FirstOrDefault(T => T.Key.StartsWith("Chat")).Value.SeekComponent<LLM>());
+        }
+
+        public static LLM GetMatchLLM(EditGroup editGroup,string Key)
+        {
+            return editGroup.ViewLayer.GameObjects.FirstOrDefault(T => T.Key== Key).Value.SeekComponent<LLM>();
+        }
+
+        public static LLM[] GetALLMatchLLM(EditGroup editGroup)
+        {
+            return editGroup.ViewLayer.GameObjects.GetSubList<LLM, KeyValuePair<string,GameObject>>(T => T.Key.StartsWith("Chat"), T => T.Value.SeekComponent<LLM>()).ToArray();
+        }
+
+        [SerializeField] private LLM m_MatchLLM;
+        public LLM MatchLLM
+        { 
+            get
+            {
+                if (m_MatchLLM == null) m_MatchLLM = GetMatchLLM(MyEditGroup);
+                return m_MatchLLM;
+            }
+            set => MatchLLM = value;
+        }
+        public string MatchLLMMonoName => MatchLLM.name;
+        public string MatchLLMComponentName => MatchLLM.GetType().Name;
     }
 }

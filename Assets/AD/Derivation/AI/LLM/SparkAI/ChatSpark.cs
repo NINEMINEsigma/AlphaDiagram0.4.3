@@ -38,12 +38,12 @@ namespace AD.Experimental.LLM
         /// <summary>
         /// 讯飞的应用设置
         /// </summary>
-        [SerializeField] private XunfeiSettings m_XunfeiSettings = new();
+        public XunfeiSettings m_XunfeiSettings = new();
         /// <summary>
         /// 选择星火大模型版本
         /// </summary>
         [Header("选择星火大模型版本")]
-        [SerializeField] private ModelType m_SparkModel = ModelType.ModelV15;
+        public ModelType m_SparkModel = ModelType.ModelV15;
 
         #endregion
 
@@ -348,7 +348,7 @@ namespace AD.Experimental.LLM
             public int index;
         }
 
-        private enum ModelType
+        public enum ModelType
         {
             ModelV15,
             ModelV20,

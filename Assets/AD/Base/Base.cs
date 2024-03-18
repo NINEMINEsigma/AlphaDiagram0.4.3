@@ -1039,6 +1039,33 @@ namespace AD.BASE
 
     public abstract class ADBaseInvokableCall
     {
+        public static void DebugLogTarget(MethodInfo info)
+        {
+            string ReturnType = info.ReturnType.FullName;
+            string FunName = info.Name;
+
+            string ParaNames =
+                info.GetParameters().Length > 0
+                ? StringExtension.LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name).ToArray(), ",")
+                : "";
+            DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+        }
+
+        public static void DebugLogMethod(MethodInfo info, params object[] args)
+        {
+            string ReturnType = info.ReturnType.FullName;
+            string FunName = info.Name;
+
+            int index = 0;
+
+            string ParaNames =
+                info.GetParameters().Length > 0
+                ? StringExtension
+                .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{args[index++]}]").ToArray(), ",")
+                : "";
+            DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+        }
+
         protected ADBaseInvokableCall()
         {
         }
@@ -1116,6 +1143,7 @@ namespace AD.BASE
 
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args);
                 this.Delegate();
             }
         }
@@ -1124,6 +1152,7 @@ namespace AD.BASE
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method);
                 this.Delegate();
             }
         }
@@ -1159,6 +1188,7 @@ namespace AD.BASE
             ADBaseInvokableCall.ThrowOnInvalidArg<T1>(args[0]);
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args);
                 this.Delegate((T1)args[0]);
             }
         }
@@ -1167,6 +1197,7 @@ namespace AD.BASE
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args);
                 this.Delegate(args);
             }
         }
@@ -1203,6 +1234,7 @@ namespace AD.BASE
             ADBaseInvokableCall.ThrowOnInvalidArg<T2>(args[1]);
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args);
                 this.Delegate((T1)args[0], (T2)args[1]);
             }
         }
@@ -1211,6 +1243,7 @@ namespace AD.BASE
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args0, args1);
                 this.Delegate(args0, args1);
             }
         }
@@ -1248,6 +1281,7 @@ namespace AD.BASE
             ADBaseInvokableCall.ThrowOnInvalidArg<T3>(args[2]);
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args);
                 this.Delegate((T1)args[0], (T2)args[1], (T3)args[2]);
             }
         }
@@ -1256,6 +1290,7 @@ namespace AD.BASE
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args0, args1, args2);
                 this.Delegate(args0, args1, args2);
             }
         }
@@ -1294,6 +1329,7 @@ namespace AD.BASE
             ADBaseInvokableCall.ThrowOnInvalidArg<T4>(args[3]);
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args);
                 this.Delegate((T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]);
             }
         }
@@ -1302,6 +1338,7 @@ namespace AD.BASE
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
+                DebugLogMethod(this.Delegate.Method, args0, args1, args2, args3);
                 this.Delegate(args0, args1, args2, args3);
             }
         }
@@ -2495,9 +2532,9 @@ namespace AD.BASE
 
         public static T SeekComponent<T>(this GameObject self) where T : class
         {
-            foreach (var componentSingle in self.GetComponents<MonoBehaviour>())
+            foreach (var item in self.GetComponents<MonoBehaviour>())
             {
-                if (componentSingle is T result)
+                if (item.As<T>(out var result))
                 {
                     return result;
                 }
@@ -2507,15 +2544,7 @@ namespace AD.BASE
 
         public static T SeekComponent<T>(this Component self) where T : class
         {
-            foreach (var componentSingle in self.gameObject.GetComponents<MonoBehaviour>())
-            {
-                Debug.Log(componentSingle.GetType().FullName);
-                if (componentSingle is T result)
-                {
-                    return result;
-                }
-            }
-            return null;
+            return SeekComponent<T>(self.gameObject);
         }
     }
 
@@ -2584,6 +2613,7 @@ namespace AD.BASE
         static DebugExtenion()
         {
             FileC.DeleteFile(LogPath);
+            File.Create(LogPath).Close();
             Application.logMessageReceived += LogHandler;
         }
 
@@ -2625,6 +2655,12 @@ namespace AD.BASE
                     var newcat = temp.SubArray(0, temp.Length - 1);
                 }
                 sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " : " + temp.LinkAndInsert('|'));
+            }
+#else
+            if (LogMethodEnabled)
+            {
+                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                sws.WriteLine(System.DateTime.Now.ToString() + " : " + message);
             }
 #endif
         }
