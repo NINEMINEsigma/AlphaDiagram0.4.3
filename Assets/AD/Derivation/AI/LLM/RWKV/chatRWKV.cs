@@ -8,6 +8,24 @@ namespace AD.Experimental.LLM
 {
     public class chatRWKV : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "SystemSetting", m_SystemSetting },
+                { "gptModel", m_gptModel }
+            };
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            m_SystemSetting = setting.Settings["SystemSetting"];
+            m_gptModel = setting.Settings["gptModel"];
+        }
+
         public chatRWKV()
         {
             url = "http://127.0.0.1:8000/v1/chat/completions";

@@ -29,7 +29,7 @@ namespace AD.Experimental.LLM
         /// <summary>
         /// 获取Token的地址
         /// </summary>
-        [SerializeField] private string m_AuthorizeURL = "https://aip.baidubce.com/oauth/2.0/token";
+        public string m_AuthorizeURL = "https://aip.baidubce.com/oauth/2.0/token";
         #endregion
 
         public void GetTokenAction(string _token)
@@ -67,6 +67,33 @@ namespace AD.Experimental.LLM
 
     public class ChatBaidu : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "APIKey", m_Settings.m_API_key },
+                { "GetTokenFromServer", m_Settings.GetTokenFromServer.ToString() },
+                { "Secret", m_Settings.m_Client_secret },
+                { "Token", m_Settings.m_Token },
+                { "AuthorizeURL", m_Settings.m_AuthorizeURL },
+                {"ModelType", m_ModelType.ToString() }
+            };
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            m_Settings.m_API_key = setting.Settings["APIKey"];
+            m_Settings.GetTokenFromServer = bool.Parse(setting.Settings["GetTokenFromServer"]);
+            m_Settings.m_Client_secret = setting.Settings["Secret"];
+            m_Settings.m_Token = setting.Settings["Token"];
+            m_Settings.m_AuthorizeURL = setting.Settings["AuthorizeURL"];
+            m_ModelType = Enum.Parse<ModelType>(setting.Settings["ModelType"]);
+            m_History = ADGlobalSystem.Deserialize<List<message>>(setting.Settings["History"], out var obj) ? obj as List<message> : new();
+        }
+
         public ChatBaidu()
         {
             url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant";

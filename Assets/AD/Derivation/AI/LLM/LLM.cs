@@ -97,18 +97,31 @@ namespace AD.Experimental.LLM
 
         public virtual VariantSetting GetSetting()
         {
-            return null;
+            return new VariantSetting()
+            {
+                DataList = m_DataList,
+                HistoryKeepCount = m_HistoryKeepCount,
+                lan = lan,
+                url = url
+            };
         }
 
         public virtual void InitVariant(VariantSetting setting)
         {
-
+            this.url=setting.url;
+            this.lan = setting.lan;
+            this.m_HistoryKeepCount = setting.HistoryKeepCount;
+            this.m_DataList = setting.DataList;
         }
 
         [Serializable]
         public class VariantSetting
         {
-            
+            public string url;
+            public string lan;
+            public int HistoryKeepCount;
+            public List<SendData> DataList;
+            public Dictionary<string, string> Settings;
         }
     }
 }

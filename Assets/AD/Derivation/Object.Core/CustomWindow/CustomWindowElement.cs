@@ -67,7 +67,8 @@ namespace AD.UI
 
         [HideInInspector] public bool isCanBackPool = true;
         protected bool isCanRefresh = true;
-        protected virtual bool isSubPageUsingOtherSetting => false;
+        public bool BaseDefaultIsSubPageUsingOtherSetting = false;
+        protected virtual bool isSubPageUsingOtherSetting => BaseDefaultIsSubPageUsingOtherSetting;
 
         public bool isCanDrag
         {
@@ -88,7 +89,7 @@ namespace AD.UI
             }
             Childs.Clear();
             rectTransform.localPosition = Vector3.zero;
-            if (!isSubPageUsingOtherSetting)
+            if (!(isSubPageUsingOtherSetting || BaseDefaultIsSubPageUsingOtherSetting))
                 SetRect(new Vector2(300, 0));
             size = Vector2.zero;
             Padding = Vector4.zero;
@@ -116,8 +117,8 @@ namespace AD.UI
 
         public void BackPool()
         {
-            if (!isCanBackPool) return;
             OnEsc.Invoke();
+            if (!isCanBackPool) return;
             HowBackPool.Invoke(this);
         }
 

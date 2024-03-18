@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Experimental.Performance;
@@ -9,7 +10,6 @@ using AD.Sample.Texter.Project;
 using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
-using Dreamteck.Splines;
 using UnityEngine;
 
 namespace AD.Sample.Texter
@@ -111,6 +111,15 @@ namespace AD.Sample.Texter
                             OnEvent?.Invoke(entry.delegates.Invoke(_that));
                         });
                     }
+                }
+            }
+
+            public void GenerateItem(Predicate<GenerateTargetEntry> predicate)
+            {
+                var target = generateTargetEntries.GetSubList(predicate);
+                foreach (var item in target)
+                {
+                    OnEvent?.Invoke(item.delegates.Invoke(_that));
                 }
             }
         }

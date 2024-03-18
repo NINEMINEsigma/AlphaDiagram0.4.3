@@ -11,6 +11,30 @@ namespace AD.Experimental.LLM
 {
     public class ChatGLM_Turbo : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "ApiKey", m_ApiKey },
+                { "Key", m_Key },
+                { "Secret", m_SecretKey },
+                { "ModelType",m_Type.ToString() },
+                { "InvokeMethod", m_InvokeMethod }
+            };
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            m_ApiKey = setting.Settings["ApiKey"];
+            m_Key = setting.Settings["Key"];
+            m_SecretKey = setting.Settings["Secret"];
+            m_Type = Enum.Parse<ModelType>(setting.Settings["ModelType"]);
+            m_InvokeMethod = setting.Settings["InvokeMethod"];
+        }
+
         #region 参数
         /// <summary>
         /// 选择的模型

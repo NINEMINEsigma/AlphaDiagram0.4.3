@@ -9,6 +9,26 @@ namespace AD.Experimental.LLM
 {
     public class chatGPT : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "Key", api_key }
+            };
+            if (ADGlobalSystem.Serialize<PostData>(m_PostDataSetting, out string str))
+                setting.Settings.Add("PostDataSetting", str);
+
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            api_key = setting.Settings["Key"];
+            m_PostDataSetting = ADGlobalSystem.Deserialize<PostData>(setting.Settings["PostDataSetting"], out object obj) ? obj as PostData : new();
+        }
+
         public chatGPT()
         {
             url = "https://api.openai.com/v1/completions";

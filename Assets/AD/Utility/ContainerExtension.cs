@@ -75,7 +75,7 @@ namespace AD.Utility
             return result;
         }
 
-        public static List<Result> GetSubListAfterLinking<T,Result>(this List<T> self) where T:IProperty_Value_get<List<Result>>
+        public static List<Result> GetSubListAfterLinking<T, Result>(this List<T> self) where T : IProperty_Value_get<List<Result>>
         {
             List<Result> result = new();
             foreach (var single in self)
@@ -182,12 +182,37 @@ namespace AD.Utility
             return result;
         }
 
-        public static List<Result> GetSubList<Result,KeyArgs, T>(this IEnumerable<T> self, Func<T, (bool, KeyArgs)> predicate, Func<T, KeyArgs, Result> transformFunc)
+        public static List<Result> GetSubList<Result, KeyArgs, T>(this IEnumerable<T> self, Func<T, (bool, KeyArgs)> predicate, Func<T, KeyArgs, Result> transformFunc)
         {
             List<Result> result = new();
             foreach (var item in self)
             {
                 if (predicate(item).Share(out var keyArgs).Item1) result.Add(transformFunc(item, keyArgs.Item2));
+            }
+            return result;
+        }
+
+        public static List<Result> Contravariance<Origin, Result>(this IEnumerable<Origin> self)
+            where Result :class, Origin
+        {
+            List<Result> result = new();
+            foreach (var item in self)
+            {
+                if(item.As<Result>(out Result cat))
+                {
+                    result.Add(cat);
+                }
+            }
+            return result;
+        }
+
+        public static List<Result> Covariance<Origin,Result>(this  IEnumerable<Origin> self)
+            where Origin:class,Result
+        {
+            List<Result> result = new();
+            foreach (var item in self)
+            {
+                result.Add(item);
             }
             return result;
         }

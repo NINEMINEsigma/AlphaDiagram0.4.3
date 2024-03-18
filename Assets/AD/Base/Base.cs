@@ -1039,6 +1039,13 @@ namespace AD.BASE
 
     public abstract class ADBaseInvokableCall
     {
+        public static bool IsLogParametersInstance 
+#if UNITY_EDITOR
+            = true;
+#else
+            = false;
+#endif
+
         public static void DebugLogTarget(MethodInfo info)
         {
             string ReturnType = info.ReturnType.FullName;
@@ -1053,17 +1060,24 @@ namespace AD.BASE
 
         public static void DebugLogMethod(MethodInfo info, params object[] args)
         {
-            string ReturnType = info.ReturnType.FullName;
-            string FunName = info.Name;
+            if (IsLogParametersInstance)
+            {
+                string ReturnType = info.ReturnType.FullName;
+                string FunName = info.Name;
 
-            int index = 0;
+                int index = 0;
 
-            string ParaNames =
-                info.GetParameters().Length > 0
-                ? StringExtension
-                .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{args[index++]}]").ToArray(), ",")
-                : "";
-            DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                string ParaNames =
+                    info.GetParameters().Length > 0
+                    ? StringExtension
+                    .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{args[index++]}]").ToArray(), ",")
+                    : "";
+                DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+            }
+            else
+            {
+                DebugLogTarget(info);
+            }
         }
 
         protected ADBaseInvokableCall()
@@ -2414,6 +2428,11 @@ namespace AD.BASE
 
     #region Extension
 
+    public interface IInvariant<T> where T : class
+    {
+
+    }
+
     public static class ObjectExtension
     {
         public static Dictionary<Type, IADArchitecture> AllArchitecture = new();
@@ -2421,12 +2440,12 @@ namespace AD.BASE
         public static T As<T>(this object self) where T : class
         {
             if (self == null) throw new ADException("Now As._Left is null");
-            return self as T;
+            return self is not IInvariant<T> ? self as T : null;
         }
 
         public static bool As<T>(this object self, out T result) where T : class
         {
-            if (self != null)
+            if (self is not IInvariant<T> && self != null)
             {
                 result = self as T;
                 return result != null;
@@ -2442,7 +2461,8 @@ namespace AD.BASE
         {
             if (self != null)
             {
-                return self as T != null;
+                if (self is IInvariant<T>) return false;
+                return self is T;
             }
             else return false;
         }
@@ -2450,7 +2470,7 @@ namespace AD.BASE
         public static bool Is<T>(this object self, out T result) where T : class
         {
             result = null;
-            if (self is T r)
+            if (self is not IInvariant<T> && self is T r)
             {
                 result = r;
                 return true;

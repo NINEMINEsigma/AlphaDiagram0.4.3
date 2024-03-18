@@ -20,27 +20,12 @@ namespace AD.Sample.Texter
     [Serializable]
     public class LLMCoreData : ProjectItemData
     {
-        public string url;
-        public string lan;
-        public string Prompt;
-        public bool IsUseDefaultPromptFormat;
-        public int HistoryKeepCount;
         public List<SendData> m_DataList = new();
         public Dictionary<string, VariantSetting> VariantSettingPairs = new();
 
-        public LLMCoreData(LLMCore projectItem,
-                           string url,
-                           string lan,
-                           string prompt,
-                           bool isUseDefaultPromptFormat,
-                           int historyKeepCount,
-                           Dictionary<string, VariantSetting> variantSettingPairs) : base(projectItem)
+        public LLMCoreData(LLMCore projectItem, List<SendData> dataList, Dictionary<string, VariantSetting> variantSettingPairs) : base(projectItem)
         {
-            this.url = url;
-            this.lan = lan;
-            this.Prompt = prompt;
-            this.IsUseDefaultPromptFormat = isUseDefaultPromptFormat;
-            this.HistoryKeepCount = historyKeepCount;
+            this.m_DataList = dataList;
             this.VariantSettingPairs = variantSettingPairs;
         }
 
@@ -48,11 +33,7 @@ namespace AD.Sample.Texter
         {
             if (from is LLMCore_BaseMap data)
             {
-                this.url = data.url;
-                this.lan = data.lan;
-                this.Prompt = data.Prompt;
-                this.IsUseDefaultPromptFormat = data.IsUseDefaultPromptFormat;
-                this.HistoryKeepCount = data.HistoryKeepCount;
+                this.m_DataList = data.m_DataList;
                 this.VariantSettingPairs = data.VariantSettingPairs;
                 return base.FromMap(from);
             }
@@ -61,7 +42,7 @@ namespace AD.Sample.Texter
 
         public override void ToMap(out ProjectData_BaseMap BM)
         {
-            BM = new LLMCore_BaseMap(url, lan, Prompt, IsUseDefaultPromptFormat, HistoryKeepCount, VariantSettingPairs);
+            BM = new LLMCore_BaseMap(m_DataList, VariantSettingPairs);
             BM.FromObject(this);
         }
     }
@@ -72,26 +53,12 @@ namespace AD.Sample.Texter
         [Serializable]
         public class LLMCore_BaseMap : ProjectData_BaseMap
         {
-            public string url;
-            public string lan;
-            public string Prompt;
-            public bool IsUseDefaultPromptFormat;
-            public int HistoryKeepCount;
             public List<SendData> m_DataList = new();
             public Dictionary<string, VariantSetting> VariantSettingPairs = new();
 
-            public LLMCore_BaseMap(string url,
-                                   string lan,
-                                   string prompt,
-                                   bool isUseDefaultPromptFormat,
-                                   int historyKeepCount,
-                                   Dictionary<string, VariantSetting> variantSettingPairs)
+            public LLMCore_BaseMap(List<SendData> dataList, Dictionary<string, VariantSetting> variantSettingPairs)
             {
-                this.url = url;
-                this.lan = lan;
-                this.Prompt = prompt;
-                this.IsUseDefaultPromptFormat = isUseDefaultPromptFormat;
-                this.HistoryKeepCount = historyKeepCount;
+                this.m_DataList = dataList;
                 this.VariantSettingPairs = variantSettingPairs;
             }
 
@@ -99,11 +66,7 @@ namespace AD.Sample.Texter
             {
                 if (from is LLMCoreData data)
                 {
-                    this.url = data.url;
-                    this.lan = data.lan;
-                    this.Prompt = data.Prompt;
-                    this.IsUseDefaultPromptFormat = data.IsUseDefaultPromptFormat;
-                    this.HistoryKeepCount = data.HistoryKeepCount;
+                    this.m_DataList = data.m_DataList;
                     this.VariantSettingPairs = data.VariantSettingPairs;
                     return base.FromObject(from);
                 }
@@ -112,7 +75,7 @@ namespace AD.Sample.Texter
 
             public override void ToObject(out ProjectItemData obj)
             {
-                obj = new LLMCoreData(null, url, lan, Prompt, IsUseDefaultPromptFormat, HistoryKeepCount, VariantSettingPairs);
+                obj = new LLMCoreData(null, m_DataList, VariantSettingPairs);
                 obj.FromMap(this);
             }
         }
@@ -168,7 +131,19 @@ namespace AD.Sample.Texter.Project
                         var cat = GetMatchLLM(that.MyEditGroup, T);
                         if (cat != null)
                         {
+                            if(that.ProjectLLMSourceData.VariantSettingPairs.ContainsKey(that.m_MatchLLM.name))
+                            {
+                                that.ProjectLLMSourceData.VariantSettingPairs[that.m_MatchLLM.name] = that.m_MatchLLM.GetSetting();
+                            }
+                            else
+                            {
+                                that.ProjectLLMSourceData.VariantSettingPairs.Add(that.m_MatchLLM.name, that.m_MatchLLM.GetSetting());
+                            }
                             that.m_MatchLLM = cat;
+                            if(that.ProjectLLMSourceData.VariantSettingPairs.TryGetValue(cat.name,out var vSetting))
+                            {
+                                cat.InitVariant(vSetting);
+                            }
                             SeLLM.SetTitle(that.MatchLLMMonoName);
                             GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();
                         }
@@ -252,7 +227,7 @@ namespace AD.Sample.Texter.Project
             }
             else
             {
-                ProjectLLMSourceData = new(this, "", "中文", "", true, 15, new());
+                ProjectLLMSourceData = new(this,new(), new());
             }
             MatchHierarchyEditor = new HierarchyBlock<LLMCore>(this, () => this.SourceData.ProjectItemID);
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
@@ -287,7 +262,7 @@ namespace AD.Sample.Texter.Project
 
         public void InitCurrentLLM()
         {
-
+            this.m_MatchLLM.InitVariant(new());
         }
 
         private void OnEnable()

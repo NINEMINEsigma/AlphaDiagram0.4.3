@@ -8,6 +8,28 @@ namespace AD.Experimental.LLM
 {
     public class chatgptTurbo : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "Key", api_key },
+                { "SystemSetting", m_SystemSetting },
+                { "Model", m_gptModel }
+            };
+
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            api_key = setting.Settings["Key"];
+            m_SystemSetting = setting.Settings["SystemSetting"];
+            m_gptModel = setting.Settings["Model"];
+        }
+
+
         public chatgptTurbo()
         {
             url = "https://api.openai.com/v1/chat/completions";

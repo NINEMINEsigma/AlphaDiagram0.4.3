@@ -8,6 +8,25 @@ namespace AD.Experimental.LLM
 {
     public class KnowledgeBaidu : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "Key", m_ApiKey },
+                { "ConversationID", m_ConversationID }
+            };
+
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            m_ApiKey = setting.Settings["Key"];
+            m_ConversationID = setting.Settings["ConversationID"];
+        }
+
         #region 定义变量
         //密钥
         [SerializeField] private string m_ApiKey = string.Empty;

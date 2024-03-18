@@ -33,6 +33,28 @@ namespace AD.Experimental.LLM
 
     public class ChatSpark : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new()
+            {
+                { "ID", m_XunfeiSettings.m_AppID },
+                { "Key", m_XunfeiSettings.m_APIKey },
+                { "Secret", m_XunfeiSettings.m_APISecret },
+                { "ModelType", m_SparkModel.ToString() }
+            };
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            m_XunfeiSettings.m_AppID = setting.Settings["ID"];
+            m_XunfeiSettings.m_APIKey = setting.Settings["Key"];
+            m_XunfeiSettings.m_APISecret = setting.Settings["Secret"];
+            m_SparkModel = Enum.Parse<ModelType>(setting.Settings["ModelType"]);
+        }
+
         #region 参数
 
         /// <summary>

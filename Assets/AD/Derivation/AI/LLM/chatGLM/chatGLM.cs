@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -9,12 +10,28 @@ namespace AD.Experimental.LLM
 {
     public class chatGLM : LLM
     {
+        public override VariantSetting GetSetting()
+        {
+            var setting = base.GetSetting();
+            setting.Settings = new();
+            if (ADGlobalSystem.Serialize<List<List<string>>>(m_History, out string str))
+                setting.Settings.Add("History", str);
+
+            return setting;
+        }
+
+        public override void InitVariant(VariantSetting setting)
+        {
+            base.InitVariant(setting);
+            m_History = ADGlobalSystem.Deserialize<List<List<string>>>(setting.Settings["History"], out object obj) ? obj as List<List<string>> : new();
+        }
+
         public chatGLM()
         {
             url = "http://localhost:8000";
         }
 
-        [SerializeField] private List<List<string>> m_History = new List<List<string>>();
+        [SerializeField] private List<List<string>> m_History = new();
 
         public override void PostMessage(string _msg, Action<string> _callback)
         {
