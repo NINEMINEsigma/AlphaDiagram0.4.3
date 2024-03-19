@@ -58,7 +58,7 @@ namespace AD.UI
                 : GameObject.Instantiate(WindowPerfab.gameObject)).GetComponent<CustomWindowElement>();
             cat.gameObject.SetActive(true);
             cat.transform.SetParent(Parent, false);
-            cat.HowBackPool = Despawn;
+            cat.HowBackPool = new UnityEngine.Events.UnityAction<CustomWindowElement>(Despawn);
             return cat;
         }
 
@@ -102,7 +102,7 @@ namespace AD.UI
             cat.gameObject.SetActive(true);
             cat.transform.SetParent(Parent, false);
             cat.Init();
-            cat.HowBackPool = Despawn;
+            cat.HowBackPool = new UnityEngine.Events.UnityAction<CustomWindowElement>(Despawn);
             return cat;
         }
 

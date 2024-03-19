@@ -246,8 +246,8 @@ namespace AD.Experimental.LLM
                         if (_responseData.header.code != 0)
                         {
                             //返回错误
-                            //PrintErrorLog(_responseData.code);
                             Debug.Log("错误码：" + _responseData.header.code);
+                            _callback("ERROR : " + _responseData.header.code);
                             m_WebSocket.Abort();
                             break;
                         }
@@ -255,6 +255,7 @@ namespace AD.Experimental.LLM
                         if (_responseData.payload.choices.text.Count == 0)
                         {
                             Debug.LogError("没有获取到回复的信息！");
+                            _callback("ERROR : No Request");
                             m_WebSocket.Abort();
                             break;
                         }
@@ -281,6 +282,7 @@ namespace AD.Experimental.LLM
             catch (Exception ex)
             {
                 Debug.LogError("报错信息: " + ex.Message);
+                _callback("ERROR : " + ex.Message);
                 m_WebSocket.Dispose();
             }
         }

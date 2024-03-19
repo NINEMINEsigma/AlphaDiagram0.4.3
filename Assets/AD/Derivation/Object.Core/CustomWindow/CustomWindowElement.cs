@@ -66,7 +66,7 @@ namespace AD.UI
         }
 
         [HideInInspector] public bool isCanBackPool = true;
-        protected bool isCanRefresh = true;
+        public bool isCanRefresh = true;
         public bool BaseDefaultIsSubPageUsingOtherSetting = false;
         protected virtual bool isSubPageUsingOtherSetting => BaseDefaultIsSubPageUsingOtherSetting;
 
@@ -79,7 +79,7 @@ namespace AD.UI
         [SerializeField] private RectTransform SubPage, TopLine;
         [SerializeField] private AD.UI.Text Title;
 
-        public ADEvent OnEsc = new ADEvent();
+        public ADEvent OnEsc = new();
 
         public virtual CustomWindowElement Init()
         {
@@ -122,7 +122,7 @@ namespace AD.UI
             HowBackPool.Invoke(this);
         }
 
-        public UnityAction<CustomWindowElement> HowBackPool;
+        public ADInvokableCall<CustomWindowElement> HowBackPool;
 
         public CustomWindowElement MoveTo(Vector3 pos)
         {

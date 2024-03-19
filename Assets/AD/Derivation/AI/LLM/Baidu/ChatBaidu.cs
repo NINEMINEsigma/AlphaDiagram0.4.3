@@ -77,7 +77,8 @@ namespace AD.Experimental.LLM
                 { "Secret", m_Settings.m_Client_secret },
                 { "Token", m_Settings.m_Token },
                 { "AuthorizeURL", m_Settings.m_AuthorizeURL },
-                {"ModelType", m_ModelType.ToString() }
+                { "ModelType", m_ModelType.ToString() },
+                { "History", ADGlobalSystem.Serialize<List<message>>(m_History,out string str)?str:"" }
             };
             return setting;
         }

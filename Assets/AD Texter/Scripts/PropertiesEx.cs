@@ -13,31 +13,34 @@ namespace AD.Experimental.GameEditor
 
         private void Awake()
         {
+            Window.OnEsc.AddListener(CallBackWindow);
+
             if (!isRegister)
             {
                 GameEditorApp.instance.RegisterController(this);
             }
-
-            Window.OnEsc.AddListener(CallBackWindow);
         }
 
         public override void Init()
         {
             Window.BaseDefaultIsSubPageUsingOtherSetting = true;
-            Window.isCanBackPool = false;
             Window.Init();
+            Window.isCanRefresh = false;
+            Window.isCanBackPool = false;
         }
 
-        public void CallWindow(string title,GameObject Prefab)
+        public GameObject CallWindow(string title,GameObject Prefab)
         {
             Window.SetTitle(title);
             Window.gameObject.SetActive(true);
-            Window.SetItemOnWindow(title, Prefab.PrefabInstantiate());
+            GameObject temp = Prefab.PrefabInstantiate();
+            Window.SetItemOnWindow(title, temp);
+            return temp;
         }
 
         public void CallBackWindow()
         {
-            Window.Init();
+            Init();
             Window.gameObject.SetActive(false);
         }
     }

@@ -102,7 +102,9 @@ namespace AD.Experimental.LLM
                 DataList = m_DataList,
                 HistoryKeepCount = m_HistoryKeepCount,
                 lan = lan,
-                url = url
+                url = url,
+                Prompt = Prompt,
+                IsUseDefaultPromptFormat = IsUseDefaultPromptFormat,
             };
         }
 
@@ -112,6 +114,8 @@ namespace AD.Experimental.LLM
             this.lan = setting.lan;
             this.m_HistoryKeepCount = setting.HistoryKeepCount;
             this.m_DataList = setting.DataList;
+            this.Prompt = setting.Prompt;
+            this.IsUseDefaultPromptFormat = setting.IsUseDefaultPromptFormat;
         }
 
         [Serializable]
@@ -120,6 +124,8 @@ namespace AD.Experimental.LLM
             public string url;
             public string lan;
             public int HistoryKeepCount;
+            public string Prompt;
+            public bool IsUseDefaultPromptFormat;
             public List<SendData> DataList;
             public Dictionary<string, string> Settings;
         }

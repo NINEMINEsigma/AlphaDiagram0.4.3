@@ -4,12 +4,9 @@ using System.Linq;
 using AD.BASE;
 using AD.Experimental.GameEditor;
 using AD.Experimental.LLM;
-using AD.Experimental.Performance;
 using AD.Sample.Texter.Data;
 using AD.Sample.Texter.Internal;
 using AD.Sample.Texter.Project;
-using AD.Sample.Texter.Scene;
-using AD.UI;
 using AD.Utility;
 using AD.Utility.Object;
 using UnityEngine;
@@ -22,11 +19,13 @@ namespace AD.Sample.Texter
     {
         public List<SendData> m_DataList = new();
         public Dictionary<string, VariantSetting> VariantSettingPairs = new();
+        public string Target;
 
-        public LLMCoreData(LLMCore projectItem, List<SendData> dataList, Dictionary<string, VariantSetting> variantSettingPairs) : base(projectItem)
+        public LLMCoreData(LLMCore projectItem, List<SendData> dataList, Dictionary<string, VariantSetting> variantSettingPairs,string target) : base(projectItem)
         {
             this.m_DataList = dataList;
             this.VariantSettingPairs = variantSettingPairs;
+            Target = target;
         }
 
         public override bool FromMap(ProjectData_BaseMap from)
@@ -35,6 +34,7 @@ namespace AD.Sample.Texter
             {
                 this.m_DataList = data.m_DataList;
                 this.VariantSettingPairs = data.VariantSettingPairs;
+                this.Target = data.Target;
                 return base.FromMap(from);
             }
             else return false;
@@ -42,7 +42,7 @@ namespace AD.Sample.Texter
 
         public override void ToMap(out ProjectData_BaseMap BM)
         {
-            BM = new LLMCore_BaseMap(m_DataList, VariantSettingPairs);
+            BM = new LLMCore_BaseMap(m_DataList, VariantSettingPairs,Target);
             BM.FromObject(this);
         }
     }
@@ -55,11 +55,13 @@ namespace AD.Sample.Texter
         {
             public List<SendData> m_DataList = new();
             public Dictionary<string, VariantSetting> VariantSettingPairs = new();
+            public string Target;
 
-            public LLMCore_BaseMap(List<SendData> dataList, Dictionary<string, VariantSetting> variantSettingPairs)
+            public LLMCore_BaseMap(List<SendData> dataList, Dictionary<string, VariantSetting> variantSettingPairs, string target)
             {
                 this.m_DataList = dataList;
                 this.VariantSettingPairs = variantSettingPairs;
+                Target = target;
             }
 
             public override bool FromObject(ProjectItemData from)
@@ -68,6 +70,7 @@ namespace AD.Sample.Texter
                 {
                     this.m_DataList = data.m_DataList;
                     this.VariantSettingPairs = data.VariantSettingPairs;
+                    this.Target = data.Target;
                     return base.FromObject(from);
                 }
                 else return false;
@@ -75,7 +78,7 @@ namespace AD.Sample.Texter
 
             public override void ToObject(out ProjectItemData obj)
             {
-                obj = new LLMCoreData(null, m_DataList, VariantSettingPairs);
+                obj = new LLMCoreData(null, m_DataList, VariantSettingPairs, Target);
                 obj.FromMap(this);
             }
         }
@@ -110,7 +113,7 @@ namespace AD.Sample.Texter.Project
                 PropertiesLayout.Label("Prompt");
                 PropertiesLayout.InputField(that.MatchLLM.Prompt, "Prompt words").AddListener(T => that.MatchLLM.Prompt = T);
 
-                PropertiesLayout.ModernUISwitch("Prompt Mode", that.MatchLLM.IsUseDefaultPromptFormat, "Is Use Default Prompt Format", T => that.MatchLLM.IsUseDefaultPromptFormat = T);
+                PropertiesLayout.Toggle("Prompt Mode", that.MatchLLM.IsUseDefaultPromptFormat, "Is Use Default Prompt Format", T => that.MatchLLM.IsUseDefaultPromptFormat = T);
 
                 PropertiesLayout.Label("Context Max", "Max History Context, Memoray");
                 PropertiesLayout.InputField(that.MatchLLM.m_HistoryKeepCount.ToString(), "Context Max", "Context Max(Max History Context)").Share(out var CMaxInput)
@@ -134,6 +137,7 @@ namespace AD.Sample.Texter.Project
                             if(that.ProjectLLMSourceData.VariantSettingPairs.ContainsKey(that.m_MatchLLM.name))
                             {
                                 that.ProjectLLMSourceData.VariantSettingPairs[that.m_MatchLLM.name] = that.m_MatchLLM.GetSetting();
+                                that.ProjectLLMSourceData.m_DataList = that.m_MatchLLM.m_DataList;
                             }
                             else
                             {
@@ -143,6 +147,7 @@ namespace AD.Sample.Texter.Project
                             if(that.ProjectLLMSourceData.VariantSettingPairs.TryGetValue(cat.name,out var vSetting))
                             {
                                 cat.InitVariant(vSetting);
+                                cat.m_DataList = that.ProjectLLMSourceData.m_DataList;
                             }
                             SeLLM.SetTitle(that.MatchLLMMonoName);
                             GameEditorApp.instance.GetController<Properties>().ClearAndRefresh();
@@ -151,7 +156,7 @@ namespace AD.Sample.Texter.Project
             }
         }
 
-        public class LLMCoreVariantBlock: ProjectItemBlock
+        public class LLMCoreVariantBlock : ProjectItemBlock
         {
             public LLMCoreVariantBlock(LLMCore target) : base(target)
             {
@@ -182,7 +187,6 @@ namespace AD.Sample.Texter.Project
                 PropertiesLayout.InputField(chat.m_XunfeiSettings.m_AppID, "api AppID").AddListener(T => chat.m_XunfeiSettings.m_AppID = T);
                 PropertiesLayout.Enum<ChatSpark.ModelType>("Model Level", (int)chat.m_SparkModel, "Model Level 1.0 - 3.5", T =>
                 {
-                    Debug.Log(T);
                     chat.m_SparkModel = T switch
                     {
                         "ModelV15" => ChatSpark.ModelType.ModelV15,
@@ -192,7 +196,18 @@ namespace AD.Sample.Texter.Project
                         _ => ChatSpark.ModelType.ModelV35
                     };
                     //Enum.TryParse<ChatSpark.ModelType>(T, out var result) ? result : ChatSpark.ModelType.ModelV30;
-                }).SetTitle(chat.m_SparkModel.ToString());
+                }).Select(chat.m_SparkModel.ToString());
+                Debug.Log(chat.m_SparkModel.ToString());
+
+                PropertiesLayout.Button("Open", "打开使用窗口", () =>
+                {
+                    var target = GameEditorApp.instance.GetController<PropertiesEx>().Share(out var propertiesEx).CallWindow("LLMCore", that.PropertiesExWindowPrefab);
+                    propertiesEx.Window.SetTitle("LLM Window");
+                    var window = target.SeekComponent<LLMCorePExWindow>();
+                    window.Init();
+                    window.SetTitle(that.MatchLLMMonoName);
+                    window.isCanBackPool = false;
+                });
             }
         }
 
@@ -223,11 +238,13 @@ namespace AD.Sample.Texter.Project
                 {
                     if (ProjectLLMSourceData.VariantSettingPairs.TryGetValue(single.name, out var setting))
                         single.InitVariant(setting);
+                    single.m_DataList = ProjectLLMSourceData.m_DataList;
                 }
+                this.MatchLLM = GetMatchLLM(MyEditGroup, ProjectLLMSourceData.Target);
             }
             else
             {
-                ProjectLLMSourceData = new(this,new(), new());
+                ProjectLLMSourceData = new(this, new(), new(), this.MatchLLMMonoName);
             }
             MatchHierarchyEditor = new HierarchyBlock<LLMCore>(this, () => this.SourceData.ProjectItemID);
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
@@ -461,9 +478,12 @@ namespace AD.Sample.Texter.Project
                 if (m_MatchLLM == null) m_MatchLLM = GetMatchLLM(MyEditGroup);
                 return m_MatchLLM;
             }
-            set => MatchLLM = value;
+            set => m_MatchLLM = value;
         }
         public string MatchLLMMonoName => MatchLLM.name;
         public string MatchLLMComponentName => MatchLLM.GetType().Name;
+
+        [Header("P EX Prefab")]
+        public GameObject PropertiesExWindowPrefab;
     }
 }

@@ -45,6 +45,7 @@ namespace AD.UI
                 if (!options.Contains(CurrentSelectOption)) CurrentSelectOption = options[0];
                 source.SetValueWithoutNotify(options.IndexOf(CurrentSelectOption));
             }
+            SetTitle(CurrentSelectOption);
         }
 
         protected void OnDestroy()
@@ -111,10 +112,11 @@ namespace AD.UI
 
         public void Select(string option)
         {
-            if(options.Contains(option))
+            if (options.Contains(option))
             {
                 SetOptionByIndex(options.IndexOf(option));
             }
+            else Debug.LogWarning("Unknown Option : " + option);
         }
     }
 }

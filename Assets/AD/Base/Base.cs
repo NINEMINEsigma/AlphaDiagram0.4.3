@@ -275,7 +275,7 @@ namespace AD.BASE
         void Execute(params object[] args);
     }
 
-    public interface ICanMonitorCommand<_Command>where _Command:IADCommand
+    public interface ICanMonitorCommand<_Command> where _Command : IADCommand
     {
         void OnCommandCall(_Command c);
     }
@@ -304,8 +304,8 @@ namespace AD.BASE
 
         void Diffusing<_Command>() where _Command : IADCommand;
         void Diffusing<_Command>(_Command command) where _Command : IADCommand;
-        void Send<_Command, _CanMonitorCommand>() where _Command : IADCommand where _CanMonitorCommand :class, ICanMonitorCommand<_Command>;
-        void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand :class, ICanMonitorCommand<_Command>;
+        void Send<_Command, _CanMonitorCommand>() where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>;
+        void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>;
     }
 
     //Diffusing Command
@@ -936,11 +936,11 @@ namespace AD.BASE
         /// that can accept this type can trigger callbacks
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
-        public void Diffusing<_Command>()where _Command: IADCommand
+        public void Diffusing<_Command>() where _Command : IADCommand
         {
             foreach (var item in AD__Objects)
             {
-                if(item.Is(out ICanMonitorCommand<_Command> monitor))
+                if (item.Is(out ICanMonitorCommand<_Command> monitor))
                 {
                     monitor.OnCommandCall(default);
                 }
@@ -969,9 +969,9 @@ namespace AD.BASE
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
         /// <typeparam name="_CanMonitorCommand"></typeparam>
-        public void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand :class, ICanMonitorCommand<_Command>
+        public void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
         {
-            if(AD__Objects.TryGetValue(typeof(_CanMonitorCommand),out object target))
+            if (AD__Objects.TryGetValue(typeof(_CanMonitorCommand), out object target))
             {
                 target.As<_CanMonitorCommand>().OnCommandCall(command);
             }
@@ -1037,14 +1037,19 @@ namespace AD.BASE
 
     #region Event from Unity & ExtAD
 
+    [Serializable]
     public abstract class ADBaseInvokableCall
     {
-        public static bool IsLogParametersInstance 
+        public static bool IsLogParametersInstance
 #if UNITY_EDITOR
             = true;
 #else
             = false;
 #endif
+
+        public string ReturnType;
+        public string Name;
+        public string[] ParametersType;
 
         public static void DebugLogTarget(MethodInfo info)
         {
@@ -1067,10 +1072,16 @@ namespace AD.BASE
 
                 int index = 0;
 
+                string[] argsStrs = args.GetSubList<string, object>(T => true, T =>
+                {
+                    string str = T.ToString();
+                    return (str.Length < 40 && !str.Contains("\n") && !str.Contains("<b>")) ? str : "[Too Long]";
+                }).ToArray();
+
                 string ParaNames =
                     info.GetParameters().Length > 0
                     ? StringExtension
-                    .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{args[index++]}]").ToArray(), ",")
+                    .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",")
                     : "";
                 DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
             }
@@ -1080,11 +1091,7 @@ namespace AD.BASE
             }
         }
 
-        protected ADBaseInvokableCall()
-        {
-        }
-
-        protected ADBaseInvokableCall(object target, MethodInfo function)
+        protected ADBaseInvokableCall(object target, MethodInfo function) : this(function)
         {
             if (function is null)
             {
@@ -1102,6 +1109,23 @@ namespace AD.BASE
             {
                 throw new ArgumentNullException("_Target");
             }
+        }
+
+        protected ADBaseInvokableCall(Delegate function) : this(function.Method) { }
+
+        private ADBaseInvokableCall(MethodInfo function)
+            : this(function.ReflectedType.FullName,
+                   function.Name,
+                   function.GetParameters().GetSubList(T => true, T => T.ParameterType.FullName).ToArray())
+        {
+
+        }
+
+        private ADBaseInvokableCall(string returnType, string name, string[] parameters)
+        {
+            ReturnType = returnType;
+            Name = name;
+            ParametersType = parameters;
         }
 
         public abstract void Invoke(object[] args);
@@ -1133,6 +1157,7 @@ namespace AD.BASE
         public abstract bool Find(object targetObj, MethodInfo method);
     }
 
+    [Serializable]
     public class ADInvokableCall : ADBaseInvokableCall
     {
         protected event UnityAction Delegate;
@@ -1143,7 +1168,7 @@ namespace AD.BASE
             this.Delegate = (UnityAction)System.Delegate.CreateDelegate(typeof(UnityAction), target, theFunction);
         }
 
-        public ADInvokableCall(UnityAction action)
+        public ADInvokableCall(UnityAction action) : base(action)
         {
             Delegate += action;
         }
@@ -1175,8 +1200,16 @@ namespace AD.BASE
         {
             return this.Delegate.Target == targetObj && this.Delegate.Method.Equals(method);
         }
+
+        public static ADInvokableCall Temp(object target, MethodInfo theFunction) => new(target, theFunction);
+        public static ADInvokableCall Temp(UnityAction action) => new(action);
+        public static ADInvokableCall Temp(Action action) => new(new UnityAction(action));
+
+        public static implicit operator ADInvokableCall(UnityAction action) => Temp(action);
+        public static implicit operator ADInvokableCall(Action action) => Temp(action);
     }
 
+    [Serializable]
     public class ADInvokableCall<T1> : ADBaseInvokableCall
     {
         protected event UnityAction<T1> Delegate;
@@ -1187,7 +1220,7 @@ namespace AD.BASE
             this.Delegate = (UnityAction<T1>)System.Delegate.CreateDelegate(typeof(UnityAction<T1>), target, theFunction);
         }
 
-        public ADInvokableCall(UnityAction<T1> action)
+        public ADInvokableCall(UnityAction<T1> action) : base(action)
         {
             Delegate += action;
         }
@@ -1220,8 +1253,16 @@ namespace AD.BASE
         {
             return this.Delegate.Target == targetObj && this.Delegate.Method.Equals(method);
         }
+
+        public static ADInvokableCall<T1> Temp(object target, MethodInfo theFunction) => new(target, theFunction);
+        public static ADInvokableCall<T1> Temp(UnityAction<T1> action) => new(action);
+        public static ADInvokableCall<T1> Temp(Action<T1> action) => new(new UnityAction<T1>(action));
+
+        public static implicit operator ADInvokableCall<T1>(UnityAction<T1> action) => Temp(action);
+        public static implicit operator ADInvokableCall<T1>(Action<T1> action) => Temp(action);
     }
 
+    [Serializable]
     public class ADInvokableCall<T1, T2> : ADBaseInvokableCall
     {
         protected event UnityAction<T1, T2> Delegate;
@@ -1232,7 +1273,7 @@ namespace AD.BASE
             this.Delegate = (UnityAction<T1, T2>)System.Delegate.CreateDelegate(typeof(UnityAction<T1, T2>), target, theFunction);
         }
 
-        public ADInvokableCall(UnityAction<T1, T2> action)
+        public ADInvokableCall(UnityAction<T1, T2> action) : base(action)
         {
             Delegate += action;
         }
@@ -1266,8 +1307,16 @@ namespace AD.BASE
         {
             return this.Delegate.Target == targetObj && this.Delegate.Method.Equals(method);
         }
+
+        public static ADInvokableCall<T1, T2> Temp(object target, MethodInfo theFunction) => new(target, theFunction);
+        public static ADInvokableCall<T1, T2> Temp(UnityAction<T1, T2> action) => new(action);
+        public static ADInvokableCall<T1, T2> Temp(Action<T1, T2> action) => new(new UnityAction<T1, T2>(action));
+
+        public static implicit operator ADInvokableCall<T1, T2>(UnityAction<T1, T2> action) => Temp(action);
+        public static implicit operator ADInvokableCall<T1, T2>(Action<T1, T2> action) => Temp(action);
     }
 
+    [Serializable]
     public class ADInvokableCall<T1, T2, T3> : ADBaseInvokableCall
     {
         protected event UnityAction<T1, T2, T3> Delegate;
@@ -1278,7 +1327,7 @@ namespace AD.BASE
             this.Delegate = (UnityAction<T1, T2, T3>)System.Delegate.CreateDelegate(typeof(UnityAction<T1, T2, T3>), target, theFunction);
         }
 
-        public ADInvokableCall(UnityAction<T1, T2, T3> action)
+        public ADInvokableCall(UnityAction<T1, T2, T3> action) : base(action)
         {
             Delegate += action;
         }
@@ -1313,8 +1362,16 @@ namespace AD.BASE
         {
             return this.Delegate.Target == targetObj && this.Delegate.Method.Equals(method);
         }
+
+        public static ADInvokableCall<T1, T2, T3> Temp(object target, MethodInfo theFunction) => new(target, theFunction);
+        public static ADInvokableCall<T1, T2, T3> Temp(UnityAction<T1, T2, T3> action) => new(action);
+        public static ADInvokableCall<T1, T2, T3> Temp(Action<T1, T2, T3> action) => new(new UnityAction<T1, T2, T3>(action));
+
+        public static implicit operator ADInvokableCall<T1, T2, T3>(UnityAction<T1, T2, T3> action) => Temp(action);
+        public static implicit operator ADInvokableCall<T1, T2, T3>(Action<T1, T2, T3> action) => Temp(action);
     }
 
+    [Serializable]
     public class ADInvokableCall<T1, T2, T3, T4> : ADBaseInvokableCall
     {
         protected event UnityAction<T1, T2, T3, T4> Delegate;
@@ -1325,7 +1382,7 @@ namespace AD.BASE
             this.Delegate = (UnityAction<T1, T2, T3, T4>)System.Delegate.CreateDelegate(typeof(UnityAction<T1, T2, T3, T4>), target, theFunction);
         }
 
-        public ADInvokableCall(UnityAction<T1, T2, T3, T4> action)
+        public ADInvokableCall(UnityAction<T1, T2, T3, T4> action) : base(action)
         {
             Delegate += action;
         }
@@ -1361,8 +1418,16 @@ namespace AD.BASE
         {
             return this.Delegate.Target == targetObj && this.Delegate.Method.Equals(method);
         }
+
+        public static ADInvokableCall<T1, T2, T3, T4> Temp(object target, MethodInfo theFunction) => new(target, theFunction);
+        public static ADInvokableCall<T1, T2, T3, T4> Temp(UnityAction<T1, T2, T3, T4> action) => new(action);
+        public static ADInvokableCall<T1, T2, T3, T4> Temp(Action<T1, T2, T3, T4> action) => new(new UnityAction<T1, T2, T3, T4>(action));
+
+        public static implicit operator ADInvokableCall<T1, T2, T3, T4>(UnityAction<T1, T2, T3, T4> action) => Temp(action);
+        public static implicit operator ADInvokableCall<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action) => Temp(action);
     }
 
+    [Serializable]
     public abstract class ADBaseOrderlyEvent
     {
         public abstract ADBaseInvokableCall[] GetAllListener();
@@ -1376,7 +1441,7 @@ namespace AD.BASE
     {
         public List<int> InvokeArray = null;
         public int Count => (_m_Delegates == null) ? 0 : _m_Delegates.Count;
-        private List<ADInvokableCall> _m_Delegates = null;
+        [SerializeField] private List<ADInvokableCall> _m_Delegates = null;
 
         public void AddListener(UnityAction call)
         {
@@ -1389,12 +1454,21 @@ namespace AD.BASE
         public void RemoveListener(UnityAction call)
         {
             if (_m_Delegates == null) return;
-            var cat = _m_Delegates.Find(T => T.Find(call.Target, call.Method));
-            if (cat != null)
+            int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
             {
-                int cat_index = _m_Delegates.FindIndex(T => T == cat);
-                InvokeArray.RemoveAll(T => T == cat_index);
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
                 _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
             }
         }
 
@@ -1423,15 +1497,29 @@ namespace AD.BASE
 
         public void Invoke()
         {
-            DebugExtenion.Log();
+            if (InvokeArray == null) return;
+
+            List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                if (index >= 0 && index < _m_Delegates.Count)
                 {
-                    Debug.LogWarning("you like to try invoke a error action");
-                    continue;
+                    if (_m_Delegates[index] == null)
+                    {
+                        Debug.LogWarning("you like to try invoke a error action");
+                        continue;
+                    }
+                    _m_Delegates[index].Invoke();
                 }
-                _m_Delegates[index].Invoke();
+                else
+                {
+                    Debug.LogWarning("you try to use a error index");
+                    bugIndex.Add(index);
+                }
+            }
+            foreach (var index in bugIndex)
+            {
+                InvokeArray.RemoveAll(T => T == index);
             }
         }
 
@@ -1452,7 +1540,7 @@ namespace AD.BASE
     {
         public List<int> InvokeArray = null;
         public int Count => (_m_Delegates == null) ? 0 : _m_Delegates.Count;
-        private List<ADInvokableCall<T0>> _m_Delegates = null;
+        [SerializeField] private List<ADInvokableCall<T0>> _m_Delegates = null;
 
         public void AddListener(UnityAction<T0> call)
         {
@@ -1465,12 +1553,21 @@ namespace AD.BASE
         public void RemoveListener(UnityAction<T0> call)
         {
             if (_m_Delegates == null) return;
-            var cat = _m_Delegates.Find(T => T.Find(call.Target, call.Method));
-            if (cat != null)
+            int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
             {
-                int cat_index = _m_Delegates.FindIndex(T => T == cat);
-                InvokeArray.RemoveAll(T => T == cat_index);
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
                 _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
             }
         }
 
@@ -1500,17 +1597,30 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0)
         {
-            DebugExtenion.Log();
-            if (InvokeArray != null)
-                foreach (var index in InvokeArray)
+            if (InvokeArray == null) return;
+
+            List<int> bugIndex = new();
+            foreach (var index in InvokeArray)
+            {
+                if (index >= 0 && index < _m_Delegates.Count)
                 {
-                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (_m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
                     }
                     _m_Delegates[index].Invoke(arg0);
                 }
+                else
+                {
+                    Debug.LogWarning("you try to use a error index");
+                    bugIndex.Add(index);
+                }
+            }
+            foreach (var index in bugIndex)
+            {
+                InvokeArray.RemoveAll(T => T == index);
+            }
         }
 
         public override ADBaseInvokableCall[] GetAllListener()
@@ -1531,7 +1641,7 @@ namespace AD.BASE
     {
         public List<int> InvokeArray = null;
         public int Count => (_m_Delegates == null) ? 0 : _m_Delegates.Count;
-        private List<ADInvokableCall<T0, T1>> _m_Delegates = null;
+        [SerializeField] private List<ADInvokableCall<T0, T1>> _m_Delegates = null;
 
         public void AddListener(UnityAction<T0, T1> call)
         {
@@ -1544,12 +1654,21 @@ namespace AD.BASE
         public void RemoveListener(UnityAction<T0, T1> call)
         {
             if (_m_Delegates == null) return;
-            var cat = _m_Delegates.Find(T => T.Find(call.Target, call.Method));
-            if (cat != null)
+            int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
             {
-                int cat_index = _m_Delegates.FindIndex(T => T == cat);
-                InvokeArray.RemoveAll(T => T == cat_index);
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
                 _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
             }
         }
 
@@ -1580,17 +1699,30 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0, T1 arg1)
         {
-            DebugExtenion.Log();
-            if (InvokeArray != null)
-                foreach (var index in InvokeArray)
+            if (InvokeArray == null) return;
+
+            List<int> bugIndex = new();
+            foreach (var index in InvokeArray)
+            {
+                if (index >= 0 && index < _m_Delegates.Count)
                 {
-                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (_m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
                     }
                     _m_Delegates[index].Invoke(arg0, arg1);
                 }
+                else
+                {
+                    Debug.LogWarning("you try to use a error index");
+                    bugIndex.Add(index);
+                }
+            }
+            foreach (var index in bugIndex)
+            {
+                InvokeArray.RemoveAll(T => T == index);
+            }
         }
 
         public override ADBaseInvokableCall[] GetAllListener()
@@ -1612,7 +1744,7 @@ namespace AD.BASE
     {
         public List<int> InvokeArray = null;
         public int Count => (_m_Delegates == null) ? 0 : _m_Delegates.Count;
-        private List<ADInvokableCall<T0, T1, T2>> _m_Delegates = null;
+        [SerializeField] private List<ADInvokableCall<T0, T1, T2>> _m_Delegates = null;
 
         public void AddListener(UnityAction<T0, T1, T2> call)
         {
@@ -1625,12 +1757,21 @@ namespace AD.BASE
         public void RemoveListener(UnityAction<T0, T1, T2> call)
         {
             if (_m_Delegates == null) return;
-            var cat = _m_Delegates.Find(T => T.Find(call.Target, call.Method));
-            if (cat != null)
+            int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
             {
-                int cat_index = _m_Delegates.FindIndex(T => T == cat);
-                InvokeArray.RemoveAll(T => T == cat_index);
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
                 _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
             }
         }
 
@@ -1662,17 +1803,30 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0, T1 arg1, T2 arg2)
         {
-            DebugExtenion.Log();
-            if (InvokeArray != null)
-                foreach (var index in InvokeArray)
+            if (InvokeArray == null) return;
+
+            List<int> bugIndex = new();
+            foreach (var index in InvokeArray)
+            {
+                if (index >= 0 && index < _m_Delegates.Count)
                 {
-                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (_m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
                     }
                     _m_Delegates[index].Invoke(arg0, arg1, arg2);
                 }
+                else
+                {
+                    Debug.LogWarning("you try to use a error index");
+                    bugIndex.Add(index);
+                }
+            }
+            foreach (var index in bugIndex)
+            {
+                InvokeArray.RemoveAll(T => T == index);
+            }
         }
 
         public override ADBaseInvokableCall[] GetAllListener()
@@ -1695,7 +1849,7 @@ namespace AD.BASE
     {
         public List<int> InvokeArray = null;
         public int Count => (_m_Delegates == null) ? 0 : _m_Delegates.Count;
-        private List<ADInvokableCall<T0, T1, T2, T3>> _m_Delegates = null;
+        [SerializeField] private List<ADInvokableCall<T0, T1, T2, T3>> _m_Delegates = null;
 
         public void AddListener(UnityAction<T0, T1, T2, T3> call)
         {
@@ -1708,12 +1862,21 @@ namespace AD.BASE
         public void RemoveListener(UnityAction<T0, T1, T2, T3> call)
         {
             if (_m_Delegates == null) return;
-            var cat = _m_Delegates.Find(T => T.Find(call.Target, call.Method));
-            if (cat != null)
+            int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
             {
-                int cat_index = _m_Delegates.FindIndex(T => T == cat);
-                InvokeArray.RemoveAll(T => T == cat_index);
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
                 _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
             }
         }
 
@@ -1746,17 +1909,30 @@ namespace AD.BASE
 
         public void Invoke(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
-            DebugExtenion.Log();
-            if (InvokeArray != null)
-                foreach (var index in InvokeArray)
+            if (InvokeArray == null) return;
+
+            List<int> bugIndex = new();
+            foreach (var index in InvokeArray)
+            {
+                if (index >= 0 && index < _m_Delegates.Count)
                 {
-                    if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] == null)
+                    if (_m_Delegates[index] == null)
                     {
                         Debug.LogWarning("you like to try invoke a error action");
                         continue;
                     }
                     _m_Delegates[index].Invoke(arg0, arg1, arg2, arg3);
                 }
+                else
+                {
+                    Debug.LogWarning("you try to use a error index");
+                    bugIndex.Add(index);
+                }
+            }
+            foreach (var index in bugIndex)
+            {
+                InvokeArray.RemoveAll(T => T == index);
+            }
         }
 
         public override ADBaseInvokableCall[] GetAllListener()
@@ -1815,7 +1991,7 @@ namespace AD.BASE
         public ADEvent Close(T1 a, T2 b)
         {
             ADEvent result = new();
-            result.AddListener(() => this.As<UnityEvent<T1,T2>>().Invoke(a, b));
+            result.AddListener(() => this.As<UnityEvent<T1, T2>>().Invoke(a, b));
             return result;
         }
 
@@ -1877,7 +2053,7 @@ namespace AD.BASE
         AbstractBindProperty<T, P> Property { get; }
     }
 
-    public interface IPropertyHasGet<T> : IPropertyHasGet<T, PropertyAsset<T>> 
+    public interface IPropertyHasGet<T> : IPropertyHasGet<T, PropertyAsset<T>>
     {
 
     }
@@ -2368,7 +2544,7 @@ namespace AD.BASE
             stringProperty._SetPropertyAsset(new ValueToStringPropertyAsset(valueProperty._m_value._m_data));
         }
 
-        public static void BindToValue( BindProperty<float> valueProperty,BindProperty<string> stringProperty)
+        public static void BindToValue(BindProperty<float> valueProperty, BindProperty<string> stringProperty)
         {
             valueProperty._SetPropertyAsset(new StringToValuePropertyAsset(stringProperty._m_value._m_data));
         }
@@ -2572,9 +2748,9 @@ namespace AD.BASE
 
     #region Event System Handler
 
-    public interface IADEventSystemHandler: IEventSystemHandler
+    public interface IADEventSystemHandler : IEventSystemHandler
     {
-        
+
     }
 
     public static class ADEventSystemExtension
@@ -2632,62 +2808,74 @@ namespace AD.BASE
 
         static DebugExtenion()
         {
-            FileC.DeleteFile(LogPath);
-            File.Create(LogPath).Close();
+            ADFile file = new(LogPath, true, false, false, false);
+            file.Dispose();
             Application.logMessageReceived += LogHandler;
         }
 
         private static void LogHandler(string logString, string stackTrace, LogType type)
         {
-            using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
-            sws.WriteLine("{");
-            sws.WriteLine("[time]:" + DateTime.Now.ToString());
-            sws.WriteLine("[type]:" + type.ToString());
-            sws.WriteLine("[exception message]:" + logString);
-            sws.WriteLine("[stack trace]:\n" + stackTrace + "}");
+            try
+            {
+                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                sws.WriteLine("{");
+                sws.WriteLine("[time]:" + DateTime.Now.ToString());
+                sws.WriteLine("[type]:" + type.ToString());
+                sws.WriteLine("[exception message]:" + logString);
+                sws.WriteLine("[stack trace]:\n" + stackTrace + "}");
+            }
+            catch { }
         }
 
         public static void Log()
         {
-#if UNITY_EDITOR
-            if (LogMethodEnabled)
+            try
             {
-                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
-                var temp = GetStackTraceModelName();
-                if (temp[^1] == nameof(Log))
+#if UNITY_EDITOR
+                if (LogMethodEnabled)
                 {
-                    var newcat = temp.SubArray(0, temp.Length - 1);
+                    using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                    var temp = GetStackTraceModelName();
+                    if (temp[^1] == nameof(Log))
+                    {
+                        var newcat = temp.SubArray(0, temp.Length - 1);
+                    }
+                    sws.WriteLine(System.DateTime.Now.ToString() + " : " + temp.LinkAndInsert('\t'));
                 }
-                sws.WriteLine(System.DateTime.Now.ToString() + " : " + temp.LinkAndInsert('|'));
-            }
 #endif
+            }
+            catch { }
         }
 
         public static void LogMessage(string message)
         {
+            try
+            {
 #if UNITY_EDITOR
-            if (LogMethodEnabled)
-            {
-                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
-                var temp = GetStackTraceModelName();
-                if (temp[^1] == nameof(LogMessage))
+                if (LogMethodEnabled)
                 {
-                    var newcat = temp.SubArray(0, temp.Length - 1);
+                    using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                    var temp = GetStackTraceModelName();
+                    if (temp[^1] == nameof(LogMessage))
+                    {
+                        var newcat = temp.SubArray(0, temp.Length - 1);
+                    }
+                    sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " : " + temp.LinkAndInsert('\t'));
                 }
-                sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " : " + temp.LinkAndInsert('|'));
-            }
 #else
-            if (LogMethodEnabled)
-            {
-                using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
-                sws.WriteLine(System.DateTime.Now.ToString() + " : " + message);
-            }
+                if (LogMethodEnabled)
+                {
+                    using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
+                    sws.WriteLine(System.DateTime.Now.ToString() + " : " + message);
+                }
 #endif
+            }
+            catch { }
         }
 
         public static string[] GetStackTraceModelName()
         {
-            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace(true);
             System.Diagnostics.StackFrame[] sfs = st.GetFrames();
             List<string> result = new();
             for (int i = sfs.Length - 1; i >= 0; i--)
@@ -2703,7 +2891,7 @@ namespace AD.BASE
         }
         public static string[] GetStackTraceModelName(int depth)
         {
-            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace();
+            System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace(true);
             System.Diagnostics.StackFrame[] sfs = st.GetFrames();
             List<string> result = new();
             for (int i = sfs.Length - 1; i >= 0; i--)
@@ -2729,7 +2917,7 @@ namespace AD.BASE
     /// </summary>
     public static class WindowProcessExtenion
     {
-        public static void StartProcess(string path,string Arguments)
+        public static void StartProcess(string path, string Arguments)
         {
             var pro = new System.Diagnostics.Process
             {
