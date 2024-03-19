@@ -2536,6 +2536,18 @@ PrefabInstance:
       propertyPath: parent
       value: 
       objectReference: {fileID: 341167485}
+    - target: {fileID: 4557396341862016157, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 4557396341862016157, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
+      propertyPath: m_fontSizeMin
+      value: 24
+      objectReference: {fileID: 0}
+    - target: {fileID: 4557396341862016157, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
+      propertyPath: m_enableAutoSizing
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5956512731225296186, guid: 02be767f7cb443c47ad117d64b9f80a3, type: 3}
       propertyPath: m_Name
       value: CreaterPage SubManager

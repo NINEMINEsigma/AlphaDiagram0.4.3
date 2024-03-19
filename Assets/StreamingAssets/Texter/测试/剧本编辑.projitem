@@ -1,0 +1,75 @@
+{
+	"projitem" : {
+		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
+		"value" : {
+			"__type" : "AD.Sample.Texter.Data.ProjectScriptSlicer_BaseMap,Assembly-CSharp",
+			"Items" : [
+				{
+					"Name" : "角色一",
+					"Words" : "第一句话",
+					"SoundAssets" : "No Voice",
+					"Command" : "",
+					"CharacterNameList" : [
+						
+					],
+					"CharacterXPositionList" : [
+						
+					],
+					"CharacterImageKeyList" : [
+						
+					]
+				},{
+					"Name" : "角色二",
+					"Words" : "回复第一句话",
+					"SoundAssets" : "No Voice",
+					"Command" : "",
+					"CharacterNameList" : [
+						
+					],
+					"CharacterXPositionList" : [
+						
+					],
+					"CharacterImageKeyList" : [
+						
+					]
+				},{
+					"Name" : "角色一",
+					"Words" : "对话二",
+					"SoundAssets" : "No Voice",
+					"Command" : "",
+					"CharacterNameList" : [
+						
+					],
+					"CharacterXPositionList" : [
+						
+					],
+					"CharacterImageKeyList" : [
+						
+					]
+				},{
+					"Name" : "角色三",
+					"Words" : "插话XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+					"SoundAssets" : "No Voice",
+					"Command" : "",
+					"CharacterNameList" : [
+						
+					],
+					"CharacterXPositionList" : [
+						
+					],
+					"CharacterImageKeyList" : [
+						
+					]
+				}
+			],
+			"Options" : null,
+			"BackgroundImage" : "F:\\AlphaDiagram0.4.3\\Assets\\StreamingAssets\\Texter\\测试Offline\\EntryBackground.jpg",
+			"BackgroundAudio" : "F:\\AlphaDiagram0.4.3\\Assets\\StreamingAssets\\Texter\\测试Offline\\glassmoon - 紫陽花.ogg",
+			"RegisterOfflineSourceFile" : null,
+			"ProjectItemID" : "剧本编辑",
+			"ParentItemID" : "ProjectRoot",
+			"ProjectItemPositionX" : -8.118122,
+			"ProjectItemPositionY" : 1.60494292
+		}
+	}
+}

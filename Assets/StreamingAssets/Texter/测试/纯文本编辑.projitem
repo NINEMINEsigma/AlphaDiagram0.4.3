@@ -1,0 +1,15 @@
+{
+	"projitem" : {
+		"__type" : "AD.Sample.Texter.Data.ProjectData_BaseMap,Assembly-CSharp",
+		"value" : {
+			"__type" : "AD.Sample.Texter.Data.ProjectTextData_BaseMap,Assembly-CSharp",
+			"text" : "测试 文本\n<color=red>测试 颜色<\/color>\n<mark=#ffff0040>测试 阴影<\/mark>\n测试 无效果",
+			"description" : "描述0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+			"RegisterOfflineSourceFile" : null,
+			"ProjectItemID" : "纯文本编辑",
+			"ParentItemID" : "ProjectRoot",
+			"ProjectItemPositionX" : 5.29760551,
+			"ProjectItemPositionY" : -3.76182914
+		}
+	}
+}

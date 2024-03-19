@@ -1,0 +1,11 @@
+{
+	"texter" : {
+		"__type" : "AD.Sample.Texter.Data.DataFile,Assembly-CSharp",
+		"value" : {
+			"CreaterName" : "留白",
+			"Description" : "利用这个空项目来测试脱机文件吧",
+			"DateTime" : "2024\/3\/20 0:35:38",
+			"AssetsName" : "如果你是新的设备"
+		}
+	}
+}

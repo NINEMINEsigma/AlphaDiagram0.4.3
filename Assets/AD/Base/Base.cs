@@ -2840,7 +2840,7 @@ namespace AD.BASE
                     {
                         var newcat = temp.SubArray(0, temp.Length - 1);
                     }
-                    sws.WriteLine(System.DateTime.Now.ToString() + " : " + temp.LinkAndInsert('\t'));
+                    sws.WriteLine(System.DateTime.Now.ToString() + " :\n" + temp.LinkAndInsert('\t'));
                 }
 #endif
             }
@@ -2860,7 +2860,7 @@ namespace AD.BASE
                     {
                         var newcat = temp.SubArray(0, temp.Length - 1);
                     }
-                    sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " : " + temp.LinkAndInsert('\t'));
+                    sws.WriteLine(System.DateTime.Now.ToString() + " : " + message + " :\n" + temp.LinkAndInsert('\t'));
                 }
 #else
                 if (LogMethodEnabled)

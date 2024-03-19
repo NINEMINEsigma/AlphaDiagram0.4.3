@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using AD.BASE;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -37,15 +36,14 @@ namespace AD.UI
             if (options.Count == 0) return;
             if (T > 0 && T < options.Count)
             {
-                CurrentSelectOption = options[T];
-                OnSelect.Invoke(CurrentSelectOption);
+                source.value = T;
             }
             else
             {
-                if (!options.Contains(CurrentSelectOption)) CurrentSelectOption = options[0];
-                source.SetValueWithoutNotify(options.IndexOf(CurrentSelectOption));
+                if (!options.Contains(CurrentSelectOption)) source.value = 0;
+                //source.SetValueWithoutNotify(options.IndexOf(CurrentSelectOption));
             }
-            SetTitle(CurrentSelectOption);
+            OnSelect.Invoke(CurrentSelectOption);
         }
 
         protected void OnDestroy()
@@ -57,7 +55,6 @@ namespace AD.UI
         {
             OnSelect.RemoveAllListeners();
             options.Clear();
-            CurrentSelectOption = "Default";
         }
 
         public static AD.UI.Dropdown Generate(string name = "New Dropdown", Transform parent = null)
@@ -89,7 +86,7 @@ namespace AD.UI
 
         public ADEvent<string> OnSelect = new();
         [SerializeField] private List<string> options = new();
-        public string CurrentSelectOption { get => source.captionText.text; private set => source.captionText.text = value; }
+        public string CurrentSelectOption { get => source.captionText.text; }
         public void AddOption(params string[] texts)
         {
             options.AddRange(texts);

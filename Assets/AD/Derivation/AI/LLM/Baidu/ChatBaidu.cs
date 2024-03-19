@@ -100,8 +100,9 @@ namespace AD.Experimental.LLM
             url = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant";
         }
 
-        void Awake()
+        public override void Init()
         {
+            base.Init();
             if (m_Settings.GetTokenFromServer)
             {
                 StartCoroutine(m_Settings.GetToken(m_Settings.GetTokenAction));

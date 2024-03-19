@@ -195,9 +195,7 @@ namespace AD.Sample.Texter.Project
                         "ModelV35" => ChatSpark.ModelType.ModelV35,
                         _ => ChatSpark.ModelType.ModelV35
                     };
-                    //Enum.TryParse<ChatSpark.ModelType>(T, out var result) ? result : ChatSpark.ModelType.ModelV30;
-                }).Select(chat.m_SparkModel.ToString());
-                Debug.Log(chat.m_SparkModel.ToString());
+                });
 
                 PropertiesLayout.Button("Open", "打开使用窗口", () =>
                 {

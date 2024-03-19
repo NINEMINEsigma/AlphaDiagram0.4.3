@@ -291,7 +291,7 @@ namespace AD.Experimental.GameEditor
             cat.ClearOptions();
             cat.AddOption(options);
             cat.AddListener(action);
-            cat.SetTitle(initSelect);
+            cat.Select(initSelect);
             return cat;
         }
         public static Dropdown Dropdown(string[] options, string initSelect, string message, UnityAction<string> action)
@@ -300,7 +300,7 @@ namespace AD.Experimental.GameEditor
             cat.ClearOptions();
             cat.AddOption(options);
             cat.AddListener(action);
-            cat.SetTitle(initSelect);
+            cat.Select(initSelect);
             return cat;
         }
         public static ModernUIDropdown ModernUIDropdown(string label, string[] options, string[] initSelects, string message, UnityAction<string> action)
