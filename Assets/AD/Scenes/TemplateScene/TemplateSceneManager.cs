@@ -71,6 +71,11 @@ public class TemplateSceneManager : MonoBehaviour
         else this.gameObject.SetActive(false);
     }
 
+    private void Awake()
+    {
+        LoadAllKeyLayer();
+    }
+
     public void LoadAllKeyLayer()
     {
         SceneComponents ??= new();
