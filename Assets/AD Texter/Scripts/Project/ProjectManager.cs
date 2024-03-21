@@ -133,16 +133,18 @@ namespace AD.Sample.Texter
         public override void Init()
         {
             Architecture.RegisterController(MainSceneLoaderManager);
-
-            loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
-            loadingTask.Register();
-            StartCoroutine(LoadEveryOne(loadingTask));
+            StartCoroutine(LoadEveryOne());
         }
 
-        private IEnumerator LoadEveryOne(TaskInfo loadingTask)
+        private IEnumerator LoadEveryOne()
         {
-            DebugExtenion.Log();
+            loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
+            loadingTask.Register();
+
+            DebugExtenion.LogMessage("Project Manager Init");
+
             Architecture.AddMessage("Start Loading Model");
+
             CurrentProjectData = new()
             {
                 DataAssetsForm = Architecture.GetModel<DataAssets>()
@@ -163,6 +165,8 @@ namespace AD.Sample.Texter
             yield return new WaitForSeconds(1f);
             loadingTask.TaskValue = 0.3f;
 
+
+            ProjectRootMono.Init();
             yield return CurrentProjectData.Load(loadingTask);
 
         }

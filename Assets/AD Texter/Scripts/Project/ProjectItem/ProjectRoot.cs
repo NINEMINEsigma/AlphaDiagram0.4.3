@@ -69,7 +69,7 @@ namespace AD.Sample.Texter.Project
 
         public List<GameObject> SubProjectItemPrefab => App.instance.GetModel<PrefabModel>().SubProjectItemPrefabs[nameof(ProjectRoot)];
 
-        private void Start()
+        public void Init()
         {
             MatchHierarchyEditor = new HierarchyBlock<ProjectRoot>(this, nameof(ProjectRoot).Translate());
             MatchPropertiesEditors = new List<ISerializePropertiesEditor>()
