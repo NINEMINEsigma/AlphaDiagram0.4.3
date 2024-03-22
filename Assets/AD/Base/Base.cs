@@ -769,6 +769,11 @@ namespace AD.BASE
         private IADArchitecture Register<_T>(_T _object) where _T : new()
         {
             var key = typeof(_T);
+            if (_p_null_type.FirstOrDefault(T => T.Equals(key)) != null)
+            {
+                Debug.LogWarning($"{key.FullName} is register now , but you try get it at last");
+                _p_null_type.RemoveAll(T => T.Equals(key));
+            }
             bool boolen = AD__Objects.ContainsKey(key);
             AD__Objects[key] = _object;
             if (boolen)
@@ -780,6 +785,7 @@ namespace AD.BASE
 
         private object _p_last_object;
         private Type _p_last_type;
+        private List<Type> _p_null_type = new();
         /// <summary>
         /// When there are extremely common objects, you can try to override the method
         /// </summary>
@@ -793,7 +799,12 @@ namespace AD.BASE
                 _p_last_type = typeof(_T);
                 return _p_last_object = result;
             }
-            else return null;
+            else
+            {
+                Debug.LogWarning("You get a null target , it may be distroy or missing");
+                _p_null_type.Add(typeof(_T));
+                return null;
+            }
         }
 
         public IADArchitecture UnRegister<_T>() where _T : new()
@@ -2662,7 +2673,15 @@ namespace AD.BASE
         public static T As<T>(this object self) where T : class
         {
             if (self == null) throw new ADException("Now As._Left is null");
-            return self is not IInvariant<T> ? self as T : null;
+            if(self is not IInvariant<T>)
+            {
+                return self as T;
+            }
+            else
+            {
+                Debug.LogWarning($"you try to use an Invariant<{typeof(T).FullName}> by As");
+                return null;
+            }
         }
 
         public static bool As<T>(this object self, out T result) where T : class

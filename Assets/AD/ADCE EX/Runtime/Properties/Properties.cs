@@ -72,9 +72,19 @@ namespace AD.Experimental.GameEditor
         {
             EditorAssets.PropertiesListView.Clear();
             if (MatchTarget == null) return;
-            foreach (var target in CurrentPropertiesEditors)
+            try
             {
-                RegisterPropertiesItem(target);
+                foreach (var target in CurrentPropertiesEditors)
+                {
+                    RegisterPropertiesItem(target);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (MatchTarget is UnityEngine.Object obj)
+                    Debug.LogException(ex, obj);
+                else
+                    Debug.LogException(new ADException(MatchTarget.GetType().FullName + " : an instance is cannt Register", ex));
             }
             EditorAssets.PropertiesListView.SortChilds();
         }
