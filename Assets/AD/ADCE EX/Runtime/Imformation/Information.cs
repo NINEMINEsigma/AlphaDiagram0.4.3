@@ -93,12 +93,12 @@ namespace AD.Experimental.GameEditor
         public TaskInfo Current { get; private set; }
         public List<TaskInfo> Tasks { get; private set; } = new();
 
-        public override IADModel Load(string path)
+        public IADModel Load(string path)
         {
             throw new NotImplementedException();
         }
 
-        public override void Save(string path)
+        public void Save(string path)
         {
             throw new NotImplementedException();
         }

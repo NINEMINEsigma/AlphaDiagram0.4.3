@@ -627,8 +627,9 @@ namespace AD
             SaveRecord();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             if (_m_instance == this)
             {
                 _m_instance = null;

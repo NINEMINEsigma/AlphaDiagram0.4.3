@@ -7,16 +7,6 @@ namespace AD.Experimental.GameEditor
 {
     public class GameEditorApp : ADArchitecture<GameEditorApp>
     {
-        public override bool FromMap(IBaseMap from)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override IBaseMap ToMap()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public override void Init()
         {
             this.RegisterModel<TaskList>();

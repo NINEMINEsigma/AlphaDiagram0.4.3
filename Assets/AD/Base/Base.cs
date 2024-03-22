@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using AD.Utility;
 using UnityEngine;
@@ -19,111 +20,33 @@ namespace AD.BASE
      * Low-level public implementation
      */
 
+    /// <summary>
+    /// Implementations for runtime entities or data , The relevant interfaces are : 
+    /// <para><see cref="IBaseMap"/> is the type used to convert to local data</para>
+    /// <para><see cref="IBase{T}"/> This type is used for stronger constraints and clear goals</para>
+    /// </summary>
     public interface IBase
     {
         void ToMap(out IBaseMap BM);
         bool FromMap(IBaseMap from);
     }
 
+    /// <summary>
+    /// A strongly constrained version of <see cref="IBase"/>
+    /// </summary>
+    /// <typeparam name="T">The target type of <see cref="IBaseMap{T}"/> you want to match</typeparam>
     public interface IBase<T> : IBase where T : class, IBaseMap, new()
     {
         void ToMap(out T BM);
         bool FromMap(T from);
     }
 
-    public abstract class BaseMonoClass : MonoBehaviour, IBase
-    {
-        #region attribute
 
-        protected bool AD__IsCollected { get; set; } = false;
-        private List<string> AD__InjoinedGroup { get; set; } = new List<string>();
-
-        public bool IsCollected
-        {
-            get { return AD__IsCollected; }
-            protected set
-            {
-                if (value != AD__IsCollected) foreach (var name in AD__InjoinedGroup)
-                        if (value) CollectionMechanism.Collect(name, this);
-                        else CollectionMechanism.Erase(name, this);
-                AD__IsCollected = value;
-            }
-        }
-
-        #endregion
-
-        #region Basefunction
-
-        public BaseMonoClass() { }
-
-        public BaseMonoClass(List<string> group_name)
-        {
-            foreach (var name in group_name) CollectionMechanism.Collect(name, this);
-            AD__InjoinedGroup = group_name;
-            AD__IsCollected = true;
-        }
-
-        ~BaseMonoClass()
-        {
-            IsCollected = false;
-        }
-
-        #endregion 
-
-        public abstract void ToMap(out IBaseMap BM);
-        public abstract bool FromMap(IBaseMap from);
-
-    }
-
-    public abstract class BaseMonoClass<T> : MonoBehaviour, IBase<T> where T : class, IBaseMap, new()
-    {
-        #region attribute
-
-        private bool AD__IsCollected { get; set; } = false;
-        private List<string> AD__InjoinedGroup { get; set; } = new List<string>();
-
-        public bool IsCollected
-        {
-            get { return AD__IsCollected; }
-            protected set
-            {
-                if (value != AD__IsCollected) foreach (var name in AD__InjoinedGroup)
-                        if (value) CollectionMechanism.Collect(name, this);
-                        else CollectionMechanism.Erase(name, this);
-                AD__IsCollected = value;
-            }
-        }
-
-        #endregion
-
-        #region Basefunction
-
-        public BaseMonoClass() { }
-
-        public BaseMonoClass(List<string> group_name)
-        {
-            foreach (var name in group_name) CollectionMechanism.Collect(name, this);
-            AD__InjoinedGroup = group_name;
-            AD__IsCollected = true;
-        }
-
-        ~BaseMonoClass()
-        {
-            IsCollected = false;
-        }
-
-        #endregion
-
-        public abstract void ToMap(out T BM);
-        public abstract bool FromMap(T from);
-        public virtual void ToMap(out IBaseMap BM)
-        {
-            ToMap(out T bm);
-            BM = bm;
-        }
-        public abstract bool FromMap(IBaseMap from);
-    }
-
+    /// <summary>
+    /// Implementations for cache data , The relevant interfaces are : 
+    /// <para><see cref="IBase"/> is the type used to convert to runtime entities or data</para>
+    /// <para><see cref="IBaseMap{T}"/> This type is used for stronger constraints and clear goals</para>
+    /// </summary>
     public interface IBaseMap
     {
         void ToObject(out IBase obj);
@@ -132,44 +55,25 @@ namespace AD.BASE
         bool Deserialize(string source);
     }
 
+    /// <summary>
+    /// A strongly constrained version of <see cref="IBaseMap"/>
+    /// </summary>
+    /// <typeparam name="T">The target type of <see cref="IBase{T}"/> you want to match</typeparam>
     public interface IBaseMap<T> : IBaseMap where T : class, IBase, new()
     {
         void ToObject(out T obj);
         bool FromObject(T from);
     }
 
-    public static class CollectionMechanism
-    {
-        static public Dictionary<string, List<IBase>> ADCollectTable { get; set; }
-
-        static public List<IBase> GetList(string key)
-        {
-            ADCollectTable.TryGetValue(key, out var cat);
-            return cat;
-        }
-
-        static public void Collect(string key, IBase target)
-        {
-            ADCollectTable.TryGetValue(key, out var value_list);
-            if (value_list != null) value_list.Add(target);
-            else ADCollectTable[key].Add(target);
-        }
-
-        static public void Erase(string key, IBase target)
-        {
-            ADCollectTable.TryGetValue(key, out var value_list);
-            value_list?.Remove(target);
-        }
-
-
-    }
-
     #endregion
 
     #region AD_S
 
+    /// <summary>
+    /// Commonly used exception
+    /// </summary>
     [Serializable]
-    public class ADException : Exception, IBaseMap
+    public class ADException : Exception
     {
         public ADException() { AD__GeneratedTime = DateTime.Now; }
         public ADException(string message) : base(message) { AD__GeneratedTime = DateTime.Now; }
@@ -178,16 +82,6 @@ namespace AD.BASE
         protected ADException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { AD__GeneratedTime = DateTime.Now; }
-
-        public bool Deserialize(string source)
-        {
-            throw new ADException("Can not deserialize to an ADException");
-        }
-
-        public bool FromObject(IBase from)
-        {
-            throw new ADException("Can not create an ADException from IBase object");
-        }
 
         public string Serialize()
         {
@@ -210,237 +104,262 @@ namespace AD.BASE
             return "[" + AD__GeneratedTime.ToString() + "]:" + HelpLink;
         }
 
-        public IBase ToObject()
-        {
-            throw new ADException("Can not use an ADException to create IBase object");
-        }
-
-        public void ToObject(out IBase obj)
-        {
-            throw new ADException("Can not use an ADException to create IBase object");
-        }
-
         private DateTime AD__GeneratedTime;
     }
 
-    //TODO
-    public class ADAssertion
+    public class NullArchitecture : ADException
     {
-        public ADAssertion(bool assert, string message)
+        public NullArchitecture() : base("Architecture is null but you also try to use it") { }
+    }
+
+    public static class ArchitectureExtension
+    {
+        public static _System GetSystem<_System>(this ICanGetSystem self) where _System : class, IADSystem
         {
-            if (assert) throw new ADException(message);
+            if(self.Architecture==null)
+            {
+                throw new NullArchitecture();
+            }
+            return self.Architecture.GetSystem<_System>();
         }
-        public ADAssertion(Exception ex, string message)
+
+        public static _Model GetModel<_Model>(this ICanGetSystem self) where _Model : class, IADModel
         {
-            if (ex != null) throw new ADException(message, ex);
+            if (self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            return self.Architecture.GetModel<_Model>();
+        }
+
+        public static _Controller GetController<_Controller>(this ICanGetController self) where _Controller : class, IADController
+        {
+            if (self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            return self.Architecture.GetController<_Controller>();
+        }
+
+        public static IADArchitecture SendCommand<_Command>(this ICanSendCommand self) where _Command : class, IADCommand,new()
+        {
+            if (self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            return self.Architecture.SendCommand<_Command>();
+        }
+
+        public static void RegisterCommand<_Command>(this IADSystem self)where _Command : class, IADCommand,new()
+        {
+            if(self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            self.Architecture.RegisterCommand<_Command>();
+        }
+        public static void RegisterCommand<_Command>(this IADSystem self, _Command command) where _Command : class, IADCommand
+        {
+            if (self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            self.Architecture.RegisterCommand<_Command>(command);
+        }
+        public static  void UnRegisterCommand<_Command>(this IADSystem self) where _Command : class, IADCommand
+        {
+            if(self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            self.Architecture.UnRegister<_Command>();
+        }
+        public static void SendCommand<_Command>(this IADSystem self) where _Command : class, IADCommand
+        {
+            if (self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            self.Architecture.SendCommand<_Command>();
+        }
+        public static void DiffusingCommand<_Command>(this IADSystem self) where _Command : class, IADCommand
+        {
+            if (self.Architecture == null)
+            {
+                throw new NullArchitecture();
+            }
+            self.Architecture.Diffusing<_Command>();
         }
     }
 
+    /// <summary>
+    /// The lowest-level interface of all AD Architecture interfaces
+    /// </summary>
     public interface IAnyArchitecture
     {
 
     }
+    /// <summary>
+    /// <see cref="Init"/> : used to initialize or reset the class
+    /// </summary>
     public interface ICanInitialize : IAnyArchitecture
     {
         void Init();
     }
+    /// <summary>
+    /// Implement this interface to get or set the Architecture
+    /// <para><see cref="IADArchitecture"/> : Target Architecture Interface</para>
+    /// </summary>
     public interface ICanGetArchitecture : IAnyArchitecture
     {
+        [Obsolete]
         IADArchitecture ADInstance();
+        [Obsolete]
         void SetArchitecture(IADArchitecture target);
-    }
-    public interface ICanUnRegister : ICanGetArchitecture
-    {
-        void UnRegist<T>() where T : new();
+
+        IADArchitecture Architecture { get; set; }
     }
     public interface ICanGetSystem : ICanGetArchitecture
     {
-        T GetSystem<T>() where T : class, IADSystem, new();
+
     }
     public interface ICanGetModel : ICanGetArchitecture
     {
-        T GetModel<T>() where T : class, IADModel, new();
+
     }
     public interface ICanGetController : ICanGetArchitecture
     {
-        T GetController<T>() where T : class, IADController, new();
+
     }
     public interface ICanSendCommand : ICanGetArchitecture
     {
-        void SendCommand<T>() where T : class, IADCommand, new();
-    }
-    public interface ICanSimulateFunction
-    {
-        void Execute();
-        void Execute(params object[] args);
-    }
 
-    public interface ICanMonitorCommand<_Command> where _Command : IADCommand
+    }
+    public interface ICanMonitorCommand<_Command> : IAnyArchitecture where _Command : IADCommand
     {
         void OnCommandCall(_Command c);
     }
 
-    public interface IADArchitecture
+    //TODO
+    public interface IADArchitecture:IAnyArchitecture,ICanInitialize
     {
-        static IADArchitecture instence { get; }
-        void Init();
+        /// <summary>
+        /// Save the messages generated during the Architecture running
+        /// </summary>
+        /// <param name="message">Target message</param>
+        /// <returns>Architecture itself</returns>
         IADArchitecture AddMessage(string message);
-        _Model GetModel<_Model>() where _Model : class, IADModel, new();
-        _System GetSystem<_System>() where _System : class, IADSystem, new();
-        _Controller GetController<_Controller>() where _Controller : class, IADController, new();
-        IADArchitecture RegisterModel<_Model>(_Model model) where _Model : IADModel, new();
-        IADArchitecture RegisterSystem<_System>(_System system) where _System : IADSystem, new();
-        IADArchitecture RegisterController<_Controller>(_Controller controller) where _Controller : IADController, new();
-        IADArchitecture RegisterCommand<_Command>(_Command command) where _Command : IADCommand, new();
+
+        #region Get
+        _Model GetModel<_Model>() where _Model : class, IADModel;
+        _System GetSystem<_System>() where _System : class, IADSystem;
+        _Controller GetController<_Controller>() where _Controller : class, IADController;
+        #endregion
+
+        #region Register By Instance
+        IADArchitecture RegisterModel<_Model>(_Model model) where _Model : IADModel;
+        IADArchitecture RegisterSystem<_System>(_System system) where _System : IADSystem;
+        IADArchitecture RegisterController<_Controller>(_Controller controller) where _Controller : IADController;
+        IADArchitecture RegisterCommand<_Command>(_Command command) where _Command : IADCommand;
+        #endregion
+
+        #region Register By Default new()
         IADArchitecture RegisterModel<_Model>() where _Model : IADModel, new();
         IADArchitecture RegisterSystem<_System>() where _System : IADSystem, new();
         IADArchitecture RegisterController<_Controller>() where _Controller : IADController, new();
         IADArchitecture RegisterCommand<_Command>() where _Command : IADCommand, new();
-        IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand, new();
-        IADArchitecture UnRegister<_T>() where _T : new();
-        IADArchitecture UnRegister(Type type);
-        bool Contains<_Type>();
-        public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new();
-        public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand, new();
+        #endregion
 
+        #region Send Command Execute By OnExecute()
+        public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new();
+        public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand;
+        IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand;
+        #endregion
+
+        #region Send Command Or Diffusing Command To Target
         void Diffusing<_Command>() where _Command : IADCommand;
         void Diffusing<_Command>(_Command command) where _Command : IADCommand;
         void Send<_Command, _CanMonitorCommand>() where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>;
         void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>;
-    }
+        #endregion
 
-    //Diffusing Command
-    public class Vibration : ADCommand
-    {
-        protected Vibration() { }
-
-        public override void OnExecute()
-        {
-
-        }
+        #region Register Or UnRegister Or Contains
+        IADArchitecture UnRegister<_T>() where _T : IAnyArchitecture;
+        IADArchitecture UnRegister(Type type);
+        IADArchitecture Register<_T>() where _T : IAnyArchitecture, new();
+        IADArchitecture Register<_T>(_T instance) where _T : IAnyArchitecture;
+        bool Contains<_Type>();
+        #endregion
     }
 
     public interface IADModel : ICanInitialize, ICanGetArchitecture
     {
-        abstract void Save(string path);
-        abstract IADModel Load(string path);
-    }
 
+    }
+    /// <summary>
+    /// Standard implementation of <see cref="IADModel"/>
+    /// </summary>
     public abstract class ADModel : IADModel
     {
-        public IADArchitecture Architecture { get; protected set; } = null;
+        public IADArchitecture Architecture { get; set; }
 
         public IADArchitecture ADInstance()
         {
             return Architecture;
         }
-
-        public abstract void Init();
-        public abstract IADModel Load(string path);
-        public abstract void Save(string path);
-
         public void SetArchitecture(IADArchitecture target)
         {
             Architecture = target;
         }
 
-        protected virtual void Output(string str)
-        {
-
-        }
+        public abstract void Init();
     }
 
     public interface IADSystem : ICanInitialize, ICanSendCommand, ICanGetArchitecture, ICanGetController
     {
-        void RegisterCommand<T>() where T : class, IADCommand, new();
-        void UnRegisterCommand<T>() where T : class, IADCommand, new();
-    }
 
+    }
+    /// <summary>
+    /// Standard implementation of <see cref="IADSystem"/>
+    /// </summary>
     public abstract class ADSystem : IADSystem
     {
-        public IADArchitecture Architecture { get; protected set; } = null;
-
+        public IADArchitecture Architecture { get; set; }
         public IADArchitecture ADInstance()
         {
             return Architecture;
         }
-
-        public abstract void Init();
-
-        public void RegisterCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.RegisterCommand<T>();
-        }
-        public void UnRegisterCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.UnRegister<T>();
-        }
-        public void SendCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.SendCommand<T>();
-        }
-
         public void SetArchitecture(IADArchitecture target)
         {
             Architecture = target;
         }
-
-        public T GetController<T>() where T : class, IADController, new()
-        {
-            return Architecture.GetController<T>();
-        }
+        public abstract void Init();
     }
-
+    /// <summary>
+    /// Standard implementation of <see cref="IADSystem"/> , and Base on <see cref="MonoBehaviour"/>
+    /// </summary>
     public abstract class MonoSystem : MonoBehaviour, IADSystem
     {
-        public IADArchitecture Architecture { get; protected set; } = null;
-
+        public IADArchitecture Architecture { get; set; }
         public IADArchitecture ADInstance()
         {
             return Architecture;
         }
-
-        public abstract void Init();
-
-        public void RegisterCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.RegisterCommand<T>();
-        }
-        public void UnRegisterCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.UnRegister<T>();
-        }
-        public void SendCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.SendCommand<T>();
-        }
-
         public void SetArchitecture(IADArchitecture target)
         {
             Architecture = target;
         }
-
-        public T GetController<T>() where T : class, IADController, new()
-        {
-            return Architecture.GetController<T>();
-        }
-
-        public MonoSystem RegisterController<_Controller>(_Controller controller) where _Controller : IADController, new()
-        {
-            Architecture.RegisterController(controller);
-            return this;
-        }
-
+        public abstract void Init();
     }
 
     public interface IADController : ICanInitialize, ICanGetArchitecture, ICanSendCommand, ICanGetSystem, ICanGetModel
     {
-        void RegisterCommand<T>() where T : class, IADCommand, new();
-        void RegisterModel<T>() where T : class, IADModel, new();
-        void RegisterCommand<T>(T _Command) where T : class, IADCommand, new();
-        void RegisterModel<T>(T _Model) where T : class, IADModel, new();
-    }
 
+    }
+    /// <summary>
+    /// Standard implementation of <see cref="IADController"/> , and Base on <see cref="MonoBehaviour"/>
+    /// <para>Default <see cref="OnDestroy"/> will Unregister itself</para>
+    /// </summary>
     public abstract class ADController : MonoBehaviour, IADController
     {
         public IADArchitecture Architecture { get; set; } = null;
@@ -448,55 +367,14 @@ namespace AD.BASE
         {
             return Architecture;
         }
-
         public abstract void Init();
-
-        public virtual void RegisterCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.RegisterCommand<T>();
-        }
-
-        public virtual void SendCommand<T>() where T : class, IADCommand, new()
-        {
-            Architecture.SendCommand<T>();
-        }
-
         public void SetArchitecture(IADArchitecture target)
         {
             Architecture = target;
         }
-
-        public T GetSystem<T>() where T : class, IADSystem, new()
-        {
-            return Architecture.GetSystem<T>();
-        }
-
-        public void RegisterModel<T>() where T : class, IADModel, new()
-        {
-            Architecture.RegisterModel<T>();
-        }
-
-        public T GetModel<T>() where T : class, IADModel, new()
-        {
-            return Architecture.GetModel<T>();
-        }
-
-        public void RegisterCommand<T>(T _Command) where T : class, IADCommand, new()
-        {
-            Architecture.RegisterCommand<T>(_Command);
-        }
-
-        public void RegisterModel<T>(T _Model) where T : class, IADModel, new()
-        {
-            Architecture.RegisterModel<T>(_Model);
-        }
-
         protected virtual void OnDestroy()
         {
-            if(Architecture!=null)
-            {
-                Architecture.UnRegister(this.GetType());
-            }
+            Architecture?.UnRegister(this.GetType());
         }
     }
 
@@ -505,10 +383,12 @@ namespace AD.BASE
         void Execute();
         string LogMessage();
     }
-
+    /// <summary>
+    /// Standard implementation of <see cref="IADCommand"/>
+    /// </summary>
     public abstract class ADCommand : IADCommand
     {
-        public IADArchitecture Architecture { get; protected set; } = null;
+        public IADArchitecture Architecture { get; set; } = null;
 
         public IADArchitecture ADInstance()
         {
@@ -533,115 +413,39 @@ namespace AD.BASE
         {
             Architecture = target;
         }
-
-        public T GetModel<T>() where T : class, IADModel, new()
-        {
-            return Architecture.GetModel<T>();
-        }
-
-        public T GetController<T>() where T : class, IADController, new()
-        {
-            return Architecture.GetController<T>();
-        }
     }
-
-    public class SimulatedFunction : IADCommand, ICanSimulateFunction
+    /// <summary>
+    /// The purpose is to provide <see cref="AD.BASE.IADArchitecture.Diffusing{_Command}()"/>> or
+    ///  <see cref="IADArchitecture.Diffusing{_Command}(_Command)"/>> within the Architecture
+    /// <para>The relevant interfaces are : </para>
+    /// <para><see cref="ICanMonitorCommand{_Command}"/> is the type used for execute when 
+    /// <see cref="Vibration"/>(also <see cref="IADCommand"/>) start a Command Diffusing(<see cref="IADArchitecture"/>)</para>
+    /// </summary>
+    public class Vibration : ADCommand
     {
-        public IADArchitecture Architecture { get; protected set; } = null;
-        private ADBaseInvokableCall OnExecute = null;
-        protected string logMessage = "";
+        protected Vibration() { }
 
-        public IADArchitecture ADInstance()
+        public override void OnExecute()
         {
-            return Architecture;
-        }
 
-        public SimulatedFunction(ADBaseInvokableCall action, string message)
-        {
-            OnExecute = action;
-            logMessage = message;
-        }
-
-        public SimulatedFunction(UnityAction action, string message)
-        {
-            OnExecute = new ADInvokableCall(action);
-            logMessage = message;
-        }
-
-        public SimulatedFunction(UnityAction<object> action, string message)
-        {
-            OnExecute = new ADInvokableCall<object>(action);
-            logMessage = message;
-        }
-
-        public SimulatedFunction(UnityAction<object, object> action, string message)
-        {
-            OnExecute = new ADInvokableCall<object, object>(action);
-            logMessage = message;
-        }
-
-        public SimulatedFunction(UnityAction<object, object, object> action, string message)
-        {
-            OnExecute = new ADInvokableCall<object, object, object>(action);
-            logMessage = message;
-        }
-
-        public SimulatedFunction(UnityAction<object, object, object, object> action, string message)
-        {
-            OnExecute = new ADInvokableCall<object, object, object, object>(action);
-            logMessage = message;
-        }
-
-        public void Execute()
-        {
-            if (Architecture == null) throw new ADException("Can not execute a command without setting architecture");
-            HowLog();
-            OnExecute?.Invoke(new object[0]);
-        }
-
-        public void Execute(params object[] args)
-        {
-            if (Architecture == null) throw new ADException("Can not execute a command without setting architecture");
-            HowLog();
-            OnExecute?.Invoke(args);
-        }
-
-        protected virtual void HowLog()
-        {
-            Architecture.AddMessage(LogMessage());
-        }
-
-        public void SetArchitecture(IADArchitecture target)
-        {
-            Architecture = target;
-        }
-
-        public T GetModel<T>() where T : class, IADModel, new()
-        {
-            return Architecture.GetModel<T>();
-        }
-
-        public string LogMessage()
-        {
-            return logMessage;
-        }
-
-        public T GetController<T>() where T : class, IADController, new()
-        {
-            return Architecture.GetController<T>();
         }
     }
 
+    /// <summary>
+    /// It is used to collect messages within the schema and has <see cref="What"/> that returns a string
+    /// </summary>
     public interface IADMessage
     {
         string What();
     }
-
+    /// <summary>
+    /// Standard implementation of <see cref="IADMessage"/>
+    /// <para>This message type is able to record <see cref="DateTime.Now"/> it was generated</para>
+    /// </summary>
     public class ADMessage : IADMessage
     {
         public string AD__Message = "null";
 
-        public ADMessage() { }
         public ADMessage(string message) { AD__Message = "[" + DateTime.Now.ToString() + "] " + message; }
 
         public string What()
@@ -649,12 +453,16 @@ namespace AD.BASE
             return AD__Message;
         }
     }
-
+    /// <summary>
+    /// A default message collector
+    /// <para>The relevant interfaces are : </para>
+    /// <para><see cref="IADMessage"/></para>
+    /// </summary>
     public class ADMessageRecord : IADModel
     {
-        private IADArchitecture Architecture = null;
+        public IADArchitecture Architecture { get; set; }
 
-        private List<IADMessage> AD__messages = new List<IADMessage>();
+        private List<IADMessage> AD__messages = new();
 
         public void Init()
         {
@@ -686,16 +494,9 @@ namespace AD.BASE
 
         public virtual void Save(string path)
         {
-            AD.BASE.FileC.TryCreateDirectroryOfFile(path);
-            string message = What();
-            using FileStream fs = File.Create(path);
-            byte[] info = Encoding.UTF8.GetBytes(message);
-            fs.Write(info, 0, info.Length);
-        }
-
-        public virtual IADModel Load(string path)
-        {
-            throw new NotImplementedException();
+            ADFile file = new(path, true, false, false, true);
+            file.Serialize(What());
+            file.Dispose();
         }
 
         public IADArchitecture ADInstance()
@@ -705,9 +506,10 @@ namespace AD.BASE
 
         public int Count { get { return AD__messages.Count; } }
 
-        public int MaxCount = 100;
+        public int MaxCount = 1000;
     }
 
+    //TODO
     public abstract class ADArchitecture<T> : IADArchitecture where T : ADArchitecture<T>, new()
     {
         #region attribute
@@ -732,17 +534,13 @@ namespace AD.BASE
         {
             get
             {
-                AD__Objects.TryAdd(typeof(ADMessageRecord), new ADMessageRecord());
-                return AD__Objects[typeof(ADMessageRecord)] as ADMessageRecord;
+                Type key = typeof(ADMessageRecord);
+                if (!this.AD__Objects.ContainsKey(key)) AD__Objects.Add(key, new ADMessageRecord());
+                return this.AD__Objects[key] as ADMessageRecord;
             }
         }
 
-        //构造函数不能public
         protected ADArchitecture() { }
-        ~ADArchitecture()
-        {
-            ObjectExtension.AllArchitecture.Remove(typeof(T));
-        }
 
         #endregion
 
@@ -751,6 +549,8 @@ namespace AD.BASE
         public static void Destory()
         {
             __ADinstance = null;
+            System.GC.Collect();
+            ObjectExtension.AllArchitecture.Remove(typeof(T));
         }
 
         public virtual void SaveRecord()
@@ -766,16 +566,12 @@ namespace AD.BASE
             MessageRecord.Save(fullPath);
         }
 
-        public abstract IBaseMap ToMap();
-
-        public abstract bool FromMap(IBaseMap from);
-
         public virtual void Init()
         {
 
         }
 
-        private IADArchitecture Register<_T>(_T _object) where _T : new()
+        public IADArchitecture Register<_T>(_T _object) where _T :IAnyArchitecture
         {
             var key = typeof(_T);
             if (_p_null_type.FirstOrDefault(T => T.Equals(key)) != null)
@@ -790,6 +586,11 @@ namespace AD.BASE
             else
                 AddMessage(_object.GetType().FullName + " is register on slot[" + key.FullName + "] , this slot is been create now");
             return instance;
+        }
+
+        public IADArchitecture Register<_T>() where _T : IAnyArchitecture,new()
+        {
+            return Register<_T>(new _T());
         }
 
         private object _p_last_object;
@@ -818,6 +619,10 @@ namespace AD.BASE
 
         public IADArchitecture UnRegister(Type type)
         {
+            if(type.GetInterface(nameof(IAnyArchitecture))==null)
+            {
+                AddMessage(type.FullName + " is not base on " + nameof(IAnyArchitecture));
+            }
             if( AD__Objects.Remove(type))
             {
                 AddMessage(type.FullName + " is unregister now");
@@ -829,7 +634,7 @@ namespace AD.BASE
             return this;
         }
 
-        public IADArchitecture UnRegister<_T>() where _T : new()
+        public IADArchitecture UnRegister<_T>() where _T : IAnyArchitecture
         {
             return UnRegister(typeof(_T));
         }
@@ -839,41 +644,41 @@ namespace AD.BASE
             return AD__Objects.ContainsKey(typeof(_Type));
         }
 
-        public _Model GetModel<_Model>() where _Model : class, IADModel, new()
+        public _Model GetModel<_Model>() where _Model : class, IADModel
         {
             return Get<_Model>() as _Model;
         }
 
-        public _System GetSystem<_System>() where _System : class, IADSystem, new()
+        public _System GetSystem<_System>() where _System : class, IADSystem
         {
             return Get<_System>() as _System;
         }
 
-        public _Controller GetController<_Controller>() where _Controller : class, IADController, new()
+        public _Controller GetController<_Controller>() where _Controller : class, IADController
         {
             return Get<_Controller>() as _Controller;
         }
 
-        public IADArchitecture RegisterModel<_Model>(_Model model) where _Model : IADModel, new()
+        public IADArchitecture RegisterModel<_Model>(_Model model) where _Model : IADModel
         {
             Register<_Model>(model);
-            model.SetArchitecture(instance);
+            model.Architecture = this;
             model.Init();
             return instance;
         }
 
-        public IADArchitecture RegisterSystem<_System>(_System system) where _System : IADSystem, new()
+        public IADArchitecture RegisterSystem<_System>(_System system) where _System : IADSystem
         {
             Register<_System>(system);
-            system.SetArchitecture(instance);
+            system.Architecture = this;
             system.Init();
             return instance;
         }
 
-        public IADArchitecture RegisterController<_Controller>(_Controller controller) where _Controller : IADController, new()
+        public IADArchitecture RegisterController<_Controller>(_Controller controller) where _Controller : IADController
         {
             Register<_Controller>(controller);
-            controller.SetArchitecture(instance);
+            controller.Architecture = this;
             controller.Init();
             return instance;
         }
@@ -896,10 +701,10 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture RegisterCommand<_Command>(_Command command) where _Command : IADCommand, new()
+        public IADArchitecture RegisterCommand<_Command>(_Command command) where _Command : IADCommand
         {
             Register(command);
-            command.SetArchitecture(instance);
+            command.Architecture = this;
             return instance;
         }
 
@@ -916,47 +721,21 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand, new()
+        public IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand
         {
-            try
-            {
-                (Get<_Command>() as _Command).Execute();
-            }
-            catch (Exception ex)
-            {
-                AddMessage("SendCommand\nErrer: " + ex.Message + "\nStackTrace:" + ex.StackTrace);
-                Debug.LogError(ex);
-            }
+            (Get<_Command>() as _Command).Execute();
             return instance;
         }
-
-        /// <summary>
-        /// _Command use this function should not depend on this Architecture
-        /// <para> (because not SetArchitecture) </para>
-        /// </summary>
-        /// <typeparam name="_Command"></typeparam>
-        /// <returns></returns>
         public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new()
         {
             if (Contains<_Command>()) SendCommand<_Command>();
             else SendImmediatelyCommand(new _Command());
             return instance;
         }
-
-        /// <summary>
-        /// _Command use this function should not depend on this Architecture
-        /// <para> (because not SetArchitecture) </para>
-        /// </summary>
-        /// <typeparam name="_Command"></typeparam>
-        /// <returns></returns>
-        public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand, new()
+        public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand
         {
-            if (Contains<_Command>()) SendCommand<_Command>();
-            else
-            {
-                RegisterCommand(command);
-                command.Execute();
-            }
+            RegisterCommand(command);
+            command.Execute();
             return instance;
         }
         #endregion

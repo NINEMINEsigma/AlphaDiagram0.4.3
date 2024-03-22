@@ -12,11 +12,6 @@ using UnityEngine.UI;
 
 namespace AD.UI
 {
-    public interface ICanGetArchitecture
-    {
-        IADArchitecture ADinstance();
-    }
-
     public interface ICanTransformSprite
     {
         void TransformSprite(Sprite target, Image image);
@@ -136,7 +131,6 @@ namespace AD.UI
             get { return CurrentPairIndex; }
         }
 
-        [HideInInspector] public ICanGetArchitecture architectureObtainer = null;
         [HideInInspector] public ICanTransformSprite canTransformSprite = null;
 
         //会对性能产生不低的影响
@@ -309,8 +303,7 @@ namespace AD.UI
 
         public IADArchitecture ADinstance()
         {
-            if (architectureObtainer == null) return null;
-            else return architectureObtainer.ADinstance();
+            return Architecture;
         }
 
         public ViewController SetTransparentChannelCollisionThreshold(float value)
@@ -452,7 +445,7 @@ namespace AD.UI
             return Architecture;
         }
 
-        public IADArchitecture Architecture { get; private set; } = null;
+        public IADArchitecture Architecture { get; set; } = null;
 
         public void SetArchitecture(IADArchitecture target)
         {

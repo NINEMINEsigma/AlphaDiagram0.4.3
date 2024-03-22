@@ -26,8 +26,9 @@ namespace AD.Experimental.Performance
             return KeySceneName.UnloadSceneAsync();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             if(!string.IsNullOrEmpty(KeySceneName)) Unload(KeySceneName);
         }
 

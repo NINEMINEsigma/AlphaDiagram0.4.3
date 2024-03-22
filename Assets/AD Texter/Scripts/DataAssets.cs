@@ -55,7 +55,7 @@ namespace AD.Sample.Texter
             if (LoadFile == null && IsAble == false) ADGlobalSystem.ThrowLogicError("Cannt Load");
             return IsAble ? this : SetupSelf(LoadingManager.LoadDataAssets(LoadFile.FullName));
         }
-        public override IADModel Load(string path)
+        public IADModel Load(string path)
         {
             if (!File.Exists(path)) return null;
             return SetupSelf(LoadingManager.LoadDataAssets(path));
@@ -66,7 +66,7 @@ namespace AD.Sample.Texter
             Save(AssetsName + LoadingManager.PointExtension);
             return this;
         }
-        public override void Save(string path)
+        public void Save(string path)
         {
             LoadingManager.SaveDataAssets(path, this);
             IsAble = true;

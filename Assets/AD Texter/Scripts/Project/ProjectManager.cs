@@ -37,12 +37,12 @@ namespace AD.Sample.Texter
             //Not Init
         }
 
-        public override IADModel Load(string path)
+        public IADModel Load(string path)
         {
             throw new System.NotImplementedException();
         }
 
-        public override void Save(string path)
+        public void Save(string path)
         {
             throw new System.NotImplementedException();
         }
@@ -78,12 +78,12 @@ namespace AD.Sample.Texter
                 //Not Init
             }
 
-            public override IADModel Load(string path)
+            public IADModel Load(string path)
             {
                 throw new NotImplementedException();
             }
 
-            public override void Save(string path)
+            public void Save(string path)
             {
                 throw new NotImplementedException();
             }

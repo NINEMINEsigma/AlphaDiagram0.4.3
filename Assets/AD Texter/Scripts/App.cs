@@ -400,16 +400,6 @@ namespace AD.Sample.Texter
             }
         }
 
-        public override bool FromMap(IBaseMap from)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override IBaseMap ToMap()
-        {
-            throw new System.NotImplementedException();
-        }
-
         public ProjectItemData CurrentProjectItemData;
     }
 

@@ -87,8 +87,9 @@ namespace AD.UI
             View.sprite = mAssets.Normal;
             coroutine = null;
         }
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             ADUI.DestroyADUI(this);
         }
 

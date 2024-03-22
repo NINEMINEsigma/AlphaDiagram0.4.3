@@ -5,15 +5,6 @@ namespace AD.Experimental.Neuron
 {
     public class App : ADArchitecture<App>
     {
-        public override bool FromMap(IBaseMap from)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override IBaseMap ToMap()
-        {
-            throw new NotImplementedException();
-        }
 
         public override void Init()
         {

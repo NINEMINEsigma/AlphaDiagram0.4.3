@@ -144,8 +144,9 @@ namespace AD.Experimental.Performance
             sceneLoadAssets.UnloadAll();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             UnloadAll();
         }
 

@@ -18,7 +18,7 @@ namespace AD.Experimental.GameEditor
     public class EditorSystem : MonoBehaviour, IADSystem,IMainHoster
     {
         #region IADSystem
-        public IADArchitecture Architecture { get; protected set; } = null;
+        public IADArchitecture Architecture { get; set; } = null;
 
         public Dictionary<IHosterTag, IHosterComponent> HosterComponents { get; set; } = new();
 
