@@ -31,6 +31,7 @@ namespace AD.Experimental.GameEditor
 
         public void AddOnTop(ISerializeHierarchyEditor editor)
         {
+            ADGlobalSystem.FinalCheck(editor);
             if (!TargetTopObjectEditors.Contains(editor))
             {
                 TargetTopObjectEditors.Add(editor);

@@ -1067,27 +1067,49 @@ namespace AD.BASE
         {
             if (IsLogParametersInstance)
             {
-                string ReturnType = info.ReturnType.FullName;
-                string FunName = info.Name;
-
-                int index = 0;
-
-                string[] argsStrs = args.GetSubList<string, object>(T => true, T =>
-                {
-                    string str = T.ToString();
-                    return (str.Length < 40 && !str.Contains("\n") && !str.Contains("<b>")) ? str : "[Too Long]";
-                }).ToArray();
-
-                string ParaNames =
-                    info.GetParameters().Length > 0
-                    ? StringExtension
-                    .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",")
-                    : "";
-                DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                InternalDebugLogMethod(info, null, args);
             }
             else
             {
                 DebugLogTarget(info);
+            }
+        }
+
+        protected static void InternalDebugLogMethod(MethodInfo info, Exception exception, params object[] args)
+        {
+            string ReturnType = info.ReturnType.FullName;
+            string FunName = info.Name;
+
+            int index = 0;
+
+            if (exception == null)
+            {
+                if (args != null && args.Length != 0)
+                {
+                    string[] argsStrs = args.GetSubList<string, object>(T => true, T =>
+                    {
+                        string str = T.ToString();
+                        return (str.Length < 40 && !str.Contains("\n") && !str.Contains("<b>")) ? str : "[Too Long]";
+                    }).ToArray();
+                    string ParaNames =
+                        info.GetParameters().Length > 0
+                        ? StringExtension
+                        .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",")
+                        : "";
+                    DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                }
+                else
+                    DebugExtenion.LogMessage($"{ReturnType} {FunName}()");
+            }
+            else
+            {
+                string[] argsStrs = args.GetSubList<string, object>(T => true, T => T.ToString()).ToArray();
+                string ParaNames =
+                info.GetParameters().Length > 0
+                    ? StringExtension
+                    .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => "\t" + T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",\n")
+                    : "";
+                DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
             }
         }
 
@@ -1179,20 +1201,24 @@ namespace AD.BASE
             {
                 throw new ArgumentException("Passed argument 'args' is invalid size. Expected size is 1");
             }
-
-            if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
-            {
-                DebugLogMethod(this.Delegate.Method, args);
-                this.Delegate();
-            }
+            Invoke();
         }
 
         public void Invoke()
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
-                DebugLogMethod(this.Delegate.Method);
-                this.Delegate();
+                Exception exception = null;
+                try
+                {
+                    this.Delegate();
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+                InternalDebugLogMethod(this.Delegate.Method, exception, null);
+                if (exception != null) throw exception;
             }
         }
 
@@ -1233,19 +1259,24 @@ namespace AD.BASE
             }
 
             ADBaseInvokableCall.ThrowOnInvalidArg<T1>(args[0]);
-            if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
-            {
-                DebugLogMethod(this.Delegate.Method, args);
-                this.Delegate((T1)args[0]);
-            }
+            Invoke((T1)args[0]);
         }
 
         public void Invoke(T1 args)
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
-                DebugLogMethod(this.Delegate.Method, args);
-                this.Delegate(args);
+                Exception exception = null;
+                try
+                {
+                    this.Delegate(args);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+                InternalDebugLogMethod(this.Delegate.Method, exception, args);
+                if (exception != null) throw exception;
             }
         }
 
@@ -1287,19 +1318,24 @@ namespace AD.BASE
 
             ADBaseInvokableCall.ThrowOnInvalidArg<T1>(args[0]);
             ADBaseInvokableCall.ThrowOnInvalidArg<T2>(args[1]);
-            if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
-            {
-                DebugLogMethod(this.Delegate.Method, args);
-                this.Delegate((T1)args[0], (T2)args[1]);
-            }
+            Invoke((T1)args[0], (T2)args[1]);
         }
 
         public void Invoke(T1 args0, T2 args1)
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
-                DebugLogMethod(this.Delegate.Method, args0, args1);
-                this.Delegate(args0, args1);
+                Exception exception = null;
+                try
+                {
+                    this.Delegate(args0, args1);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+                InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1);
+                if (exception != null) throw exception;
             }
         }
 
@@ -1342,19 +1378,24 @@ namespace AD.BASE
             ADBaseInvokableCall.ThrowOnInvalidArg<T1>(args[0]);
             ADBaseInvokableCall.ThrowOnInvalidArg<T2>(args[1]);
             ADBaseInvokableCall.ThrowOnInvalidArg<T3>(args[2]);
-            if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
-            {
-                DebugLogMethod(this.Delegate.Method, args);
-                this.Delegate((T1)args[0], (T2)args[1], (T3)args[2]);
-            }
+            Invoke((T1)args[0], (T2)args[1], (T3)args[2]);
         }
 
         public void Invoke(T1 args0, T2 args1, T3 args2)
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
-                DebugLogMethod(this.Delegate.Method, args0, args1, args2);
-                this.Delegate(args0, args1, args2);
+                Exception exception = null;
+                try
+                {
+                    this.Delegate(args0, args1, args2);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+                InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1, args2);
+                if (exception != null) throw exception;
             }
         }
 
@@ -1398,19 +1439,24 @@ namespace AD.BASE
             ADBaseInvokableCall.ThrowOnInvalidArg<T2>(args[1]);
             ADBaseInvokableCall.ThrowOnInvalidArg<T3>(args[2]);
             ADBaseInvokableCall.ThrowOnInvalidArg<T4>(args[3]);
-            if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
-            {
-                DebugLogMethod(this.Delegate.Method, args);
-                this.Delegate((T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]);
-            }
+            Invoke((T1)args[0], (T2)args[1], (T3)args[2], (T4)args[3]);
         }
 
         public void Invoke(T1 args0, T2 args1, T3 args2, T4 args3)
         {
             if (ADBaseInvokableCall.AllowInvoke(this.Delegate))
             {
-                DebugLogMethod(this.Delegate.Method, args0, args1, args2, args3);
-                this.Delegate(args0, args1, args2, args3);
+                Exception exception = null;
+                try
+                {
+                    this.Delegate(args0, args1, args2, args3);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+                InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1, args2, args3);
+                if (exception != null) throw exception;
             }
         }
 

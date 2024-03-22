@@ -1076,7 +1076,11 @@ namespace AD
 
         public static T FinalCheckCanntNull<T>(T result, string message = "you obtain a null object") where T : class
         {
-            if (result == null) AddError(message);
+            if (result == null)
+            {
+                AddError(message);
+                return default;
+            }
             return result;
         }
 

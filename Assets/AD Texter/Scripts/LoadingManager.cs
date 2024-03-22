@@ -75,7 +75,7 @@ namespace AD.Sample.Texter
             FileC.TryCreateDirectroryOfFile(Path.Combine(FilePath, "File"));
             var af = AllFile;
             if (af == null) return;
-            foreach (var single in GetDatas(af))
+            foreach (var single in ADGlobalSystem.FinalCheck(GetDatas(af)))
             {
                 single.CreateInstance(Prefab, ParentTransform);
             }
