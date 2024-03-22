@@ -193,12 +193,12 @@ namespace AD.Utility
         }
 
         public static List<Result> Contravariance<Origin, Result>(this IEnumerable<Origin> self)
-            where Result :class, Origin
+            where Result : class, Origin
         {
             List<Result> result = new();
             foreach (var item in self)
             {
-                if(item.As<Result>(out Result cat))
+                if (item.As<Result>(out Result cat))
                 {
                     result.Add(cat);
                 }
@@ -206,8 +206,19 @@ namespace AD.Utility
             return result;
         }
 
-        public static List<Result> Covariance<Origin,Result>(this  IEnumerable<Origin> self)
-            where Origin:class,Result
+
+        public static List<Result> Contravariance<Origin, Result>(this IEnumerable<Origin> self, Func<Origin, Result> transformer)
+        {
+            List<Result> result = new();
+            foreach (var item in self)
+            {
+                result.Add(transformer(item));
+            }
+            return result;
+        }
+
+        public static List<Result> Covariance<Origin, Result>(this IEnumerable<Origin> self)
+            where Origin : class, Result
         {
             List<Result> result = new();
             foreach (var item in self)
@@ -216,6 +227,25 @@ namespace AD.Utility
             }
             return result;
         }
+
+        public static List<T> RemoveNull<T>(this List<T> self)
+        {
+            self.RemoveAll(T => T == null);
+            return self;
+        }
+
+
+        public static List<T> RemoveNullAsNew<T>(this List<T> self)
+        {
+            List<T> result = new();
+            foreach (var item in self)
+            {
+                if (item != null)
+                    result.Add(item);
+            }
+            return result;
+        }
+
     }
 
     [System.Serializable]

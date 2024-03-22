@@ -298,6 +298,7 @@ namespace AD.BASE
         IADArchitecture RegisterCommand<_Command>() where _Command : IADCommand, new();
         IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand, new();
         IADArchitecture UnRegister<_T>() where _T : new();
+        IADArchitecture UnRegister(Type type);
         bool Contains<_Type>();
         public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new();
         public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand, new();
@@ -488,6 +489,14 @@ namespace AD.BASE
         public void RegisterModel<T>(T _Model) where T : class, IADModel, new()
         {
             Architecture.RegisterModel<T>(_Model);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if(Architecture!=null)
+            {
+                Architecture.UnRegister(this.GetType());
+            }
         }
     }
 
@@ -801,16 +810,28 @@ namespace AD.BASE
             }
             else
             {
-                Debug.LogWarning("You get a null target , it may be distroy or missing");
+                Debug.LogWarning("You get a unregister target , it may be distroy or missing");
                 _p_null_type.Add(typeof(_T));
                 return null;
             }
         }
 
+        public IADArchitecture UnRegister(Type type)
+        {
+            if( AD__Objects.Remove(type))
+            {
+                AddMessage(type.FullName + " is unregister now");
+            }
+            else
+            {
+                AddMessage(type.FullName + " is not register , but you try to unregister it");
+            }
+            return this;
+        }
+
         public IADArchitecture UnRegister<_T>() where _T : new()
         {
-            AD__Objects.Remove(typeof(_T));
-            return instance;
+            return UnRegister(typeof(_T));
         }
 
         public bool Contains<_Type>()

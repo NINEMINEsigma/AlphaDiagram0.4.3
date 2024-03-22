@@ -118,11 +118,6 @@ namespace AD.Sample.Texter
 #endif
         }
 
-        private void OnDestroy()
-        {
-            Architecture.UnRegister<ProjectManager>();
-        }
-
         private void OnApplicationQuit()
         {
             App.instance.SaveRecord();
@@ -138,6 +133,11 @@ namespace AD.Sample.Texter
 
         private IEnumerator LoadEveryOne()
         {
+            while (!GameEditorApp.instance.Contains<Information>())
+            {
+                yield return null;  
+            }
+
             loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
             loadingTask.Register();
 
@@ -162,7 +162,7 @@ namespace AD.Sample.Texter
             Architecture.RegisterModel(ProjectPrefabModel);
 
             loadingTask.TaskValue = 0.1f;
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(0.5f);
             loadingTask.TaskValue = 0.3f;
 
 

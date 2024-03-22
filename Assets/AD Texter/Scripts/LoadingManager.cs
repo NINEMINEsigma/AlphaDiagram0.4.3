@@ -23,10 +23,9 @@ namespace AD.Sample.Texter
 
         public static List<FileInfo> AllFile => FileC.FindAll(FilePath, PointExtension);
 
-        private static DataAssets CurrentTransform;
         public static List<DataAssets> GetDatas(List<FileInfo> files)
         {
-            return files.GetSubList(T => (CurrentTransform = LoadDataAssets(T)) != null, T => CurrentTransform);
+            return files.Contravariance(T => LoadDataAssets(T)).RemoveNull();
         }
         public static DataAssets LoadDataAssets(FileInfo source)
         {
@@ -80,11 +79,6 @@ namespace AD.Sample.Texter
                 single.CreateInstance(Prefab, ParentTransform);
             }
             SceneTrans.instance.SceneOpenAnimation["EntryScene"] = "ZoomIn";
-        }
-
-        private void OnDestroy()
-        {
-            Architecture.UnRegister<LoadingManager>();
         }
 
     }
