@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using AD.Utility;
 using UnityEngine;
 using UnityEngine.Events;
@@ -813,12 +811,14 @@ namespace AD.BASE
         #endregion
     }
 
+    //TODO
     public interface ISubPagesArchitecture : IEnumerable<IADArchitecture>
     {
         Dictionary<Type, IADArchitecture> SubArchitectures { get; }
         IADArchitecture this[Type type] { get; }
     }
 
+    //TODO
     public abstract class TopArchitecture<T, _Entry, _MainPage, _EndPage, _SubPages>
         : ADArchitecture<T>
         where T : TopArchitecture<T, _Entry, _MainPage, _EndPage, _SubPages>, new()
@@ -848,6 +848,13 @@ namespace AD.BASE
 
     #region Event from Unity & ExtAD
 
+    /// <summary>
+    /// You will be able to get the actual content of the executed function or delegate and more detailed information,
+    /// and you will be able to get the error parameters from the log when an error occurs
+    /// <para>Implementations for cache data , The relevant interfaces are : </para>
+    /// <para>template typename T... <see cref="ADInvokableCall"/> , up to four generic parameters</para>
+    /// <para>template typename T... <see cref="ADOrderlyEvent"/> , up to four generic parameters</para>
+    /// </summary>
     [Serializable]
     public abstract class ADBaseInvokableCall
     {
@@ -861,6 +868,7 @@ namespace AD.BASE
         public string ReturnType;
         public string Name;
         public string[] ParametersType;
+        public readonly MethodInfo m_MethodInfo;
 
         public static void DebugLogTarget(MethodInfo info)
         {
@@ -951,7 +959,7 @@ namespace AD.BASE
                    function.Name,
                    function.GetParameters().GetSubList(T => true, T => T.ParameterType.FullName).ToArray())
         {
-
+            m_MethodInfo = function;
         }
 
         private ADBaseInvokableCall(string returnType, string name, string[] parameters)
@@ -988,6 +996,11 @@ namespace AD.BASE
         }
 
         public abstract bool Find(object targetObj, MethodInfo method);
+
+        public bool Equals(ADBaseInvokableCall call)
+        {
+            return m_MethodInfo.Equals(call.m_MethodInfo);
+        }
     }
 
     [Serializable]
@@ -1284,6 +1297,13 @@ namespace AD.BASE
         public static implicit operator ADInvokableCall<T1, T2, T3, T4>(Action<T1, T2, T3, T4> action) => Temp(action);
     }
 
+
+    /// <summary>
+    /// <see cref="ADBaseInvokableCall"/> can be executed in an orderly manner
+    /// <para>Implementations for cache data , The relevant interfaces are : </para>
+    /// <para>template typename T... <see cref="ADInvokableCall"/> , up to four generic parameters</para>
+    /// <para>template typename T... <see cref="ADOrderlyEvent"/> , up to four generic parameters</para>
+    /// </summary>
     [Serializable]
     public abstract class ADBaseOrderlyEvent
     {
@@ -1308,10 +1328,39 @@ namespace AD.BASE
             _m_Delegates.Add(GetDelegate(call));
         }
 
+        public void AddListener(ADInvokableCall call)
+        {
+            InvokeArray ??= new List<int>();
+            _m_Delegates ??= new List<ADInvokableCall>();
+            InvokeArray.Add(_m_Delegates.Count);
+            _m_Delegates.Add(call);
+        }
+
         public void RemoveListener(UnityAction call)
         {
             if (_m_Delegates == null) return;
             int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
+            {
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
+                _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
+            }
+        }
+
+        public void RemoveListener(ADInvokableCall call)
+        {
+            if (_m_Delegates == null) return;
+            int index = _m_Delegates.FindIndex(T => T.Equals(call));
             if (index != -1)
             {
                 var cat = _m_Delegates[index];
@@ -1352,6 +1401,10 @@ namespace AD.BASE
             return new ADInvokableCall(action);
         }
 
+        /// <summary>
+        /// If an incorrect index is found or the corresponding trigger is null, 
+        /// the location will be cleared and a warning will be sent
+        /// </summary>
         public void Invoke()
         {
             if (InvokeArray == null) return;
@@ -1359,13 +1412,8 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count)
+                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] != null)
                 {
-                    if (_m_Delegates[index] == null)
-                    {
-                        Debug.LogWarning("you like to try invoke a error action");
-                        continue;
-                    }
                     _m_Delegates[index].Invoke();
                 }
                 else
@@ -1385,6 +1433,10 @@ namespace AD.BASE
             return _m_Delegates.ToArray();
         }
 
+        /// <summary>
+        /// Warning, if the parameter type is incorrect,
+        /// it will be populated with <b>default</b> instead of an immediate error
+        /// </summary>
         public override void Invoke(params object[] args)
         {
             if (args.Length > 0) Debug.LogWarning("you try to input some error args");
@@ -1407,10 +1459,39 @@ namespace AD.BASE
             _m_Delegates.Add(GetDelegate(call));
         }
 
+        public void AddListener(ADInvokableCall<T0> call)
+        {
+            InvokeArray ??= new List<int>();
+            _m_Delegates ??= new List<ADInvokableCall<T0>>();
+            InvokeArray.Add(_m_Delegates.Count);
+            _m_Delegates.Add(call);
+        }
+
         public void RemoveListener(UnityAction<T0> call)
         {
             if (_m_Delegates == null) return;
             int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
+            {
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
+                _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
+            }
+        }
+
+        public void RemoveListener(ADInvokableCall<T0> call)
+        {
+            if (_m_Delegates == null) return;
+            int index = _m_Delegates.FindIndex(T => T.Equals(call));
             if (index != -1)
             {
                 var cat = _m_Delegates[index];
@@ -1452,6 +1533,10 @@ namespace AD.BASE
             return new ADInvokableCall<T0>(action);
         }
 
+        /// <summary>
+        /// If an incorrect index is found or the corresponding trigger is null, 
+        /// the location will be cleared and a warning will be sent
+        /// </summary>
         public void Invoke(T0 arg0)
         {
             if (InvokeArray == null) return;
@@ -1459,13 +1544,8 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count)
+                if (index >= 0 && index < _m_Delegates.Count&& _m_Delegates[index] != null)
                 {
-                    if (_m_Delegates[index] == null)
-                    {
-                        Debug.LogWarning("you like to try invoke a error action");
-                        continue;
-                    }
                     _m_Delegates[index].Invoke(arg0);
                 }
                 else
@@ -1485,6 +1565,10 @@ namespace AD.BASE
             return _m_Delegates.ToArray();
         }
 
+        /// <summary>
+        /// Warning, if the parameter type is incorrect,
+        /// it will be populated with <b>default</b> instead of an immediate error
+        /// </summary>
         public override void Invoke(params object[] args)
         {
             if (args.Length != 1) Debug.LogWarning("you try to input some error args");
@@ -1508,10 +1592,39 @@ namespace AD.BASE
             _m_Delegates.Add(GetDelegate(call));
         }
 
+        public void AddListener(ADInvokableCall<T0, T1> call)
+        {
+            InvokeArray ??= new List<int>();
+            _m_Delegates ??= new List<ADInvokableCall<T0, T1>>();
+            InvokeArray.Add(_m_Delegates.Count);
+            _m_Delegates.Add(call);
+        }
+
         public void RemoveListener(UnityAction<T0, T1> call)
         {
             if (_m_Delegates == null) return;
             int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
+            {
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
+                _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
+            }
+        }
+
+        public void RemoveListener(ADInvokableCall<T0, T1> call)
+        {
+            if (_m_Delegates == null) return;
+            int index = _m_Delegates.FindIndex(T => T.Equals(call));
             if (index != -1)
             {
                 var cat = _m_Delegates[index];
@@ -1554,6 +1667,10 @@ namespace AD.BASE
             return new ADInvokableCall<T0, T1>(action);
         }
 
+        /// <summary>
+        /// If an incorrect index is found or the corresponding trigger is null, 
+        /// the location will be cleared and a warning will be sent
+        /// </summary>
         public void Invoke(T0 arg0, T1 arg1)
         {
             if (InvokeArray == null) return;
@@ -1561,13 +1678,8 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count)
+                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] != null)
                 {
-                    if (_m_Delegates[index] == null)
-                    {
-                        Debug.LogWarning("you like to try invoke a error action");
-                        continue;
-                    }
                     _m_Delegates[index].Invoke(arg0, arg1);
                 }
                 else
@@ -1587,6 +1699,10 @@ namespace AD.BASE
             return _m_Delegates.ToArray();
         }
 
+        /// <summary>
+        /// Warning, if the parameter type is incorrect,
+        /// it will be populated with <b>default</b> instead of an immediate error
+        /// </summary>
         public override void Invoke(params object[] args)
         {
             if (args.Length != 2) Debug.LogWarning("you try to input some error args");
@@ -1611,10 +1727,39 @@ namespace AD.BASE
             _m_Delegates.Add(GetDelegate(call));
         }
 
+        public void AddListener(ADInvokableCall<T0, T1, T2> call)
+        {
+            InvokeArray ??= new List<int>();
+            _m_Delegates ??= new List<ADInvokableCall<T0, T1, T2>>();
+            InvokeArray.Add(_m_Delegates.Count);
+            _m_Delegates.Add(call);
+        }
+
         public void RemoveListener(UnityAction<T0, T1, T2> call)
         {
             if (_m_Delegates == null) return;
             int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
+            {
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
+                _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
+            }
+        }
+
+        public void RemoveListener(ADInvokableCall<T0, T1, T2> call)
+        {
+            if (_m_Delegates == null) return;
+            int index = _m_Delegates.FindIndex(T => T.Equals(call));
             if (index != -1)
             {
                 var cat = _m_Delegates[index];
@@ -1658,6 +1803,10 @@ namespace AD.BASE
             return new ADInvokableCall<T0, T1, T2>(action);
         }
 
+        /// <summary>
+        /// If an incorrect index is found or the corresponding trigger is null, 
+        /// the location will be cleared and a warning will be sent
+        /// </summary>
         public void Invoke(T0 arg0, T1 arg1, T2 arg2)
         {
             if (InvokeArray == null) return;
@@ -1665,13 +1814,8 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count)
+                if (index >= 0 && index < _m_Delegates.Count&&_m_Delegates[index] != null)
                 {
-                    if (_m_Delegates[index] == null)
-                    {
-                        Debug.LogWarning("you like to try invoke a error action");
-                        continue;
-                    }
                     _m_Delegates[index].Invoke(arg0, arg1, arg2);
                 }
                 else
@@ -1691,6 +1835,10 @@ namespace AD.BASE
             return _m_Delegates.ToArray();
         }
 
+        /// <summary>
+        /// Warning, if the parameter type is incorrect,
+        /// it will be populated with <b>default</b> instead of an immediate error
+        /// </summary>
         public override void Invoke(params object[] args)
         {
             if (args.Length != 3) Debug.LogWarning("you try to input some error args");
@@ -1716,10 +1864,39 @@ namespace AD.BASE
             _m_Delegates.Add(GetDelegate(call));
         }
 
+        public void AddListener(ADInvokableCall<T0, T1, T2, T3> call)
+        {
+            InvokeArray ??= new List<int>();
+            _m_Delegates ??= new List<ADInvokableCall<T0, T1, T2, T3>>();
+            InvokeArray.Add(_m_Delegates.Count);
+            _m_Delegates.Add(call);
+        }
+
         public void RemoveListener(UnityAction<T0, T1, T2, T3> call)
         {
             if (_m_Delegates == null) return;
             int index = _m_Delegates.FindIndex(T => T.Find(call.Target, call.Method));
+            if (index != -1)
+            {
+                var cat = _m_Delegates[index];
+
+                InvokeArray.RemoveAll(T => T == index);
+                _m_Delegates.Remove(cat);
+
+                for (int i = 0, e = InvokeArray.Count; i < e; i++)
+                {
+                    if (InvokeArray[i] > index)
+                    {
+                        InvokeArray[i]--;
+                    }
+                }
+            }
+        }
+
+        public void RemoveListener(ADInvokableCall<T0, T1, T2, T3> call)
+        {
+            if (_m_Delegates == null) return;
+            int index = _m_Delegates.FindIndex(T => T.Equals(call));
             if (index != -1)
             {
                 var cat = _m_Delegates[index];
@@ -1764,6 +1941,10 @@ namespace AD.BASE
             return new ADInvokableCall<T0, T1, T2, T3>(action);
         }
 
+        /// <summary>
+        /// If an incorrect index is found or the corresponding trigger is null, 
+        /// the location will be cleared and a warning will be sent
+        /// </summary>
         public void Invoke(T0 arg0, T1 arg1, T2 arg2, T3 arg3)
         {
             if (InvokeArray == null) return;
@@ -1771,13 +1952,8 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count)
+                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] != null)
                 {
-                    if (_m_Delegates[index] == null)
-                    {
-                        Debug.LogWarning("you like to try invoke a error action");
-                        continue;
-                    }
                     _m_Delegates[index].Invoke(arg0, arg1, arg2, arg3);
                 }
                 else
@@ -1797,6 +1973,10 @@ namespace AD.BASE
             return _m_Delegates.ToArray();
         }
 
+        /// <summary>
+        /// Warning, if the parameter type is incorrect,
+        /// it will be populated with <b>default</b> instead of an immediate error
+        /// </summary>
         public override void Invoke(params object[] args)
         {
             if (args.Length != 4) Debug.LogWarning("you try to input some error args");
@@ -1808,23 +1988,56 @@ namespace AD.BASE
         }
     }
 
+    /// <summary>
+    /// You can use macro : <list type="bullet">ADEVENT_DISABLE_TRY</list> to turn off all additional behaviors
+    /// </summary>
     [Serializable]
     public class ADEvent : UnityEvent
     {
         public ADEvent() { }
         public ADEvent(UnityAction call) { this.AddListener(call); }
 
+#if ADEVENT_DISABLE_TRY
+#else
         public new void Invoke()
         {
-            DebugExtenion.Log();
-            base.Invoke();
+            try
+            {
+                base.Invoke();
+            }
+            catch (Exception ex)
+            {
+                DebugExtenion.LogMessage(ex.Message);
+                throw;
+            }
         }
+#endif
     }
+    /// <summary>
+    /// You can use macro : <list type="bullet">ADEVENT_DISABLE_TRY</list> to turn off all additional behaviors
+    /// </summary>
     [Serializable]
     public class ADEvent<T1> : UnityEvent<T1>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1> call) { this.AddListener(call); }
+
+#if ADEVENT_DISABLE_TRY
+#else
+        public new void Invoke(T1 arg)
+        {
+            try
+            {
+                base.Invoke(arg);
+            }
+            catch (Exception ex)
+            {
+                string argStr = arg.ToString();
+                DebugExtenion.LogMessage(ex.Message + "\n{\n" + argStr + "\n}\n");
+                throw;
+            }
+        }
+#endif
 
         public ADEvent Close(T1 a)
         {
@@ -1832,18 +2045,33 @@ namespace AD.BASE
             result.AddListener(() => this.As<UnityEvent<T1>>().Invoke(a));
             return result;
         }
-
-        public new void Invoke(T1 a)
-        {
-            DebugExtenion.Log();
-            base.Invoke(a);
-        }
     }
+    /// <summary>
+    /// You can use macro : <list type="bullet">ADEVENT_DISABLE_TRY</list> to turn off all additional behaviors
+    /// </summary>
     [Serializable]
     public class ADEvent<T1, T2> : UnityEvent<T1, T2>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1, T2> call) { this.AddListener(call); }
+
+#if ADEVENT_DISABLE_TRY
+#else
+        public new void Invoke(T1 arg0,T2 arg1)
+        {
+            try
+            {
+                base.Invoke(arg0, arg1);
+            }
+            catch (Exception ex)
+            {
+                string arg0Str = arg0.ToString();
+                string arg1Str = arg1.ToString();
+                DebugExtenion.LogMessage(ex.Message + "\n{\n" + arg0Str + "\n},\n{" + arg1Str + "\n}\n");
+                throw;
+            }
+        }
+#endif
 
         public ADEvent Close(T1 a, T2 b)
         {
@@ -1851,18 +2079,37 @@ namespace AD.BASE
             result.AddListener(() => this.As<UnityEvent<T1, T2>>().Invoke(a, b));
             return result;
         }
-
-        public new void Invoke(T1 a, T2 b)
-        {
-            DebugExtenion.Log();
-            base.Invoke(a, b);
-        }
     }
+    /// <summary>
+    /// You can use macro : <list type="bullet">ADEVENT_DISABLE_TRY</list> to turn off all additional behaviors
+    /// </summary>
     [Serializable]
     public class ADEvent<T1, T2, T3> : UnityEvent<T1, T2, T3>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1, T2, T3> call) { this.AddListener(call); }
+
+#if ADEVENT_DISABLE_TRY
+#else
+        public new void Invoke(T1 arg0, T2 arg1,T3 arg2)
+        {
+            try
+            {
+                base.Invoke(arg0, arg1, arg2);
+            }
+            catch (Exception ex)
+            {
+                string arg0Str = arg0.ToString();
+                string arg1Str = arg1.ToString();
+                string arg2Str = arg2.ToString();
+                DebugExtenion.LogMessage(ex.Message +
+                    "\n{\n" + arg0Str +
+                    "\n},\n{" + arg1Str +
+                    "\n},\n{" + arg2Str + "\n}\n");
+                throw;
+            }
+        }
+#endif
 
         public ADEvent Close(T1 a, T2 b, T3 c)
         {
@@ -1870,18 +2117,39 @@ namespace AD.BASE
             result.AddListener(() => this.As<UnityEvent<T1, T2, T3>>().Invoke(a, b, c));
             return result;
         }
-
-        public new void Invoke(T1 a, T2 b, T3 c)
-        {
-            DebugExtenion.Log();
-            base.Invoke(a, b, c);
-        }
     }
+    /// <summary>
+    /// You can use macro : <list type="bullet">ADEVENT_DISABLE_TRY</list> to turn off all additional behaviors
+    /// </summary>
     [Serializable]
     public class ADEvent<T1, T2, T3, T4> : UnityEvent<T1, T2, T3, T4>
     {
         public ADEvent() { }
         public ADEvent(UnityAction<T1, T2, T3, T4> call) { this.AddListener(call); }
+
+#if ADEVENT_DISABLE_TRY
+#else
+        public new void Invoke(T1 arg0, T2 arg1, T3 arg2,T4 arg3)
+        {
+            try
+            {
+                base.Invoke(arg0, arg1, arg2, arg3);
+            }
+            catch (Exception ex)
+            {
+                string arg0Str = arg0.ToString();
+                string arg1Str = arg1.ToString();
+                string arg2Str = arg2.ToString();
+                string arg3Str = arg3.ToString();
+                DebugExtenion.LogMessage(ex.Message +
+                    "\n{\n" + arg0Str +
+                    "\n},\n{" + arg1Str +
+                    "\n},\n{" + arg2Str +
+                    "\n},\n{" + arg3Str + "\n}\n");
+                throw;
+            }
+        }
+#endif
 
         public ADEvent Close(T1 a, T2 b, T3 c, T4 d)
         {
@@ -1889,36 +2157,57 @@ namespace AD.BASE
             result.AddListener(() => this.As<UnityEvent<T1, T2, T3, T4>>().Invoke(a, b, c, d));
             return result;
         }
-
-        public new void Invoke(T1 a, T2 b, T3 c, T4 d)
-        {
-            DebugExtenion.Log();
-            base.Invoke(a, b, c, d);
-        }
     }
 
     #endregion
 
     #region Property 
 
+    /// <summary>
+    /// This interface needs to be implemented <see cref="Property"/>.get , 
+    /// <para>it is requires you to implement a class that implements <see cref="AbstractBindProperty{T, P}"/></para>
+    /// </summary>
+    /// <typeparam name="T">target type which you want</typeparam>
+    /// <typeparam name="P">a subclass of <see cref="PropertyAsset{T}"/>></typeparam>
     public interface IPropertyHasGet<T, P> where P : PropertyAsset<T>, new()
     {
         AbstractBindProperty<T, P> Property { get; }
     }
+    /// <summary>
+    /// This interface needs to be implemented <see cref="Property"/>.set , 
+    /// <para>it is requires you to implement a class that implements <see cref="AbstractBindProperty{T, P}"/></para>
+    /// </summary>
+    /// <typeparam name="T">target type which you want</typeparam>
+    /// <typeparam name="P">a subclass of <see cref="PropertyAsset{T}"/>></typeparam>
     public interface IPropertyHasSet<T, P> where P : PropertyAsset<T>, new()
     {
         AbstractBindProperty<T, P> Property { get; }
     }
 
+    /// <summary>
+    /// A default version of <see cref="IPropertyHasGet{T, P}"/> 
+    /// that uses the default PropertyAsset implementation , P is <see cref="PropertyAsset{T}"/>
+    /// </summary>
+    /// <typeparam name="T">target type which you want</typeparam>
     public interface IPropertyHasGet<T> : IPropertyHasGet<T, PropertyAsset<T>>
     {
 
     }
+    /// <summary>
+    /// A default version of <see cref="IPropertyHasSet{T, P}"/> 
+    /// that uses the default PropertyAsset implementation , P is <see cref="PropertyAsset{T}"/>
+    /// </summary>
+    /// <typeparam name="T">target type which you want</typeparam>
     public interface IPropertyHasSet<T> : IPropertyHasGet<T, PropertyAsset<T>>
     {
 
     }
 
+    /// <summary>
+    /// Used to get real objects
+    /// <para>You can achieve more complex purposes by inheriting this class and override <see cref="value"/></para>
+    /// <para>Default implementation is default fetching</para>
+    /// </summary>
     public class PropertyAsset<T>
     {
         public PropertyAsset()
@@ -1933,6 +2222,11 @@ namespace AD.BASE
         public virtual T value { get; set; } = default;
     }
 
+    /// <summary>
+    /// Re-encapsulation of the <see cref="PropertyAsset{T}"/> to support the actual functionality
+    /// <para>It can trigger the listener when get value, set value,
+    /// or the same value is been set again , <b>these things happen before the assignment or acquisition</b></para>
+    /// </summary>
     public class Property<T, P> where P : PropertyAsset<T>, new()
     {
         internal ADOrderlyEvent _m_get = null;
@@ -1976,6 +2270,7 @@ namespace AD.BASE
 
         public T Get()
         {
+            _m_get?.Invoke();
             return (IsHaveValue) ? _m_data.value : default;
         }
 
@@ -2083,18 +2378,7 @@ namespace AD.BASE
 
     public abstract class AbstractBindProperty<T, P> where P : PropertyAsset<T>, new()
     {
-        internal Property<T, P> _m_value = new Property<T, P>();
-        internal T value
-        {
-            get
-            {
-                return this._m_value.Get();
-            }
-            set
-            {
-                this._m_value.Set(value);
-            }
-        }
+        internal Property<T, P> _m_value = new();
 
         protected void SetPropertyAsset(P asset)
         {
@@ -2107,12 +2391,17 @@ namespace AD.BASE
 
         #region Func
 
-        public AbstractBindProperty<T, P> Init()
+        public virtual AbstractBindProperty<T, P> Init()
         {
             _m_value.Init();
             return this;
         }
 
+        /// <summary>
+        /// <para>to share <see cref="_m_value"/> and be like a pointer : 
+        /// <b><see cref="TrackThisShared(AbstractBindProperty{T, P})"/> is the method to accept <see cref="_m_value"/> from other instances</b>
+        /// </para>
+        /// </summary>
         public void TrackThisShared(AbstractBindProperty<T, P> OtherProperty)
         {
             this._m_value = OtherProperty._m_value;
@@ -2202,18 +2491,18 @@ namespace AD.BASE
 
         #endregion
 
-        public bool Equals(AbstractBindProperty<T, P> _Right)
-        {
-            if (!(_Right._m_value.IsHaveValue || this._m_value.IsHaveValue)) return true;
-            else if (_Right._m_value.IsHaveValue != this._m_value.IsHaveValue) return false;
-            else if (_Right._m_value.Get().Equals(this._m_value.Get())) return true;
-            else return false;
-        }
-
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
-        }
+        //public bool Equals(AbstractBindProperty<T, P> _Right)
+        //{
+        //    if (!(_Right._m_value.IsHaveValue || this._m_value.IsHaveValue)) return false;
+        //    else if (_Right._m_value.IsHaveValue != this._m_value.IsHaveValue) return false;
+        //    else if (_Right._m_value.Get().Equals(this._m_value.Get())) return true;
+        //    else return false;
+        //}
+        //
+        //public override int GetHashCode()
+        //{
+        //    return base.GetHashCode();
+        //}
 
         public override string ToString()
         {
@@ -2241,6 +2530,12 @@ namespace AD.BASE
         }
     }
 
+    /// <summary>
+    /// A readable and writable binder
+    /// <para>Base on : <see cref="AbstractBindProperty{T, P}"/> , 
+    /// <see cref="IPropertyHasGet{T, P}"/> ,
+    /// <see cref="IPropertyHasSet{T, P}"/></para>
+    /// </summary>
     public class BindProperty<T, P> : AbstractBindProperty<T, P>, IPropertyHasGet<T, P>, IPropertyHasSet<T, P> where P : PropertyAsset<T>, new()
     {
         public AbstractBindProperty<T, P> Property => this;
@@ -2260,31 +2555,59 @@ namespace AD.BASE
         }
     }
 
+    /// <summary>
+    /// A writable binder
+    /// <para>Base on : <see cref="AbstractBindProperty{T, P}"/> , 
+    /// <see cref="IPropertyHasGet{T, P}"/></para>
+    /// </summary>
     public class BindPropertyJustGet<T, P> : AbstractBindProperty<T, P>, IPropertyHasGet<T, P> where P : PropertyAsset<T>, new()
     {
         public AbstractBindProperty<T, P> Property => this;
     }
 
+    /// <summary>
+    /// A writable binder
+    /// <para>Base on : <see cref="AbstractBindProperty{T, P}"/> , 
+    /// <see cref="IPropertyHasSet{T, P}"/></para>
+    /// </summary>
     public class BindPropertyJustSet<T, P> : AbstractBindProperty<T, P>, IPropertyHasSet<T, P> where P : PropertyAsset<T>, new()
     {
         public AbstractBindProperty<T, P> Property => this;
     }
 
+    /// <summary>
+    /// A readable and writable binder
+    /// <para>Base on : <see cref="BindProperty{T, P}"/> , 
+    /// it's <b>P</b> is the default implementation <see cref="PropertyAsset{T}"/></para>
+    /// </summary>
     public class BindProperty<T> : BindProperty<T, PropertyAsset<T>>
     {
 
     }
 
+    /// <summary>
+    /// A readable binder
+    /// <para>Base on : <see cref="BindPropertyJustGet{T, P}"/> , 
+    /// it's <b>P</b> is the default implementation <see cref="PropertyAsset{T}"/></para>
+    /// </summary>
     public class BindPropertyJustGet<T> : BindPropertyJustGet<T, PropertyAsset<T>>
     {
 
     }
 
+    /// <summary>
+    /// A writable binder
+    /// <para>Base on : <see cref="BindPropertyJustSet{T, P}"/> , 
+    /// it's <b>P</b> is the default implementation <see cref="PropertyAsset{T}"/></para>
+    /// </summary>
     public class BindPropertyJustSet<T> : BindPropertyJustSet<T, PropertyAsset<T>>
     {
 
     }
 
+    /// <summary>
+    /// Use extension functions to support polymorphism function of interface or class
+    /// </summary>
     public static class PropertyExtension
     {
         public static T GetOriginal<T, P>(this IPropertyHasGet<T, P> self) where P : PropertyAsset<T>, new()
@@ -2524,6 +2847,16 @@ namespace AD.BASE
             return self.IsAssignableFrom(target) || self.IsSubclassOf(target);
         }
 
+        public static bool IsAssignableFromOrSubClass(this object self, object target)
+        {
+            return IsAssignableFromOrSubClass(self.GetType(), target.GetType());
+        }
+
+        public static bool IsAssignableFromOrSubClass<T,P>()
+        {
+            return IsAssignableFromOrSubClass(typeof(T), typeof(P));
+        }
+
         public enum ClassCorrelation
         {
             None, Base, Derived
@@ -2696,7 +3029,6 @@ namespace AD.BASE
         {
             try
             {
-#if UNITY_EDITOR
                 if (LogMethodEnabled)
                 {
                     using StreamWriter sws = new(LogPath, true, System.Text.Encoding.UTF8);
@@ -2707,7 +3039,6 @@ namespace AD.BASE
                     }
                     sws.WriteLine(System.DateTime.Now.ToString() + " :\n" + temp.LinkAndInsert('\t'));
                 }
-#endif
             }
             catch { }
         }
