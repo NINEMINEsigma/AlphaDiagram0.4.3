@@ -276,9 +276,9 @@ namespace AD
 
         #region InputSystem
 
-        public Dictionary<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> multipleInputController { get; private set; } = new();
+        public Dictionary<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> multipleInputController = new();
 
-        public List<MulHitSameControl> mulHitControls { get; private set; } = new();
+        public List<MulHitSameControl> mulHitControls = new();
 
         private static void ReleaseThisFrameUpdate(KeyValuePair<List<ButtonControl>, Dictionary<PressType, ADOrderlyEvent>> key)
         {

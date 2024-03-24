@@ -17,22 +17,24 @@ namespace AD.UI
         public Camera TargetCamera;
         public float Distance;
 
+        private void OnClickWhenCurrentWasPressLeftListener()
+        {
+            if (Selected)
+                OnClickWhenCurrentWasPressLeft.Invoke(TargetCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue().ToVector3().SetZ(Distance)));
+        }
+
+        private void OnClickWhenCurrentWasPressRightListener()
+        {
+            if (Selected)
+                OnClickWhenCurrentWasPressLeft.Invoke(TargetCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue().ToVector3().SetZ(Distance)));
+        }
+
         protected virtual void Start()
         {
             ADUI.Initialize(this);
             if (TargetCamera == null) TargetCamera = Camera.main;
-            LeftRegisterInfo = ADGlobalSystem.AddListener(Mouse.current.leftButton,
-                () =>
-                {
-                    if (Selected)
-                        OnClickWhenCurrentWasPressLeft.Invoke(TargetCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue().ToVector3().SetZ(Distance)));
-                }, AD.PressType.ThisFramePressed);
-            RightRegisterInfo = ADGlobalSystem.AddListener(Mouse.current.rightButton,
-                () =>
-                {
-                    if (Selected)
-                        OnClickWhenCurrentWasPressRight.Invoke(TargetCamera.ScreenToWorldPoint(Mouse.current.position.ReadValue().ToVector3().SetZ(Distance)));
-                }, AD.PressType.ThisFramePressed);
+            LeftRegisterInfo = ADGlobalSystem.AddListener(Mouse.current.leftButton, OnClickWhenCurrentWasPressLeftListener, AD.PressType.ThisFramePressed);
+            RightRegisterInfo = ADGlobalSystem.AddListener(Mouse.current.rightButton, OnClickWhenCurrentWasPressRightListener, AD.PressType.ThisFramePressed);
         }
         protected virtual void OnDestroy()
         {

@@ -147,7 +147,6 @@ namespace AD
                 EditorGUILayout.PropertyField(OnSceneEnd, true);
                 GUILayout.Space(2);
                 GUILayout.EndVertical();
-
             }
 
             if (that._IsOnValidate)

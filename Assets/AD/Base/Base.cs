@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using AD.Utility;
 using UnityEngine;
 using UnityEngine.Events;
@@ -11,12 +12,6 @@ using UnityEngine.EventSystems;
 namespace AD.BASE
 {
     #region AD_I
-
-    /*
-     * ADInstance
-     * Base
-     * Low-level public implementation
-     */
 
     /// <summary>
     /// Implementations for runtime entities or data , The relevant interfaces are : 
@@ -238,7 +233,17 @@ namespace AD.BASE
         void OnCommandCall(_Command c);
     }
 
-    //TODO
+    /// <summary>
+    /// By implementing this interface, you can customize the real behavior of Architectures
+    /// <para>Base on : <see cref="IAnyArchitecture"/> , <see cref="ICanInitialize"/></para>
+    /// The relevant interfaces are : 
+    /// <para>
+    /// <list type="bullet"><see cref="IADCommand"/></list>
+    /// <list type="bullet"><see cref="IADController"/></list>
+    /// <list type="bullet"><see cref="IADModel"/></list>
+    /// <list type="bullet"><see cref="IADSystem"/></list>
+    /// </para>
+    /// </summary>
     public interface IADArchitecture:IAnyArchitecture,ICanInitialize
     {
         /// <summary>
@@ -290,6 +295,10 @@ namespace AD.BASE
         #endregion
     }
 
+    /// <summary>
+    /// Model class should only trigger behavior when data is updated
+    /// <para><b>Recommended:</b> Do these behaviors by <see cref="IADArchitecture"/>.Send <see cref="IADCommand"/></para>
+    /// </summary>
     public interface IADModel : ICanInitialize, ICanGetArchitecture
     {
 
@@ -313,6 +322,9 @@ namespace AD.BASE
         public abstract void Init();
     }
 
+    /// <summary>
+    /// System class should respond to <see cref="IADCommand"/> or be invoked by the <see cref="IADController"/> only
+    /// </summary>
     public interface IADSystem : ICanInitialize, ICanSendCommand, ICanGetArchitecture, ICanGetController
     {
 
@@ -335,6 +347,9 @@ namespace AD.BASE
     }
     /// <summary>
     /// Standard implementation of <see cref="IADSystem"/> , and Base on <see cref="MonoBehaviour"/>
+    /// <para><b>Warning:</b> <see cref="MonoSystem"/> is not automatically use 
+    /// <see cref="IADArchitecture.UnRegister{_T}()"/> or <see cref="IADArchitecture.UnRegister(Type)"/> to 
+    /// unregister in the <see cref="Architecture"/> after it is destroyed</para>
     /// </summary>
     public abstract class MonoSystem : MonoBehaviour, IADSystem
     {
@@ -350,6 +365,10 @@ namespace AD.BASE
         public abstract void Init();
     }
 
+    /// <summary>
+    /// Controller class should respond to <see cref="IADCommand"/> and
+    /// have the authority to direct modify or accessing <see cref="IADModel"/> and <see cref="IADSystem"/>
+    /// </summary>
     public interface IADController : ICanInitialize, ICanGetArchitecture, ICanSendCommand, ICanGetSystem, ICanGetModel
     {
 
@@ -376,6 +395,10 @@ namespace AD.BASE
         }
     }
 
+    /// <summary>
+    /// Command should not store any data and complex implementations,
+    /// it should only complete the logic between different part of the <see cref="IADArchitecture"/>
+    /// </summary>
     public interface IADCommand : ICanGetArchitecture, ICanGetModel, ICanGetController
     {
         void Execute();
@@ -386,7 +409,7 @@ namespace AD.BASE
     /// </summary>
     public abstract class ADCommand : IADCommand
     {
-        public IADArchitecture Architecture { get; set; } = null;
+        public IADArchitecture Architecture { get; set; }
 
         public IADArchitecture ADInstance()
         {
@@ -395,7 +418,7 @@ namespace AD.BASE
 
         public void Execute()
         {
-            if (Architecture == null) throw new ADException("Can not execute a command without setting architecture");
+            if (Architecture == null) throw new NullArchitecture();
             Architecture.AddMessage(LogMessage());
             OnExecute();
         }
@@ -405,6 +428,9 @@ namespace AD.BASE
             return this.GetType().FullName + "(Command) is been send";
         }
 
+        /// <summary>
+        /// <see cref="OnExecute"/> is executed after the <see cref="LogMessage"/> returns message has been added to the schema's message collector
+        /// </summary>
         public abstract void OnExecute();
 
         public void SetArchitecture(IADArchitecture target)
@@ -427,6 +453,11 @@ namespace AD.BASE
         {
 
         }
+
+        public override string LogMessage()
+        {
+            return this.GetType().FullName + "(Vibration) is been send";
+        }
     }
 
     /// <summary>
@@ -442,7 +473,7 @@ namespace AD.BASE
     /// </summary>
     public class ADMessage : IADMessage
     {
-        public string AD__Message = "null";
+        public string AD__Message;
 
         public ADMessage(string message) { AD__Message = "[" + DateTime.Now.ToString() + "] " + message; }
 
@@ -462,9 +493,12 @@ namespace AD.BASE
 
         private List<IADMessage> AD__messages = new();
 
+        /// <summary>
+        /// Clear the messages
+        /// </summary>
         public void Init()
         {
-            AD__messages.Add(new ADMessage("Already generated"));
+            AD__messages.Clear();
         }
 
         public string What()
@@ -507,7 +541,6 @@ namespace AD.BASE
         public int MaxCount = 1000;
     }
 
-    //TODO
     public abstract class ADArchitecture<T> : IADArchitecture where T : ADArchitecture<T>, new()
     {
         #region attribute
@@ -617,7 +650,12 @@ namespace AD.BASE
 
         public IADArchitecture UnRegister(Type type)
         {
-            if(type.GetInterface(nameof(IAnyArchitecture))==null)
+            if (type == _p_last_type)
+            {
+                _p_last_type = null;
+                _p_last_object = null;
+            }
+            if (type.GetInterface(nameof(IAnyArchitecture))==null)
             {
                 AddMessage(type.FullName + " is not base on " + nameof(IAnyArchitecture));
             }
@@ -715,13 +753,16 @@ namespace AD.BASE
         public virtual IADArchitecture AddMessage(string message)
         {
             MessageRecord.Add(new ADMessage(message));
+#if AD_ADDMESSAGE_DISABLE_LOG
+#else
             Debug.Log(message);
+#endif
             return instance;
         }
 
         public IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand
         {
-            (Get<_Command>() as _Command).Execute();
+            (Get<_Command>() as IADCommand).Execute();
             return instance;
         }
         public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new()
@@ -747,13 +788,8 @@ namespace AD.BASE
         /// <typeparam name="_Command"></typeparam>
         public void Diffusing<_Command>() where _Command : IADCommand
         {
-            foreach (var item in AD__Objects)
-            {
-                if (item.Is(out ICanMonitorCommand<_Command> monitor))
-                {
-                    monitor.OnCommandCall(default);
-                }
-            }
+            if (Contains<_Command>()) Diffusing((_Command)Get<_Command>());
+            else Diffusing<_Command>(default);
         }
 
         /// <summary>
@@ -767,7 +803,7 @@ namespace AD.BASE
             {
                 if (item.Is(out ICanMonitorCommand<_Command> monitor))
                 {
-                    monitor.OnCommandCall(command);
+                    monitor?.OnCommandCall(command);
                 }
             }
         }
@@ -780,13 +816,10 @@ namespace AD.BASE
         /// <typeparam name="_CanMonitorCommand"></typeparam>
         public void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
         {
-            if (AD__Objects.TryGetValue(typeof(_CanMonitorCommand), out object target))
+            foreach (var item in AD__Objects)
             {
-                target.As<_CanMonitorCommand>().OnCommandCall(command);
-            }
-            else
-            {
-                AddMessage(typeof(_CanMonitorCommand).Name + " is not register");
+                if (item is ICanMonitorCommand<_Command> monitor)
+                    monitor.As<_CanMonitorCommand>().OnCommandCall(command);
             }
         }
 
@@ -798,14 +831,8 @@ namespace AD.BASE
         /// <typeparam name="_CanMonitorCommand"></typeparam>
         public void Send<_Command, _CanMonitorCommand>() where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
         {
-            if (AD__Objects.TryGetValue(typeof(_CanMonitorCommand), out object target))
-            {
-                target.As<_CanMonitorCommand>().OnCommandCall(default);
-            }
-            else
-            {
-                AddMessage(typeof(_CanMonitorCommand).Name + " is not register");
-            }
+            if (Contains<_Command>()) Send<_Command, _CanMonitorCommand>((_Command)Get<_Command>());
+            else Send<_Command, _CanMonitorCommand>(default);
         }
 
         #endregion
@@ -922,13 +949,18 @@ namespace AD.BASE
             }
             else
             {
-                string[] argsStrs = args.GetSubList<string, object>(T => true, T => T.ToString()).ToArray();
-                string ParaNames =
-                info.GetParameters().Length > 0
-                    ? StringExtension
-                    .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => "\t" + T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",\n")
-                    : "";
-                DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                if (args != null)
+                {
+                    string[] argsStrs = args.GetSubList<string, object>(T => true, T => T.ToString()).ToArray();
+                    string ParaNames =
+                    info.GetParameters().Length > 0
+                        ? StringExtension
+                        .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => "\t" + T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",\n")
+                        : "";
+                    DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                }
+                else
+                    DebugExtenion.LogMessage($"{ReturnType} {FunName}()");
             }
         }
 
@@ -2996,6 +3028,11 @@ namespace AD.BASE
 
     #region Debug
 
+    /// <summary>
+    /// A debug system when every UnityEngine.Debug logging it will log the message
+    /// <para><see cref="LogPath"/> : Debug log file's path</para>
+    /// <para><see cref="LogMethodEnabled"/> : Is DebugExtension enable to record some message from <see cref="Log"/> or <see cref="LogMessage(string)"/></para>
+    /// </summary>
     public static class DebugExtenion
     {
         public static string LogPath = Path.Combine(Application.persistentDataPath, "Debug.dat");
