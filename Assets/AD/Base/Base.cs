@@ -109,7 +109,7 @@ namespace AD.BASE
     {
         public static _System GetSystem<_System>(this ICanGetSystem self) where _System : class, IADSystem
         {
-            if(self.Architecture==null)
+            if (self.Architecture == null)
             {
                 throw new NullArchitecture();
             }
@@ -134,7 +134,7 @@ namespace AD.BASE
             return self.Architecture.GetController<_Controller>();
         }
 
-        public static IADArchitecture SendCommand<_Command>(this ICanSendCommand self) where _Command : class, IADCommand,new()
+        public static IADArchitecture SendCommand<_Command>(this ICanSendCommand self) where _Command : class, IADCommand, new()
         {
             if (self.Architecture == null)
             {
@@ -143,9 +143,9 @@ namespace AD.BASE
             return self.Architecture.SendCommand<_Command>();
         }
 
-        public static void RegisterCommand<_Command>(this IADSystem self)where _Command : class, IADCommand,new()
+        public static void RegisterCommand<_Command>(this IADSystem self) where _Command : class, IADCommand, new()
         {
-            if(self.Architecture == null)
+            if (self.Architecture == null)
             {
                 throw new NullArchitecture();
             }
@@ -159,9 +159,9 @@ namespace AD.BASE
             }
             self.Architecture.RegisterCommand<_Command>(command);
         }
-        public static  void UnRegisterCommand<_Command>(this IADSystem self) where _Command : class, IADCommand
+        public static void UnRegisterCommand<_Command>(this IADSystem self) where _Command : class, IADCommand
         {
-            if(self.Architecture == null)
+            if (self.Architecture == null)
             {
                 throw new NullArchitecture();
             }
@@ -244,7 +244,7 @@ namespace AD.BASE
     /// <list type="bullet"><see cref="IADSystem"/></list>
     /// </para>
     /// </summary>
-    public interface IADArchitecture:IAnyArchitecture,ICanInitialize
+    public interface IADArchitecture : IAnyArchitecture, ICanInitialize
     {
         /// <summary>
         /// Save the messages generated during the Architecture running
@@ -602,7 +602,11 @@ namespace AD.BASE
 
         }
 
-        public IADArchitecture Register<_T>(_T _object) where _T :IAnyArchitecture
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+        IADArchitecture Register<_T>(_T _object) where _T : IAnyArchitecture
         {
             var key = typeof(_T);
             if (_p_null_type.FirstOrDefault(T => T.Equals(key)) != null)
@@ -619,7 +623,12 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture Register<_T>() where _T : IAnyArchitecture,new()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture Register<_T>() where _T : IAnyArchitecture, new()
         {
             return Register<_T>(new _T());
         }
@@ -648,18 +657,23 @@ namespace AD.BASE
             }
         }
 
-        public IADArchitecture UnRegister(Type type)
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture UnRegister(Type type)
         {
             if (type == _p_last_type)
             {
                 _p_last_type = null;
                 _p_last_object = null;
             }
-            if (type.GetInterface(nameof(IAnyArchitecture))==null)
+            if (type.GetInterface(nameof(IAnyArchitecture)) == null)
             {
                 AddMessage(type.FullName + " is not base on " + nameof(IAnyArchitecture));
             }
-            if( AD__Objects.Remove(type))
+            if (AD__Objects.Remove(type))
             {
                 AddMessage(type.FullName + " is unregister now");
             }
@@ -670,32 +684,62 @@ namespace AD.BASE
             return this;
         }
 
-        public IADArchitecture UnRegister<_T>() where _T : IAnyArchitecture
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture UnRegister<_T>() where _T : IAnyArchitecture
         {
             return UnRegister(typeof(_T));
         }
 
-        public bool Contains<_Type>()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         bool Contains<_Type>()
         {
             return AD__Objects.ContainsKey(typeof(_Type));
         }
 
-        public _Model GetModel<_Model>() where _Model : class, IADModel
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         _Model GetModel<_Model>() where _Model : class, IADModel
         {
             return Get<_Model>() as _Model;
         }
 
-        public _System GetSystem<_System>() where _System : class, IADSystem
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         _System GetSystem<_System>() where _System : class, IADSystem
         {
             return Get<_System>() as _System;
         }
 
-        public _Controller GetController<_Controller>() where _Controller : class, IADController
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         _Controller GetController<_Controller>() where _Controller : class, IADController
         {
             return Get<_Controller>() as _Controller;
         }
 
-        public IADArchitecture RegisterModel<_Model>(_Model model) where _Model : IADModel
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterModel<_Model>(_Model model) where _Model : IADModel
         {
             Register<_Model>(model);
             model.Architecture = this;
@@ -703,7 +747,12 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture RegisterSystem<_System>(_System system) where _System : IADSystem
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterSystem<_System>(_System system) where _System : IADSystem
         {
             Register<_System>(system);
             system.Architecture = this;
@@ -711,7 +760,12 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture RegisterController<_Controller>(_Controller controller) where _Controller : IADController
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterController<_Controller>(_Controller controller) where _Controller : IADController
         {
             Register<_Controller>(controller);
             controller.Architecture = this;
@@ -719,32 +773,57 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture RegisterModel<_Model>() where _Model : IADModel, new()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterModel<_Model>() where _Model : IADModel, new()
         {
             RegisterModel(new _Model());
             return instance;
         }
 
-        public IADArchitecture RegisterSystem<_System>() where _System : IADSystem, new()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterSystem<_System>() where _System : IADSystem, new()
         {
             RegisterSystem(new _System());
             return instance;
         }
 
-        public IADArchitecture RegisterController<_Controller>() where _Controller : IADController, new()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterController<_Controller>() where _Controller : IADController, new()
         {
             RegisterController(new _Controller());
             return instance;
         }
 
-        public IADArchitecture RegisterCommand<_Command>(_Command command) where _Command : IADCommand
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterCommand<_Command>(_Command command) where _Command : IADCommand
         {
             Register(command);
             command.Architecture = this;
             return instance;
         }
 
-        public IADArchitecture RegisterCommand<_Command>() where _Command : IADCommand, new()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture RegisterCommand<_Command>() where _Command : IADCommand, new()
         {
             RegisterCommand(new _Command());
             return instance;
@@ -760,18 +839,33 @@ namespace AD.BASE
             return instance;
         }
 
-        public IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture SendCommand<_Command>() where _Command : class, IADCommand
         {
             (Get<_Command>() as IADCommand).Execute();
             return instance;
         }
-        public IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new()
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture SendImmediatelyCommand<_Command>() where _Command : class, IADCommand, new()
         {
             if (Contains<_Command>()) SendCommand<_Command>();
             else SendImmediatelyCommand(new _Command());
             return instance;
         }
-        public IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         IADArchitecture SendImmediatelyCommand<_Command>(_Command command) where _Command : class, IADCommand
         {
             RegisterCommand(command);
             command.Execute();
@@ -786,7 +880,12 @@ namespace AD.BASE
         /// that can accept this type can trigger callbacks
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
-        public void Diffusing<_Command>() where _Command : IADCommand
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         void Diffusing<_Command>() where _Command : IADCommand
         {
             if (Contains<_Command>()) Diffusing((_Command)Get<_Command>());
             else Diffusing<_Command>(default);
@@ -797,7 +896,12 @@ namespace AD.BASE
         /// that can accept this type can trigger callbacks
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
-        public void Diffusing<_Command>(_Command command) where _Command : IADCommand
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         void Diffusing<_Command>(_Command command) where _Command : IADCommand
         {
             foreach (var item in AD__Objects)
             {
@@ -814,7 +918,12 @@ namespace AD.BASE
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
         /// <typeparam name="_CanMonitorCommand"></typeparam>
-        public void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         void Send<_Command, _CanMonitorCommand>(_Command command) where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
         {
             foreach (var item in AD__Objects)
             {
@@ -829,7 +938,12 @@ namespace AD.BASE
         /// </summary>
         /// <typeparam name="_Command"></typeparam>
         /// <typeparam name="_CanMonitorCommand"></typeparam>
-        public void Send<_Command, _CanMonitorCommand>() where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
+
+        public
+#if ARCHITECTURE_VIRTUAL
+        virtual
+#endif
+         void Send<_Command, _CanMonitorCommand>() where _Command : IADCommand where _CanMonitorCommand : class, ICanMonitorCommand<_Command>
         {
             if (Contains<_Command>()) Send<_Command, _CanMonitorCommand>((_Command)Get<_Command>());
             else Send<_Command, _CanMonitorCommand>(default);
@@ -906,7 +1020,7 @@ namespace AD.BASE
                 info.GetParameters().Length > 0
                 ? StringExtension.LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name).ToArray(), ",")
                 : "";
-            DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+            DebugExtension.LogMessage($"{ReturnType} {FunName}({ParaNames})");
         }
 
         public static void DebugLogMethod(MethodInfo info, params object[] args)
@@ -942,10 +1056,10 @@ namespace AD.BASE
                         ? StringExtension
                         .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",")
                         : "";
-                    DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                    DebugExtension.LogMessage($"{ReturnType} {FunName}({ParaNames})");
                 }
                 else
-                    DebugExtenion.LogMessage($"{ReturnType} {FunName}()");
+                    DebugExtension.LogMessage($"{ReturnType} {FunName}()");
             }
             else
             {
@@ -957,10 +1071,10 @@ namespace AD.BASE
                         ? StringExtension
                         .LinkAndInsert(info.GetParameters().GetSubList<string, ParameterInfo>(T => true, T => "\t" + T.ParameterType.FullName + " " + T.Name + $"[{argsStrs[index++]}]").ToArray(), ",\n")
                         : "";
-                    DebugExtenion.LogMessage($"{ReturnType} {FunName}({ParaNames})");
+                    DebugExtension.LogMessage($"{ReturnType} {FunName}({ParaNames})");
                 }
                 else
-                    DebugExtenion.LogMessage($"{ReturnType} {FunName}()");
+                    DebugExtension.LogMessage($"{ReturnType} {FunName}()");
             }
         }
 
@@ -1072,9 +1186,12 @@ namespace AD.BASE
                 catch (Exception ex)
                 {
                     exception = ex;
+                    throw;
                 }
-                InternalDebugLogMethod(this.Delegate.Method, exception, null);
-                if (exception != null) throw exception;
+                finally
+                {
+                    InternalDebugLogMethod(this.Delegate.Method, exception, null);
+                }
             }
         }
 
@@ -1130,9 +1247,12 @@ namespace AD.BASE
                 catch (Exception ex)
                 {
                     exception = ex;
+                    throw;
                 }
-                InternalDebugLogMethod(this.Delegate.Method, exception, args);
-                if (exception != null) throw exception;
+                finally
+                {
+                    InternalDebugLogMethod(this.Delegate.Method, exception, args);
+                }
             }
         }
 
@@ -1189,9 +1309,12 @@ namespace AD.BASE
                 catch (Exception ex)
                 {
                     exception = ex;
+                    throw;
                 }
-                InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1);
-                if (exception != null) throw exception;
+                finally
+                {
+                    InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1);
+                }
             }
         }
 
@@ -1249,9 +1372,12 @@ namespace AD.BASE
                 catch (Exception ex)
                 {
                     exception = ex;
+                    throw;
                 }
-                InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1, args2);
-                if (exception != null) throw exception;
+                finally
+                {
+                    InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1, args2);
+                }
             }
         }
 
@@ -1310,9 +1436,12 @@ namespace AD.BASE
                 catch (Exception ex)
                 {
                     exception = ex;
+                    throw;
                 }
-                InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1, args2, args3);
-                if (exception != null) throw exception;
+                finally
+                {
+                    InternalDebugLogMethod(this.Delegate.Method, exception, args0, args1, args2, args3);
+                }
             }
         }
 
@@ -1576,7 +1705,7 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count&& _m_Delegates[index] != null)
+                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] != null)
                 {
                     _m_Delegates[index].Invoke(arg0);
                 }
@@ -1846,7 +1975,7 @@ namespace AD.BASE
             List<int> bugIndex = new();
             foreach (var index in InvokeArray)
             {
-                if (index >= 0 && index < _m_Delegates.Count&&_m_Delegates[index] != null)
+                if (index >= 0 && index < _m_Delegates.Count && _m_Delegates[index] != null)
                 {
                     _m_Delegates[index].Invoke(arg0, arg1, arg2);
                 }
@@ -2039,7 +2168,7 @@ namespace AD.BASE
             }
             catch (Exception ex)
             {
-                DebugExtenion.LogMessage(ex.Message);
+                DebugExtension.LogMessage(ex.Message);
                 throw;
             }
         }
@@ -2065,7 +2194,7 @@ namespace AD.BASE
             catch (Exception ex)
             {
                 string argStr = arg.ToString();
-                DebugExtenion.LogMessage(ex.Message + "\n{\n" + argStr + "\n}\n");
+                DebugExtension.LogMessage(ex.Message + "\n{\n" + argStr + "\n}\n");
                 throw;
             }
         }
@@ -2089,7 +2218,7 @@ namespace AD.BASE
 
 #if ADEVENT_DISABLE_TRY
 #else
-        public new void Invoke(T1 arg0,T2 arg1)
+        public new void Invoke(T1 arg0, T2 arg1)
         {
             try
             {
@@ -2099,7 +2228,7 @@ namespace AD.BASE
             {
                 string arg0Str = arg0.ToString();
                 string arg1Str = arg1.ToString();
-                DebugExtenion.LogMessage(ex.Message + "\n{\n" + arg0Str + "\n},\n{" + arg1Str + "\n}\n");
+                DebugExtension.LogMessage(ex.Message + "\n{\n" + arg0Str + "\n},\n{" + arg1Str + "\n}\n");
                 throw;
             }
         }
@@ -2123,7 +2252,7 @@ namespace AD.BASE
 
 #if ADEVENT_DISABLE_TRY
 #else
-        public new void Invoke(T1 arg0, T2 arg1,T3 arg2)
+        public new void Invoke(T1 arg0, T2 arg1, T3 arg2)
         {
             try
             {
@@ -2134,7 +2263,7 @@ namespace AD.BASE
                 string arg0Str = arg0.ToString();
                 string arg1Str = arg1.ToString();
                 string arg2Str = arg2.ToString();
-                DebugExtenion.LogMessage(ex.Message +
+                DebugExtension.LogMessage(ex.Message +
                     "\n{\n" + arg0Str +
                     "\n},\n{" + arg1Str +
                     "\n},\n{" + arg2Str + "\n}\n");
@@ -2161,7 +2290,7 @@ namespace AD.BASE
 
 #if ADEVENT_DISABLE_TRY
 #else
-        public new void Invoke(T1 arg0, T2 arg1, T3 arg2,T4 arg3)
+        public new void Invoke(T1 arg0, T2 arg1, T3 arg2, T4 arg3)
         {
             try
             {
@@ -2173,7 +2302,7 @@ namespace AD.BASE
                 string arg1Str = arg1.ToString();
                 string arg2Str = arg2.ToString();
                 string arg3Str = arg3.ToString();
-                DebugExtenion.LogMessage(ex.Message +
+                DebugExtension.LogMessage(ex.Message +
                     "\n{\n" + arg0Str +
                     "\n},\n{" + arg1Str +
                     "\n},\n{" + arg2Str +
@@ -2828,7 +2957,7 @@ namespace AD.BASE
         public static T As<T>(this object self) where T : class
         {
             if (self == null) throw new ADException("Now As._Left is null");
-            if(self is not IInvariant<T>)
+            if (self is not IInvariant<T>)
             {
                 return self as T;
             }
@@ -2884,7 +3013,7 @@ namespace AD.BASE
             return IsAssignableFromOrSubClass(self.GetType(), target.GetType());
         }
 
-        public static bool IsAssignableFromOrSubClass<T,P>()
+        public static bool IsAssignableFromOrSubClass<T, P>()
         {
             return IsAssignableFromOrSubClass(typeof(T), typeof(P));
         }
@@ -2998,13 +3127,13 @@ namespace AD.BASE
             {
                 architecture.AddMessage(" [ AD Error Message ] " + ex.SerializeMessage());
                 architecture.AddMessage(" [ AD Error Stack ] " + ex.SerializeStackTrace());
-                DebugExtenion.Log();
+                DebugExtension.Log();
             }
             catch (Exception ex)
             {
                 architecture.AddMessage(" [ Unknow Error Message ] " + ex.Message);
                 architecture.AddMessage(" [ Unknow Error Stack ] " + ex.StackTrace);
-                DebugExtenion.Log();
+                DebugExtension.Log();
             }
         }
 
@@ -3018,7 +3147,7 @@ namespace AD.BASE
             }
             catch
             {
-                DebugExtenion.Log();
+                DebugExtension.Log();
                 throw;
             }
         }
@@ -3033,7 +3162,7 @@ namespace AD.BASE
     /// <para><see cref="LogPath"/> : Debug log file's path</para>
     /// <para><see cref="LogMethodEnabled"/> : Is DebugExtension enable to record some message from <see cref="Log"/> or <see cref="LogMessage(string)"/></para>
     /// </summary>
-    public static class DebugExtenion
+    public static class DebugExtension
     {
         public static string LogPath = Path.Combine(Application.persistentDataPath, "Debug.dat");
 
@@ -3041,7 +3170,7 @@ namespace AD.BASE
 
         public static string[] FilterdName = new string[] { "GetStackTraceModelName" };
 
-        static DebugExtenion()
+        static DebugExtension()
         {
             ADFile file = new(LogPath, true, false, false, false);
             file.Dispose();

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 namespace AD.UI
 {
@@ -371,6 +371,12 @@ namespace AD.UI
         {
             ADGlobalSystem.instance.TargetSceneName = SceneText;
             ADGlobalSystem.instance.OnEnd();
+        }
+
+        public void SetNormalColor(Color color)
+        {
+            normalCG.GetComponentInChildren<Image>().color = color;
+            normalCG.GetComponentInChildren<TMP_Text>().color = color;
         }
     }
 }

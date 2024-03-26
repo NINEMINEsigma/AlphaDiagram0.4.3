@@ -28,9 +28,11 @@ namespace AD
             this.buttons = buttons;
             this._action = action;
             this.type = type;
+            DebugExtension.LogMessage($"{buttons}[{type}] is generate");
         }
         ~RegisterInfo()
         {
+            DebugExtension.LogMessage($"{buttons}[{type}] is destroy");
             this.UnRegister();
         }
 
@@ -103,6 +105,7 @@ namespace AD
         {
             TargetHitCount = targetHitCounter;
             TargetButton = targetButton;
+            //DebugExtenion.LogMessage($"{TargetButton}[{TargetHitCount}] is generate");
         }
 
         private float CurrentTime = 0;
@@ -171,7 +174,7 @@ namespace AD
     [ExecuteAlways]
     public class ADGlobalSystem : SceneBaseController
     {
-        public static string Version => "AD/0.4.3/20240321/2056";
+        public static string Version => "AD/0.4.3/20240326/0937";
 
         public const string _BackSceneTargetSceneName = "_BACK_";
 
@@ -490,7 +493,7 @@ namespace AD
             Debug.Log("Version : " + Version);
             if (_m_instance != null && _m_instance != this)
             {
-                DebugExtenion.Log();
+                DebugExtension.Log();
                 Debug.LogError(this);
                 Debug.LogError(_m_instance);
                 DestroyImmediate(_m_instance.gameObject);
@@ -809,6 +812,17 @@ namespace AD
             }
         }
 
+        public static string Serialize<T>(T obj)
+        {
+#if UNITY_EDITOR
+            if (typeof(T).GetAttribute<SerializableAttribute>() == null)
+            {
+                Debug.LogWarning("this type is not use SerializableAttribute but you now is try to serialize it");
+            }
+#endif
+            return JsonConvert.SerializeObject(obj, Formatting.Indented);
+        }
+
         public static bool Serialize<T>(T obj, out string str)
         {
 #if UNITY_EDITOR
@@ -1109,7 +1123,7 @@ namespace AD
 
         public override void OnEnd()
         {
-            DebugExtenion.Log();
+            DebugExtension.Log();
             if (IsEnableSceneController)
             {
                 if (this.TargetSceneName == _BackSceneTargetSceneName) this.TargetSceneName = PreviousSceneName;

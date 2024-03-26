@@ -82,7 +82,7 @@ namespace AD.Sample.Texter
 
         public IEnumerator Save(TaskInfo savingTask)
         {
-            DebugExtenion.Log();
+            DebugExtension.Log();
             App.instance.AddMessage("Start Saving Data");
 
             TimeClocker timer = TimeExtension.GetTimer();

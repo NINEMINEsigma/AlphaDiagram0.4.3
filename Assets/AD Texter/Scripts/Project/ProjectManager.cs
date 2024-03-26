@@ -141,7 +141,7 @@ namespace AD.Sample.Texter
             loadingTask = new TaskInfo("Project Loading", 0, 0, new Vector2(0, 2.3f), false);
             loadingTask.Register();
 
-            DebugExtenion.LogMessage("Project Manager Init");
+            DebugExtension.LogMessage("Project Manager Init");
 
             Architecture.AddMessage("Start Loading Model");
 
