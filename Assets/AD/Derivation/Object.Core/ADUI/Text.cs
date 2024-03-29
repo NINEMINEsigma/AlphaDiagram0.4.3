@@ -1,7 +1,6 @@
 using System;
 using AD.BASE;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 
 namespace AD.UI
@@ -54,6 +53,7 @@ namespace AD.UI
         public Text SetText(string text)
         {
             _SetText(text);
+            _m_Property?.RemoveListenerOnSet(_SetText);
             _m_Property = null;
             return this;
         }

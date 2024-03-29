@@ -141,7 +141,7 @@ namespace AD.UI
         private void Awake()
         {
             Source = GetComponent<AudioSource>();
-
+            OnValidate();
             GetSampleCount();
         }
 

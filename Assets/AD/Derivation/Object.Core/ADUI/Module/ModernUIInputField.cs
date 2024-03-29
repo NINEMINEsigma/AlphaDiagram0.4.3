@@ -12,7 +12,7 @@ namespace AD.UI
             this.ElementArea = nameof(ModernUIInputField);
         }
 
-        [Header("Resources")]
+        //[Header("Resources")]
         public AD.UI.Text Title;
         [SerializeField]private AD.UI.InputField _Source;
         public AD.UI.InputField Source
@@ -35,7 +35,7 @@ namespace AD.UI
             }
         }
 
-        [Header("Setting")]
+        //[Header("Setting")]
         public string NumericManagerName = DefaultNumericManagerName;
 
         // Hidden variables
